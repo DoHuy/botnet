@@ -1,7 +1,7 @@
 {
-  "name": "childprocess",
+  "name": "botnet",
   "version": "1.0.0",
-  "description": "huy text",
+  "description": "multiple request",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,9 +13,13 @@
   "keywords": [
     "cc"
   ],
-  "author": "huyDo",
+  "author": "HuyDo",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "mocha": "^5.2.0",
+    "puppeteer": "^1.8.0"
+  },
   "devDependencies": {
     "@types/node": "^10.9.4",
     "ts-config": "^20.4.0",
