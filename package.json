@@ -16,8 +16,10 @@
   "author": "HuyDo",
   "license": "ISC",
   "dependencies": {
+    "curl": "^0.1.4",
     "dotenv": "^6.0.0",
     "mocha": "^5.2.0",
+    "pg": "^7.5.0",
     "puppeteer": "^1.8.0"
   },
   "devDependencies": {
