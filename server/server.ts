@@ -1,10 +1,7 @@
-const net = require('net');
-const server = net.createServer((socket) => {
-    socket.end('goodbye\n');
-}).on('error', (err) => {
-    // handle errors here
-    throw err;
-});
+import* as express from 'express';
+const server = express();
+const Constants = require('../utils/Constants');
 
-// grab an arbitrary unused port.
-server.listen(8080, '127.0.0.1');
+// console.log(process.env.SERVER_PORT);
+server.get('/', (req, res)=>{ res.send('Hello world')});
+server.listen(Constants.CONFIGS.SERVER_PORT,()=> console.log(`Server listenning ${Constants.CONFIGS.SERVER_PORT}`));
