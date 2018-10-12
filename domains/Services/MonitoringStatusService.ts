@@ -1,17 +1,17 @@
 const puppeteer = require('puppeteer');
-const monitorStatusServiceInterface  = require('MonitorStatusServiceInterface');
+const monitorStatusServiceInterface  = require('MonitoringStatusServiceInterface');
 const util = require('util');
 
 // constructor
-function MonitorStatusService() {
+function MonitoringStatusService() {
     monitorStatusServiceInterface.call(this);
 }
 // monitorStatusService implements monitorStatusServiceInterface
-util.inherits(MonitorStatusService, monitorStatusServiceInterface);
+util.inherits(MonitoringStatusService, monitorStatusServiceInterface);
 
 
 // ham nay get ve data cua
-MonitorStatusService.prototype.getResponseTimeSingleLocation = async function () {
+MonitoringStatusService.prototype.getResponseTimeSingleLocation = async function () {
     let responseTime;
     try{
         let browser = await puppeteer.launch();
@@ -26,4 +26,4 @@ MonitorStatusService.prototype.getResponseTimeSingleLocation = async function ()
     return responseTime;
 
 }
-module.exports = MonitorStatusService;
+module.exports = MonitoringStatusService;
