@@ -5,7 +5,12 @@ const path = require('path');
 const curl = require('curl');
 
 
-
+/**
+ * ham tra ve duong dan tuong doi
+ * @param currentPath
+ * @param destinationFolder
+ * @param filename
+ */
 function generatePath (currentPath, destinationFolder, filename?:null) {
     destinationFolder = filename==null?destinationFolder:`${destinationFolder}/${filename}`;
     return path.relative( currentPath,  destinationFolder);
@@ -33,26 +38,20 @@ async function generateRandomLink(){
 
     }
 
-async function generateRandomLocation (numberLocations){
-    let result = {};
-    // let a = generateRandomLink();
-    let data:any = await new Promise((resolve, reject) => {
-        Fs.readFile( this.generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, 'listproxy.json'), 'utf8', (err, data) =>{
-            if(err) reject(err);
-            resolve(data);
-        } );
-    }).then(result=>{
-        return result;
-    }).catch(e=> {throw e});
-
-    let listProxy = JSON.parse(data);
-
-
+/**
+ * min va max la 2 so nguyen duong
+ * return  so nam trong khoang tu min den max
+ * @param min
+ * @param max
+ */
+function generateRandomIndex(min, max){
+    return min+Math.floor(Math.random() * max-min);
 }
+
 
 
 module.exports = {
     generatePath,
     generateRandomLink,
-    generateRandomLocation
+    generateRandomIndex
 };

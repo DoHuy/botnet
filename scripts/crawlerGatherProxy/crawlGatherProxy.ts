@@ -2,8 +2,8 @@
  *  File nay thuc hien nhiem vu crawl listproxy tu trang : http://www.gatherproxy.com
  */
 const Puppeteer = require('puppeteer');
-const fs        = require('fs');
-
+let fs        = require('fs');
+const Connections = require('../../libs/Connections');
 (async() => {
     const browser = await Puppeteer.launch({headless: false});
     const page = await browser.newPage();
@@ -13,7 +13,7 @@ const fs        = require('fs');
         let titleLinks = document.querySelectorAll('ul.pc-list > li > a');
         let Links = [...titleLinks];
         let urls = Links.map(link => ({
-            country: link.textContent.split(" ")[0],
+            country: link.textContent.split(/[^a-zA-Z\+]/g).join(""),
             url: `http://www.gatherproxy.com${link.getAttribute('href').split(" ").join("%20")}`
         }));
         return urls;
@@ -22,7 +22,6 @@ const fs        = require('fs');
     let listProxy={};
     for(let i=0 ; i<urls.length ; i++){
         await page.goto(urls[i].url);
-
         let result = await page.evaluate(()=>{
             let table = document.querySelectorAll('div.proxy-list > table > tbody > tr');
             let rows = [...table];
@@ -47,9 +46,37 @@ const fs        = require('fs');
         listProxy[urls[i].country]=result;
 
     }
+    //
+    // // console.log(typeof listProxy);
+    // fs.writeFile('listproxy.json', JSON.stringify(listProxy),'utf8', (err)=> {
+    //     if(err) throw err;
+    //     console.log('The file has been saved !');
+    // });
+    //  insert proxy vao bang proxies
 
+    let client  =  Connections.createConnectionDb();
+    let list;
+    for(let i in listProxy){
+        list = {};
+        list["country"] = i;
+        list['proxies'] = listProxy[i];
+        let arrTmp=[];
+        for(let j=0 ; j<listProxy[i].length ; j++){
+            let fields = ['xxx', 'ip', 'port','proxyType', 'xxx', 'xxx', 'responseTime', 'status'];
+            let element = list[i][j];
+            let objTmp = {};
+            for(let k=0 ; k<element.length ; k++){
+                if(k==0 || k==4 || k==5) continue;
+                objTmp[fields[k]] = element[k];
+            }
+            arrTmp.push(objTmp);
+
+        }
+        list["proxies"]=arrTmp;
+    }
+    //
     // console.log(typeof listProxy);
-    fs.writeFile('listproxy.json', JSON.stringify(listProxy),'utf8', (err)=> {
+    fs.writeFile('listproxy.json', JSON.stringify(list),'utf8', (err)=> {
         if(err) throw err;
         console.log('The file has been saved !');
     });

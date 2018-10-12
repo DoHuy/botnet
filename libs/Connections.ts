@@ -18,5 +18,10 @@ function createConnectionDb() {
     }
     return client;
 }
-
 module.exports = {createConnectionDb};
+// let client = createConnectionDb()
+//
+// client.query('SELECT NOW()', (err, res) => {
+//     console.log(err, res)
+//     client.end()
+// })

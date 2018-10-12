@@ -1,27 +1,31 @@
-import * as puppeteer from "puppeteer";
-const Libs = require('../../libs/Libs');
-/**
- *
- * @param list
- */
-const checkStatusProxy = async function (list){
-    let linksList = await Libs.generateRandomLink();
-    linksList.length = 5; // lay 5 phan tu dau tien cua mang
-    // for(let i=0 ; i<list.length ; i++){
-    //     let host = list[i][0];
-    //     let port = list[i][1];
-    //     let browser = await puppeteer.launch({args: [ `--proxy-server=${host}:${port}` ]});
-    //     let page    = await browser.newPage();
-    //     let response:any = await page.goto(linksList[i].href);
-    //
-    //     if(response.headers.status !=='200') return false;
-    //
-    // }
-    console.log(linksList);
+const Libs   = require('../../libs/Libs');
+const utils  = require('util');
+const exec   = utils.promisify(require('child_process').exec);
+const connection = require('../../libs/Connections');
+// sau 60 phut kiem tra 1 lan
+setInterval(async ()=>{
+    try{
+        let client  = connections.createConnectionDb();
+        let rs = await client.query(`SELECT*FROM Proxies`);
+        let proxies = rs.rows;
+        let links: any = await Libs.generateRandomLink();
+        for(let x in proxies){
+            let proxy = proxies[x];
+            let result: any = await exec(`curl --proxy https://${proxy.host}:${proxy.port} -o /dev/null -s -w '%{http_code} ${links[Libs.generateRandomIndex(0, links.length-1)]}`);
+            if(/2[0-9][0-9]/g.test(result.stdout) === false){
+                // update lai status cua proxy active->inactive
+                let sql = `UPDATE Proxies SET status=$1 WHERE id=$2`;
+                await client.query(sql, ['inactive', proxy.id]);
 
-    return true;
-}
+            }
+        }
+    }catch(e){
+        console.log(e.message);
+        throw e;
 
-checkStatusProxy('a').then(rs=>{
-    console.log(rs);
-})
+    }
+}, 30*60*1000);
+//
+// exec(`curl --proxy https://1.55.240.156:53281 -o /dev/null -s -w '%{http_code}' https://news.zing.vn`).then(rs=>{
+//     console.log( rs);
+// })

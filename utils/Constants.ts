@@ -15,7 +15,7 @@ export const WORDS = [['sky', 'ocean', 'humans', 'animals', 'drone', 'robot', 'a
 export const CONFIGS = {
     "PG_HOST":'localhost',
     "PG_USER":"postgres",
-    "PG_PASSWORD":"vnistadmin",
+    "PG_PASSWORD":"postgres",
     "PG_DATABASE":"webassistant",
     "PG_PORT":5432,
     "SERVER_PORT":8080,
