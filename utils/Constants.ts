@@ -16,7 +16,7 @@ export const CONFIGS = {
     "PG_HOST":'localhost',
     "PG_USER":"postgres",
     "PG_PASSWORD":"postgres",
-    "PG_DATABASE":"webassistant",
+    "PG_DATABASE":"webix",
     "PG_PORT":5432,
     "SERVER_PORT":8080,
     "HOST_SERVER":"localhost"

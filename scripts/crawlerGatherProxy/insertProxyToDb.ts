@@ -9,8 +9,16 @@ const Fs = require('fs');
     });
 
     const client = connections.createConnectionDb();
-    let query = `INSERT INTO Proxies(data) VALUES($1)`;
-    client.query(query, [data]).then(rs=>{
-        console.log(rs.rows[0]);
-    })
+    data = JSON.parse(data);
+    // console.log(data);
+    let count=0;
+    for(let i in data){
+        for(let proxy of data[i]){
+            count++;
+            let query = `INSERT INTO Proxies(ip, port, proxyType, responseTime, country, status) VALUES($1,$2,$3,$4,$5,$6)`;
+            console.log(proxy.ip, proxy.port, proxy.proxyType, proxy.responseTime, i, proxy.status);
+            let rs = await client.query(query, [proxy.ip,proxy.port, proxy.proxyType, proxy.responseTime, i, proxy.status ]);
+        }
+    }
+    console.log("\nso luong ban ghi da them: ", count);
 })();

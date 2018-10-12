@@ -55,11 +55,9 @@ const Connections = require('../../libs/Connections');
     //  insert proxy vao bang proxies
 
     let client  =  Connections.createConnectionDb();
-    let list;
+    let list = {};
     for(let i in listProxy){
-        list = {};
-        list["country"] = i;
-        list['proxies'] = listProxy[i];
+        list[i] = listProxy[i];
         let arrTmp=[];
         for(let j=0 ; j<listProxy[i].length ; j++){
             let fields = ['xxx', 'ip', 'port','proxyType', 'xxx', 'xxx', 'responseTime', 'status'];
@@ -72,7 +70,7 @@ const Connections = require('../../libs/Connections');
             arrTmp.push(objTmp);
 
         }
-        list["proxies"]=arrTmp;
+        list[i] = arrTmp;
     }
     //
     // console.log(typeof listProxy);
