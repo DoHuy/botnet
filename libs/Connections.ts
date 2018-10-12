@@ -1,15 +1,15 @@
 const {Client}  = require('pg');
-const Constants = require('../utils/Constants');
+const CONFIGS = require('../utils/Configs');
 
 function createConnectionDb() {
     let client: any;
     try{
         client = new Client({
-            user: Constants.CONFIGS.PG_USER,
-            host: Constants.CONFIGS.PG_HOST,
-            database: Constants.CONFIGS.PG_DATABASE,
-            password: Constants.CONFIGS.PG_PASSWORD,
-            port: Constants.CONFIGS.PG_PORT,
+            user: CONFIGS.db_config.PG_USER,
+            host: CONFIGS.db_config.PG_HOST,
+            database: CONFIGS.db_config.PG_DATABASE,
+            password: CONFIGS.db_config.PG_PASSWORD,
+            port: CONFIGS.db_config.PG_PORT,
         });
 
         client.connect();

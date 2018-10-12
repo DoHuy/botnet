@@ -3,6 +3,8 @@ import * as puppeteer from "puppeteer";
 import * as Fs from "fs";
 const path = require('path');
 const curl = require('curl');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 
 /**
@@ -39,19 +41,56 @@ async function generateRandomLink(){
     }
 
 /**
- * min va max la 2 so nguyen duong
+ * 
  * return  so nam trong khoang tu min den max
- * @param min
- * @param max
+ * @param min so nguuyen duong can duoi
+ * @param max so nguyen duong can tren
  */
 function generateRandomIndex(min, max){
     return min+Math.floor(Math.random() * max-min);
 }
 
+/** khong duoc truyen nguoc
+ * ham tao ra 1 req de lay resource timing
+ * @param url ls link cua website muon check
+ * @param proxyServer la 1 may chu proxy
+ */
+async function requestCurl(url, proxyServer=null){
+    let result: any ;
+    let tmp: any;
+    let fields = ['statusCode', 'nameLookupTime', 'connectionTime', 'SSLHandshakingTime', 'pretransferTime', 'redirectTime', 'startTransferTime', 'responseTime'];
+    try{
+        switch (arguments.length) {
+            case 1:
+                tmp = await exec(`curl -o /dev/null -s -w '%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}'
+                                ${url}`);
 
+                tmp = tmp.stdout.split(" ");
+                for(let i=0 ; i<tmp.length ; i++ ){
+                    result[fields[i]] = tmp[i];
+                }
+                break;
+            case 2:
+                tmp = await exec(`curl --proxy https://${proxyServer.ip}:${proxyServer.port} -o /dev/null -s -w '%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}'
+                                ${url}`);
+
+                tmp = tmp.stdout.split(" ");
+                for(let i=0 ; i<tmp.length ; i++ ){
+                    result[fields[i]] = tmp[i];
+                }
+                break;
+
+        }
+    } catch (e) {
+        throw e;
+    }
+
+    return result;
+}
 
 module.exports = {
     generatePath,
     generateRandomLink,
-    generateRandomIndex
+    generateRandomIndex,
+    requestCurl
 };
