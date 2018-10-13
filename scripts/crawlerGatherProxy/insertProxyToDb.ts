@@ -26,3 +26,5 @@ const Fs = require('fs');
     }
     console.log("\nso luong ban ghi da them: ", count);
 })();
+
+process.exit();

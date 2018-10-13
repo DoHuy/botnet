@@ -54,7 +54,7 @@ const Connections = require('../../libs/Connections');
     // });
     //  insert proxy vao bang proxies
 
-    let client  =  Connections.createConnectionDb();
+    // let client  =  Connections.createConnectionDb();
     let list = {};
     for(let i in listProxy){
         list[i] = listProxy[i];
