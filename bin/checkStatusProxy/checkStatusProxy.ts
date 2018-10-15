@@ -1,8 +1,8 @@
-const Libs   = require('../../libs/Libs');
+const Libs   = require('../../commons/Libs');
 const utils  = require('util');
 const exec   = utils.promisify(require('child_process').exec);
 // @ts-ignore
-const connection = require('../../libs/Connections');
+const connection = require('../../commons/Connections');
 
 (async ()=>{
     try{
@@ -25,7 +25,7 @@ const connection = require('../../libs/Connections');
                 // throw e;
             }
 
-            console.log(dem++);
+            console.log("So luong cac proxy inactive: ",++dem);
         }
     }catch(e){
         console.log(e.message);

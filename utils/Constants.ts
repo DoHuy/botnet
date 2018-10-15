@@ -22,4 +22,6 @@ export const LINKS =[
     'https://www.youtube.com/',
     'https://www.google.com/',
     'https://www.google.com/intl/ru/gmail/about/#'
-]
+];
+
+

@@ -1,9 +1,9 @@
 const puppeteer = require('puppeteer');
 const monitorStatusServiceInterface  = require('MonitoringStatusServiceInterface');
 const util = require('util');
-const lib  = require('../../libs/Libs');
+const lib  = require('../../commons/Libs');
 // @ts-ignore
-const connection = require('../../libs/Libs');
+const connection = require('../../commons/Libs');
 // constructor
 function MonitoringStatusService() {
     monitorStatusServiceInterface.call(this);
