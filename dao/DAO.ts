@@ -21,24 +21,32 @@ function createConnectionDb() {
 }
 
 
+// @ts-ignore
 function DAO () {
     let self = this;
     self.connection = createConnectionDb();
 }
 
-DAO.prototype.insert = function () {
+
+DAO.prototype.findAll = async function () {
 
 }
 
-DAO.prototype.select = function () {
+DAO.prototype.findById = async function () {
 
 }
 
-DAO.prototype.delete = function () {
+DAO.prototype.create = async function () {
 
 }
 
-DAO.prototype.update = function () {
+DAO.prototype.destroy = function(){
+
+}
+
+
+
+DAO.prototype.saveById = function () {
 
 }
 
