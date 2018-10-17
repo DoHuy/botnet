@@ -3,7 +3,6 @@
  */
 const Puppeteer = require('puppeteer');
 let fs        = require('fs');
-const Connections = require('../../libs/Connections');
 (async() => {
     const browser = await Puppeteer.launch({headless: false});
     const page = await browser.newPage();

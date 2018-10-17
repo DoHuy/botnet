@@ -21,7 +21,12 @@ export const LINKS =[
     'https://mp3.zing.vn/',
     'https://www.youtube.com/',
     'https://www.google.com/',
-    'https://www.google.com/intl/ru/gmail/about/#'
+    'https://www.google.com/intl/ru/gmail/about/#',
+    `https://techmaster.vn/`,
+    `https://khuyenmaithe.techcombank.com.vn/trang-chu`,
+    `https://www.lazada.vn/`,
+    `https://stackoverflow.com/`,
+    `https://github.com/`
 ];
 
 

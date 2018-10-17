@@ -5,7 +5,6 @@ const curl = require('curl');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const Constants   = require('../utils/Constants');
-const connection = require('./Connections');
 const config    = require('../utils/Configs');
 
 /**
@@ -43,24 +42,28 @@ function generateRandomIndex(min, max){
  * @param proxyServer la 1 may chu proxy
  * @param timeOutProxy
  */
-async function requestCurl(url, proxyServer=null, timeOutProxy=null){
-    let proxies;
-    let result;
-    let client = connection.createConnectionDb();
-    try{
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}`]
-        });
-        const page = await browser.newPage();
-        await page.goto(`${url}`, {
-            timeout: timeOutProxy = timeOutProxy==null?config.NAVIGATION_TIME:timeOutProxy});
+async function requestCurl(url, proxyServer, timeOutProxy=null){
+    let result={};
+    let timeout = timeOutProxy==null?55:timeOutProxy;
+    let cmd = `curl --max-time ${timeout} --proxy http://${proxyServer.ip}:${proxyServer.port} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`;
 
-    }catch(e){
-        console.log(e.message);
+    try{
+       let tmp = await exec(cmd);
+
+       let tmp2 = tmp.stdout.split(" ");
+       let fields=['httpCode', 'timeNameLockup', 'timeConnect',
+                    'timeSSLHanshake', 'timePretransfer', 'timeRedirect',
+                    'timeStartTransfer', 'timeTotal'];
+       for(let i=0 ; i< fields.length ; i++){
+           result[fields[i]] = tmp2[i];
+       }
+
+    }catch (e) {
         throw e;
     }
-    return result;
+
+    return result
+
 }
 
 module.exports = {
@@ -69,8 +72,8 @@ module.exports = {
     generateRandomIndex,
     requestCurl
 };
-//
-// requestCurl('https://news.zing.vn',{ip: '113.161.180.101', port: '8080'}).then(rs=>{
+
+// requestCurl('https://news.zing.vn',{ip: '117.103.2.254', port: '58276'}, 2).then(rs=>{
 //     console.log(rs);
 // }).catch(e=>{
 //     console.log(e.message);

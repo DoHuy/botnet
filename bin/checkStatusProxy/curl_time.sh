@@ -1,1 +1,1 @@
-`curl --proxy https://${proxyServer.ip}:${proxyServer.port} -L --output /dev/null --silent --show-error --write-out '%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}' '${url}'`
+ curl --proxy http://117.103.2.254:58276 -w "%{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "https://news.zing.vn"

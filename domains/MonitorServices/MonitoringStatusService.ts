@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const monitorStatusServiceInterface  = require('MonitoringStatusServiceInterface');
+// @ts-ignore
 const util = require('util');
 const lib  = require('../../commons/Libs');
 // @ts-ignore

@@ -1,3 +1,8 @@
+drop database if exists webix;
+create database webix;
+
+\c webix;
+
 create table if not exists proxies(
     id serial not null primary key,
     ip text not null,
@@ -9,20 +14,20 @@ create table if not exists proxies(
 
 );
 
-create table if not exists users(
+create table if not exists credentials(
     id serial not null primary key,
     username text,
     password text,
-    tokenId int,
+    tokenId int
 );
 
 create table if not exists tokens(
     id serial primary key,
     token text,
-    time text
+    existedTime text
 );
 
-create table if not exists monitoredwebsites(
+create table if not exists monitoredWebsites(
     id serial primary key not null,
     siteName text,
     url text,
@@ -32,16 +37,11 @@ create table if not exists monitoredwebsites(
     created date,
     modified date,
     deleted date,
-    responseTime json
-);
-
-create table if not exists notifications (
-    id serial not null primary key,
-    webId int not null,
+    responseTime json,
     notification json
 );
 
-create table if not exists webstructs (
+create table if not exists webStructs (
     id serial not null primary key,
     webId int not null,
     struct json

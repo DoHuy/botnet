@@ -1,5 +1,4 @@
-
- export const DB_CONFIG = {
+export const DB_CONFIG = {
         "PG_HOST":'localhost',
         "PG_USER":"postgres",
         "PG_PASSWORD":"postgres",
@@ -13,4 +12,4 @@ export const SERVER = {
 }
 export const PROXY_TIME = {"check_proxy_time": 5*60*1000} // default 5 phut
 
-export const NAVIGATION_TIME = 100000; // nguoi dung khong truyen thi deafualt = 100000
+export const NAVIGATION_TIME = 100000; // nguoi dung khong truyen thi default = 100000

@@ -28,11 +28,11 @@ function DAO () {
 }
 
 
-DAO.prototype.findAll = async function () {
+DAO.prototype.findAll = async function (limit=null) {
 
 }
 
-DAO.prototype.findById = async function () {
+DAO.prototype.findById = async function (id) {
 
 }
 
@@ -40,13 +40,13 @@ DAO.prototype.create = async function () {
 
 }
 
-DAO.prototype.destroy = function(){
+DAO.prototype.deleteById = function(){
 
 }
 
 
 
-DAO.prototype.saveById = function () {
+DAO.prototype.modifyById = function () {
 
 }
 
