@@ -2,7 +2,7 @@ import* as express from 'express';
 const server = express();
 const Constants = require('../utils/Constants');
 const config    = require('../utils/Configs');
+const Router    = require('../http/routes/Routes');
 
-// console.log(process.env.SERVER_PORT);
-server.get('/', (req, res)=>{ res.send('Hello world')});
-server.listen(config.SERVER.SERVER_PORT,()=> console.log(`Server listenning ${config.SERVER.SERVER_PORT}`));
+server.use(Router);
+server.listen(8000);
