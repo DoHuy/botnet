@@ -29,6 +29,7 @@ create table if not exists tokens(
 
 create table if not exists monitoredWebsites(
     id serial primary key not null,
+    credentialId int,
     siteName text,
     url text,
     frequently text,

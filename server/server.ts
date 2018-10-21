@@ -1,8 +1,11 @@
-import* as express from 'express';
+// @ts-ignore
+const express = require('express');
 const server = express();
-const Constants = require('../utils/Constants');
-const config    = require('../utils/Configs');
-const Router    = require('../http/routes/Routes');
+const Router = require('../http/routes/Routes');
+const Config = require('../utils/Configs');
+
 
 server.use(Router);
-server.listen(8000);
+server.listen(Config.SERVER.SERVER_PORT, ()=>{
+    console.log(`${Config.SERVER.HOST_SERVER} listenning on ${Config.SERVER.SERVER_PORT}`);
+})

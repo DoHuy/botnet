@@ -2,6 +2,7 @@
 const fs = require('fs');
 // @ts-ignore
 const ProxyDAO = require('../../dao/ProxyDAO');
+// @ts-ignore
 let proxyDAO = new ProxyDAO();
 
 (async ()=>{

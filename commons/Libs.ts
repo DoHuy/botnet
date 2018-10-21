@@ -7,6 +7,7 @@ const exec = util.promisify(require('child_process').exec);
 const Constants   = require('../utils/Constants');
 const config    = require('../utils/Configs');
 
+
 /**
  * ham tra ve duong dan tuong doi
  * @param currentPath
@@ -59,22 +60,94 @@ async function requestCurl(url, proxyServer, timeOutProxy=null){
        }
 
     }catch (e) {
+        let  page;
+        const browser = await puppeteer.launch({
+            headless: false
+        });
+
+        try{
+            page = await browser.newPage();
+            await page.goto(url, {
+                waitUntil: 'networkidle0',
+                timeout: timeout*1000
+            });
+        }catch (err) {
+
+            await page.screenshot({
+                // @ts-ignore
+                path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
+                fullPage: true,
+                omitBackground: true
+
+            });
+            e = err;
+            console.log(e);
+        }
+
+        await browser.close();
         throw e;
     }
 
-    return result
+    return result;
 
 }
+
+/** khong duoc truyen nguoc
+ * ham tao ra 1 req de lay resource timing
+ * @param url ls link cua website muon check
+ * @param proxyServer la 1 may chu proxy
+ * @param timeOutProxy
+ */
+// async function requestPuppeteer(url, proxyServer, timeOutProxy=null){
+//     let result;
+//     let page;
+//     const browser = await puppeteer.launch({
+//         headless: false,
+//         args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}`]
+//     });
+//     let timeout = timeOutProxy==null?55*1000:timeOutProxy*1000;
+//     try{
+//        page = await browser.newPage();
+//        await page.goto(url, {
+//            waitUntil: 'networkidle0',
+//            timeout: timeout
+//        });
+//         result = await page.evaluate(() => {
+//             return window.performance.timing
+//         });
+//
+//     }catch (e) {
+//         await page.screenshot({
+//             // @ts-ignore
+//             path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
+//             fullPage: true,
+//             omitBackground: true
+//
+//         });
+//         throw e;
+//
+//     }
+//     await browser.close();
+//     return result;
+//
+//
+// }
+
+
 
 module.exports = {
     generatePath,
     generateRandomLink,
     generateRandomIndex,
-    requestCurl
+    requestCurl,
+    // requestPuppeteer
 };
-
-// requestCurl('https://news.zing.vn',{ip: '117.103.2.254', port: '58276'}, 2).then(rs=>{
+// // //
+// requestCurl('https://news.zingd.vn',{ip: '117.103.2.254', port: '58276'}, 55).then(rs=>{
 //     console.log(rs);
 // }).catch(e=>{
 //     console.log(e.message);
 // })
+
+
+// console.log( generatePath(__dirname, Constants.PATH.FILE_DATA_PATH));
