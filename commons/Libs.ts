@@ -62,7 +62,8 @@ async function requestCurl(url, proxyServer, timeOutProxy=null){
     }catch (e) {
         let  page;
         const browser = await puppeteer.launch({
-            headless: false
+            headless: false,
+            args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}` ]
         });
 
         try{
@@ -71,6 +72,7 @@ async function requestCurl(url, proxyServer, timeOutProxy=null){
                 waitUntil: 'networkidle0',
                 timeout: timeout*1000
             });
+            // console.log("heelo");
         }catch (err) {
 
             await page.screenshot({
@@ -81,7 +83,7 @@ async function requestCurl(url, proxyServer, timeOutProxy=null){
 
             });
             e = err;
-            console.log(e);
+            // console.log(e);
         }
 
         await browser.close();
@@ -89,7 +91,6 @@ async function requestCurl(url, proxyServer, timeOutProxy=null){
     }
 
     return result;
-
 }
 
 /** khong duoc truyen nguoc
@@ -98,40 +99,45 @@ async function requestCurl(url, proxyServer, timeOutProxy=null){
  * @param proxyServer la 1 may chu proxy
  * @param timeOutProxy
  */
-// async function requestPuppeteer(url, proxyServer, timeOutProxy=null){
-//     let result;
-//     let page;
-//     const browser = await puppeteer.launch({
-//         headless: false,
-//         args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}`]
-//     });
-//     let timeout = timeOutProxy==null?55*1000:timeOutProxy*1000;
-//     try{
-//        page = await browser.newPage();
-//        await page.goto(url, {
-//            waitUntil: 'networkidle0',
-//            timeout: timeout
-//        });
-//         result = await page.evaluate(() => {
-//             return window.performance.timing
-//         });
-//
-//     }catch (e) {
-//         await page.screenshot({
-//             // @ts-ignore
-//             path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
-//             fullPage: true,
-//             omitBackground: true
-//
-//         });
-//         throw e;
-//
-//     }
-//     await browser.close();
-//     return result;
-//
-//
-// }
+async function requestWithPuppeteer(url, proxyServer, timeOutProxy=null){
+    let result;
+    let page;
+    const browser = await puppeteer.launch({
+        headless: false,
+        args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}`]
+    });
+    let timeout = timeOutProxy==null?100*1000:timeOutProxy*1000;
+    try{
+       page = await browser.newPage();
+       await page.goto(url, {
+           waitUntil: "domcontentloaded",
+           timeout: timeout
+       });
+        result = await page.evaluate(() => {
+            return window.performance.timing
+        });
+
+        await browser.close();
+        return result;
+
+    }catch (e) {
+        await page.screenshot({
+            // @ts-ignore
+            path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
+            fullPage: true,
+            omitBackground: true
+
+        });
+
+        await browser.close();
+        throw e;
+
+    }
+
+    await browser.close();
+
+
+}
 
 
 
@@ -140,14 +146,14 @@ module.exports = {
     generateRandomLink,
     generateRandomIndex,
     requestCurl,
-    // requestPuppeteer
+    requestWithPuppeteer
 };
 // // //
-// requestCurl('https://news.zingd.vn',{ip: '117.103.2.254', port: '58276'}, 55).then(rs=>{
+// requestWithPuppeteer('https://github.com/GoogleChrome/puppeteer/issues/1535',{ip: '117.103.2.254', port: '58276'}, 100).then(rs=>{
 //     console.log(rs);
 // }).catch(e=>{
 //     console.log(e.message);
 // })
-
+//
 
 // console.log( generatePath(__dirname, Constants.PATH.FILE_DATA_PATH));
