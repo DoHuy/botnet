@@ -22,7 +22,7 @@ ProxyDAO.prototype.findById = async function (id) {
     // @ts-ignore
     let proxy = result.rows[0];
     // @ts-ignore
-    return new Proxy(proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.country, proxy.status);
+    return new Proxy(proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.details, proxy.status);
 }
 
 ProxyDAO.prototype.findAll = async function (limit=null) {
@@ -37,7 +37,7 @@ ProxyDAO.prototype.findAll = async function (limit=null) {
     let proxyList = [];
     for(let proxy of result.rows){
         // @ts-ignore
-        proxyList.push(new Proxy(proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.country, proxy.status));
+        proxyList.push(new Proxy(proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.details, proxy.status));
     }
 
     return proxyList;
@@ -45,9 +45,9 @@ ProxyDAO.prototype.findAll = async function (limit=null) {
 
 ProxyDAO.prototype.create = async function (proxy) {
     let result;
-    let sql = `insert into proxies (ip, port, proxytype, responsetime, country, status)
+    let sql = `insert into proxies (ip, port, proxytype, responsetime, details, status)
                 values ($1, $2, $3, $4, $5, $6) RETURNING *`;
-    let values = [proxy.ip, proxy.port, proxy.proxyType, proxy.responseTime, proxy.country, proxy.status];
+    let values = [proxy.ip, proxy.port, proxy.proxyType, proxy.responseTime, proxy.details, proxy.status];
     try{
         result = await this.connection.query(sql, values);
     }catch(e){
@@ -55,7 +55,7 @@ ProxyDAO.prototype.create = async function (proxy) {
     }
     let newProxy = result.rows[0];
     // @ts-ignore
-    return new Proxy(newProxy.ip, newProxy.port, newProxy.proxytype, newProxy.responsetime, newProxy.country, newProxy.status);
+    return new Proxy(newProxy.ip, newProxy.port, newProxy.proxytype, newProxy.responsetime, newProxy.details, newProxy.status);
 }
 
 

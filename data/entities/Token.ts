@@ -1,7 +1,8 @@
 // @ts-ignore
-function Token(token, existedTime) {
+function Token(token, created, expired) {
     this.token = token;
-    this.existedTime = existedTime;
+    this.created = created;
+    this.expired  = expired;
 }
 
 module.exports = Token;

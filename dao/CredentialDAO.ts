@@ -1,10 +1,11 @@
 // @ts-ignore
-const DAO = require('DAO');
+const DAO = require('./DAO');
 // @ts-ignore
 const util = require('util');
-
 // @ts-ignore
 const Credential = require('../data/entities/Credential');
+
+// @ts-ignore
 function CredentialDAO(newCredential=null) {
     DAO.call(this);
     this.newCredential = newCredential;
@@ -27,22 +28,22 @@ CredentialDAO.prototype.findById = async function (id) {
     return new Credential(person.username, person.password, person.tokenid);
 };
 
-CredentialDAO.prototype.findByUsername = async function (username) {
+CredentialDAO.prototype.findByUsernameAndPassword = async function (username, password) {
     let result;
     let sql = `select*from credentials
-                where username=$1`;
+                where username=$1 and password=$2`;
     try{
-        result = await this.connection.query(sql, [username]);
+        result = await this.connection.query(sql, [username, password]);
     }catch (e) {
         throw e;
     }
     // @ts-ignore
     let person = result.rows[0];
     // @ts-ignore
-    return new Credential(person.username, person.password, person.tokenid);
+    return new Credential(person.username, person.password, person.token);
 }
 
-ProxyDAO.prototype.findAll = async function (limit=null) {
+CredentialDAO.prototype.findAll = async function (limit=null) {
     let result;
     let sql = `select*from credentials
                 limit ${limit}`;
@@ -61,7 +62,7 @@ ProxyDAO.prototype.findAll = async function (limit=null) {
     return credentialList;
 }
 
-ProxyDAO.prototype.create = async function (credential) {
+CredentialDAO.prototype.create = async function (credential) {
     let result;
     let sql = `insert into credentials(username, password, tokenid)
                 values($1, $2, $3) RETURNING *`;
@@ -77,7 +78,7 @@ ProxyDAO.prototype.create = async function (credential) {
 }
 
 
-ProxyDAO.prototype.deleteById = async function (id) {
+CredentialDAO.prototype.deleteById = async function (id) {
     let sql = `update credentials set deleted=$1 where id=$2`;
     let values = [new Date(), id];
     let flag;
@@ -91,7 +92,7 @@ ProxyDAO.prototype.deleteById = async function (id) {
     return flag;
 }
 
-ProxyDAO.prototype.modifyById = async function (id, key, value) {
+CredentialDAO.prototype.modifyById = async function (id, key, value) {
     let result;
     let sql = `update credentials set ${key}=$1 where id=$2`;
     let tmp = [value, id];

@@ -2,6 +2,7 @@
  *  File nay thuc hien nhiem vu crawl listproxy tu trang : http://www.gatherproxy.com
  */
 const Puppeteer = require('puppeteer');
+// @ts-ignore
 let fs        = require('fs');
 (async() => {
     const browser = await Puppeteer.launch({headless: false});
@@ -29,7 +30,7 @@ let fs        = require('fs');
             let result = rows.map(element => {
                 let tmp=[];
                 let cols = element.children;
-
+                // console.log(cols); return 0;
                 for(let j=0 ; j< cols.length ; j++){
                     if(Array.prototype.indexOf.call(cols, cols[j]) !== 5){
                         tmp.push(cols[j].textContent);

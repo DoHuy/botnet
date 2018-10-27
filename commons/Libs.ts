@@ -34,7 +34,7 @@ function generateRandomLink(){
  * @param max so nguyen duong can tren
  */
 function generateRandomIndex(min, max){
-    return min+Math.floor(Math.random() * max-min);
+    return min+Math.floor(Math.random() * (max-min));
 }
 
 /** khong duoc truyen nguoc
@@ -45,7 +45,7 @@ function generateRandomIndex(min, max){
  */
 async function requestCurl(url, proxyServer, timeOutProxy=null){
     let result={};
-    let timeout = timeOutProxy==null?55:timeOutProxy;
+    let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy;
     let cmd = `curl --max-time ${timeout} --proxy http://${proxyServer.ip}:${proxyServer.port} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`;
 
     try{
@@ -60,33 +60,6 @@ async function requestCurl(url, proxyServer, timeOutProxy=null){
        }
 
     }catch (e) {
-        let  page;
-        const browser = await puppeteer.launch({
-            headless: false,
-            args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}` ]
-        });
-
-        try{
-            page = await browser.newPage();
-            await page.goto(url, {
-                waitUntil: 'networkidle0',
-                timeout: timeout*1000
-            });
-            // console.log("heelo");
-        }catch (err) {
-
-            await page.screenshot({
-                // @ts-ignore
-                path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
-                fullPage: true,
-                omitBackground: true
-
-            });
-            e = err;
-            // console.log(e);
-        }
-
-        await browser.close();
         throw e;
     }
 
@@ -106,16 +79,19 @@ async function requestWithPuppeteer(url, proxyServer, timeOutProxy=null){
         headless: false,
         args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}`]
     });
-    let timeout = timeOutProxy==null?100*1000:timeOutProxy*1000;
+    let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy*1000;
     try{
        page = await browser.newPage();
        await page.goto(url, {
            waitUntil: "domcontentloaded",
            timeout: timeout
        });
-        result = await page.evaluate(() => {
-            return window.performance.timing
-        });
+
+       const result = await page.evaluate(()=>{
+          let result = window.performance.timing.toJSON();
+
+          return result;
+        })
 
         await browser.close();
         return result;
@@ -139,6 +115,26 @@ async function requestWithPuppeteer(url, proxyServer, timeOutProxy=null){
 
 }
 
+/**
+ *  ham nay convert base64 to base64Url
+ * @param str la chuoi thong tin
+ * @return chuoi da duoc ma hoa bang base64Url
+ */
+function base64EncodeUrl(str){
+    str = Buffer.from(str).toString('base64');
+    return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
+}
+
+/**
+ *  ham nay convert base64 to base64Url
+ * @param str la chuoi dang bi ma hoa bang base64Url
+ * @return chuoi thong tin
+ */
+function base64DecodeUrl(str){
+    str = (str + '===').slice(0, str.length + (str.length % 4));
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    return Buffer.from(str, 'base64').toString('ascii');
+}
 
 
 module.exports = {
@@ -146,14 +142,19 @@ module.exports = {
     generateRandomLink,
     generateRandomIndex,
     requestCurl,
-    requestWithPuppeteer
+    requestWithPuppeteer,
+    base64EncodeUrl,
+    base64DecodeUrl
 };
-// // //
-// requestWithPuppeteer('https://github.com/GoogleChrome/puppeteer/issues/1535',{ip: '117.103.2.254', port: '58276'}, 100).then(rs=>{
-//     console.log(rs);
-// }).catch(e=>{
-//     console.log(e.message);
-// })
+// // // //
 //
+// setInterval(function () {
+//     requestWithPuppeteer('https://github.com/GoogleChrome/puppeteer/issues/1535',{ip: '103.15.51.160', port: '8080'}, 60).then(rs=>{
+//         console.log(rs);
+//     }).catch(e=>{
+//         console.log(e.message);
+//     })
+//
+// }, 30*1000)
 
 // console.log( generatePath(__dirname, Constants.PATH.FILE_DATA_PATH));
