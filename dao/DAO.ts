@@ -29,7 +29,23 @@ DAO.prototype.modifyById = function () {
 
 }
 
-module.exports = DAO;
+DAO.prototype.finished = async function(){
+    // @ts-ignore
+    await Connection.closeDb();
+}
 
-let dao = new DAO();
-console.log(dao);
+
+DAO.prototype.transactionBegin = async function(){
+    await this.connection.query('BEGIN');
+}
+
+DAO.prototype.transactionCommit = async function(){
+    await this.connection.query('COMMIT');
+}
+
+
+DAO.prototype.transactionRollback = async function(){
+    await this.connection.query('ROLLBACK');
+}
+
+module.exports = DAO;

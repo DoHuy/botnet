@@ -16,4 +16,6 @@ export const DEFAULT_TIMEOUT = 30000; // nguoi dung khong truyen thi default = 1
 
 export const SECRET_KEY = 'huy_dep_zai'; // secretKey cho JWT
 
-export const PAY_LOAD_FIELD = ['id', 'credentialname', 'expired', 'role']; // cac tu khoa ta truyen vao trong payload cua json web token
+export const PAY_LOAD_FIELD = ['id', 'credentialname', 'created']; // created-la ngay tao token cac tu khoa ta truyen vao trong payload cua json web token
+
+export const EXPIRED_TOKEN = 3 // day

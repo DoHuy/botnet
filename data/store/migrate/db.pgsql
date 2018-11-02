@@ -4,17 +4,6 @@ create database webix;
 \c webix;
 
 
-/*
-details = {
-    continents: Asia,
-    country: Vietnam,
-    city: hanoi,
-    region: DNA,
-    lat: 1313,
-    lon: 12313
-}
-*/
-
 create table if not exists proxies(
     id serial not null primary key,
     ip text not null,
@@ -30,35 +19,18 @@ create table if not exists credentials(
     id serial not null primary key,
     credentialname text,
     password text,
-    created date,
-    modified date,
-    deleted date,
-    token text
-);
-
-create table if not exists roles(
-    id serial not null primary key,
-    role text,
-    created text,
-    modified text,
-    deleted text
-)
-
-create table if not exists profiles(
-    id serial primary key,
-    fullname text,
     email text,
     phone text,
-    created date,
-    modified date,
-    deleted date,
-    credentialId int
-
+    created text,
+    modified text,
+    deleted text,
+    token text,
+    status text
 );
 
 create table if not exists tokens(
     token text primary key,
-    created date,
+    created text,
     expired text
 );
 
@@ -94,9 +66,9 @@ create table if not exists monitoredWebsites(
     frequently text,
     connectionTimeout text,
     parent int,
-    created date,
-    modified date,
-    deleted date,
+    created text,
+    modified text,
+    deleted text,
     responseTime json,
     notification json
 );

@@ -43,10 +43,13 @@ function generateRandomIndex(min, max){
  * @param proxyServer la 1 may chu proxy
  * @param timeOutProxy
  */
-async function requestCurl(url, proxyServer, timeOutProxy=null){
+async function requestCurl(url, proxyServer=null, timeOutProxy=null){
     let result={};
     let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy;
-    let cmd = `curl --max-time ${timeout} --proxy http://${proxyServer.ip}:${proxyServer.port} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`;
+    let cmd = typeof proxyServer === 'object'
+                ? `curl --max-time ${timeout} --proxy http://${proxyServer.ip}:${proxyServer.port} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`
+                : `curl --max-time ${timeout} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`;
+
 
     try{
        let tmp = await exec(cmd);
@@ -135,6 +138,8 @@ function base64DecodeUrl(str){
     str = str.replace(/-/g, '+').replace(/_/g, '/');
     return Buffer.from(str, 'base64').toString('ascii');
 }
+
+// function conver
 
 
 module.exports = {

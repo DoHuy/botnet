@@ -29,4 +29,5 @@ export const LINKS =[
     `https://github.com/`
 ];
 
+export const SERVICE_MAIL = ['VERIFY_MAIL'];
 
