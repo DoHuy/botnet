@@ -1,7 +1,7 @@
 
 
-function CheckStatusService() {
-
-}
-
-CheckStatusService.prototype.checkUp
+// function RegisterService() {
+//
+// }
+//
+// CheckStatusService.prototype.checkUp

@@ -130,16 +130,14 @@ Auth.prototype.createCredential = async function (newCredential) {
        let link = `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/verifyAccount/${credential.id}/${credential.credentialname}`;
        let form = `
             <h1>Link verify account:</h1> <br>
-            <a id="verify" href="${link}"><strong>${link}</strong></a>            
+            <a id="verify" href="${link}"><strong>${Libs.base64EncodeUrl(link)}</strong></a>            
        `;
-        console.log(form);
-        let res =  await thirdFact.getThirdPartyService(SERVICE_MAIL["VERIFY_MAIL"]).sendMail(
-            'gmail', {user: 'huyboxi7@gmail.com', pass: 'anhhuy12'},
-            {from: 'huyboxi7@gmail.com', to: credential.email, subject: "XÁC THỰC LẠI TÀI KHOẢN ĐĂNG KÍ CỦA DỊCH VỤ WEBCHECKER", html: form}
+        // console.log(form);
+        let info =  await thirdFact.getThirdPartyService(SERVICE_MAIL["VERIFY_MAIL"]).sendMail(
+            'Outlook', {user: 'huy.dv146328@sis.hust.edu.vn', pass: 'anhhuy12'},
+            {from: 'huy.dv146328@sis.hust.edu.vn', to: credential.email, subject: "XÁC THỰC LẠI TÀI KHOẢN ĐĂNG KÍ CỦA DỊCH VỤ WEBCHECKER", html: form}
         );
-
-        console.log(res);
-
+        return true;
     }catch (e) {
         throw e;
     }
@@ -148,24 +146,32 @@ Auth.prototype.createCredential = async function (newCredential) {
 /**
  * done
  * @param id cua credential da dang ki su dung api
- * @return false neu khong ton tai, neu ton tai thi tao new token update status la active
+ * @return false neu khong ton tai hoac da ton tai token, tra ve true, neu ton tai thi tao new token update status la active
  */
 Auth.prototype.verifyCredential = async function(credential){
     let credentialDAO = new CredentialDAO();
     let tokenDAO = new TokenDAO();
     let infoCredential = {id: credential.id, credentialname: credential.credentialname, created: new Date()};
-    // @ts-ignore
-    let token = encode(infoCredential);
-    let newToken = {token: token, created: infoCredential.created};
-    try{
-        await tokenDAO.transactionBegin();
-        let token = await tokenDAO.create(newToken);
-        await credentialDAO.modifyById({key: 'token', value: token.token}, credential.id);
-        await credentialDAO.modifyById({key: 'status', value: 'active'}, credential.id);
-        await tokenDAO.transactionCommit();
-    } catch(e){
-        await tokenDAO.transactionRollback();
-        throw e;
+    let account = await credentialDAO.findById(credential.id);
+    if(account.token == null){
+        // @ts-ignore
+        let token = encode(infoCredential);
+        let newToken = {token: token, created: infoCredential.created};
+        try{
+            await tokenDAO.transactionBegin();
+            let token = await tokenDAO.create(newToken);
+            await credentialDAO.modifyById({key: 'token', value: token.token}, credential.id);
+            await credentialDAO.modifyById({key: 'status', value: 'active'}, credential.id);
+            await tokenDAO.transactionCommit();
+            return true;
+        } catch(e){
+            await tokenDAO.transactionRollback();
+            throw e;
+        }
+
+    }
+    else{
+        return false;
     }
 
 }

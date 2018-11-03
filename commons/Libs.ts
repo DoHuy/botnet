@@ -75,13 +75,11 @@ async function requestCurl(url, proxyServer=null, timeOutProxy=null){
  * @param proxyServer la 1 may chu proxy
  * @param timeOutProxy
  */
-async function requestWithPuppeteer(url, proxyServer, timeOutProxy=null){
+async function requestWithPuppeteer(url, proxyServer=null, timeOutProxy=null){
     let result;
     let page;
-    const browser = await puppeteer.launch({
-        headless: false,
-        args: [ `--proxy-server=${proxyServer.ip}:${proxyServer.port}`]
-    });
+    let option = proxyServer==null?{headless: false}:{headless: false, args: [`--proxy-server=${proxyServer.ip}:${proxyServer.port}`]};
+    const browser = await puppeteer.launch(option);
     let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy*1000;
     try{
        page = await browser.newPage();
