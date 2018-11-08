@@ -22,7 +22,7 @@ ProxyDAO.prototype.findById = async function (id) {
     // @ts-ignore
     let proxy = result.rows[0];
     // @ts-ignore
-    return new Proxy(proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.details, proxy.status);
+    return new Proxy(proxy.id, proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.details, proxy.status);
 }
 
 ProxyDAO.prototype.findAll = async function (limit=null) {
@@ -37,7 +37,7 @@ ProxyDAO.prototype.findAll = async function (limit=null) {
     let proxyList = [];
     for(let proxy of result.rows){
         // @ts-ignore
-        proxyList.push(new Proxy(proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.details, proxy.status));
+        proxyList.push(new Proxy(proxy.id, proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.details, proxy.status));
     }
 
     return proxyList;
@@ -55,7 +55,7 @@ ProxyDAO.prototype.create = async function (proxy) {
     }
     let newProxy = result.rows[0];
     // @ts-ignore
-    return new Proxy(newProxy.ip, newProxy.port, newProxy.proxytype, newProxy.responsetime, newProxy.details, newProxy.status);
+    return new Proxy(newProxy.id, newProxy.ip, newProxy.port, newProxy.proxytype, newProxy.responsetime, newProxy.details, newProxy.status);
 }
 
 
@@ -81,6 +81,7 @@ ProxyDAO.prototype.modifyById = async function (id, key, value) {
 }
 
 
+
 ProxyDAO.prototype.modifyByIpAndPort = async function (ip, port, key, value) {
     let result;
 
@@ -88,13 +89,13 @@ ProxyDAO.prototype.modifyByIpAndPort = async function (ip, port, key, value) {
     let tmp = [value, ip, port];
     try{
         await this.connection.query(sql, tmp);
-        // result = await this.findById();
+        result = await this.findById();
     }catch (e) {
         throw e;
     }
 
     // @ts-ignore
-    // return result;
+    return result;
 
 }
 

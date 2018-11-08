@@ -64,13 +64,11 @@ async function requestCurl(url, proxyServer=null, timeOutProxy=null){
        }
         // console.log(rawResult);
        result.DNSLookup = rawResult.time_namelookup;
-       result.TCPHandshake = rawResult.time_connect - rawResult.time_namelookup;
-       result.SSLHandshake =  rawResult.time_appconnect - rawResult.time_connect;
+       // ssl+tcp(clientvsproxy+proxyvswebserver)
+       result.ConnectionTime = rawResult.time_connect - rawResult.time_namelookup + rawResult.time_appconnect - rawResult.time_connect;
        result.WaitTime = rawResult.time_starttransfer - rawResult.time_appconnect;
        result.DataTransfer = rawResult.time_total - rawResult.time_starttransfer;
        result.TotalTime = rawResult.time_total;
-
-
 
     }catch (e) {
         throw e;
@@ -79,7 +77,8 @@ async function requestCurl(url, proxyServer=null, timeOutProxy=null){
     return result;
 }
 
-/** khong duoc truyen nguoc
+/** done
+ *  khong duoc truyen nguoc
  * ham tao ra 1 req de lay resource timing
  * @param url ls link cua website muon check
  * @param proxyServer la 1 may chu proxy
@@ -93,8 +92,8 @@ async function requestWithPuppeteer(url, proxyServer=null, timeOutProxy=null){
     let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy*1000;
     try{
        page = await browser.newPage();
-       await page.goto(url, {
-           waitUntil: "networkidle0",
+      let response =  await page.goto(url, {
+           waitUntil: "domcontentloaded",
            timeout: timeout
        });
 
@@ -102,30 +101,28 @@ async function requestWithPuppeteer(url, proxyServer=null, timeOutProxy=null){
           let nav:any={};
           let res:any={};
           let pagNav: any = window.performance.timing.toJSON();
-           console.log(pagNav);
+           // console.log(pagNav);
            nav.DNSLookup      = pagNav.domainLookupEnd - pagNav.domainLookupStart;
            nav.InitConnection = pagNav.connectEnd - pagNav.connectStart;
-           nav.SSLHandshake   = 0; // <-- Assume 0 by default
-
-            // Did any TLS stuff happen?
-           if (pagNav.secureConnectionStart > 0) {
-               // Awesome! Calculate it!
-               nav.SSLHandshake = pagNav.connectEnd - pagNav.secureConnectionStart;
-               nav.TCPHandshake = nav.InitConnection - nav.SSLHandshake;
-           }
-           else{
-               nav.TCPHandshake = nav.InitConnection;
-           }
-           // Response time only (download)
            nav.DataTransfer = pagNav.responseEnd - pagNav.responseStart;
-           // Request plus response time (network only)
-            nav.TotalTime = pagNav.responseEnd - pagNav.requestStart;
-            nav.WaitTime = pagNav.responseStart - pagNav.requestStart;
-        // Time to First Byte (TTFB)
-           nav.TTFB = pagNav.responseStart - pagNav.requestStart;
+           nav.ResponseTime = pagNav.responseEnd - pagNav.requestStart;
+           nav.WaitTime     = pagNav.responseStart - pagNav.requestStart;
           return nav;
         });
 
+        console.log(response["_headers"].status);
+        result.status = response["_headers"].status;
+        result.server = response["_headers"].server;
+        if(result.status !== '200'){
+            // chup lai anh neu loi xay ra
+            await page.screenshot({
+                // @ts-ignore
+                path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
+                fullPage: true,
+                omitBackground: true
+
+            });
+        }
         await browser.close();
         return result;
 
@@ -182,17 +179,17 @@ module.exports = {
     base64EncodeUrl,
     base64DecodeUrl
 };
-
-requestCurl('https://news.zing.vn',null, 60).then(rs=>{
-    console.log(rs);
-}).catch(e=>{
-    console.log(e.message);
-});
-// // // //
-    requestWithPuppeteer('https://news.zing.vn',null, 60).then(rs=>{
-        console.log(rs);
-    }).catch(e=>{
-        console.log(e.message);
-    });
-
-// // // //
+//
+// requestCurl('https://news.zing.vn',null, 60).then(rs=>{
+//     console.log(rs);
+// }).catch(e=>{
+//     console.log(e.message);
+// });
+// // // // // //
+//     requestWithPuppeteer('https://news.zing.vn',{ip:'109.86.196.126', port:'43103'}, 30).then(rs=>{
+//         console.log(rs);
+//     }).catch(e=>{
+//         console.log(e.message);
+//     });
+// //
+// // // // // //

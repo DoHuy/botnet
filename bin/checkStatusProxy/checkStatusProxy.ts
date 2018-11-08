@@ -40,7 +40,7 @@ setInterval(async ()=>{
 
     }
 
-}, Configs.PROXY_TIME.check_proxy_time);
+}, Configs.CHECK_PROXY_TIME);
 //
 //
 // (async ()=>{

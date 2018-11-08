@@ -6,23 +6,12 @@ const fs = require('fs');
 const ProxyDAO = require('../../dao/ProxyDAO');
 // @ts-ignore
 const fetch = require('node-fetch');
-const sleep = require('sleep');
-const syncRequest = require('sync-request');
+// const sleep = require('sleep');
+// const syncRequest = require('sync-request');
 // @ts-ignore
 let proxyDAO = new ProxyDAO();
-
-
-function getDetailsLocationProxy(ip){
-        try{
-            // let response = await fetch(`http://ip-api.com/json/${ip}`);
-            var res = request('GET', `http://ip-api.com/json/${ip}`);
-
-            return res.getBody('utf8');
-        } catch (e) {
-            throw e;
-        }
-}
-
+//
+//
 
 // console.log(getDetailsLocationProxy('195.94.27.249'));
 
@@ -56,12 +45,19 @@ function getDetailsLocationProxy(ip){
         for(let proxy of data[i]){
             let objTmp;
             objTmp = proxy;
-            objTmp.details = getDetailsLocationProxy(objTmp.ip);
-            proxyList.push(objTmp);
+            objTmp.details = null;
+            try{
+                let rs = await proxyDAO.create(objTmp);
+                console.log(rs);
+                console.log("da insert duoc ", count++);
+            }catch (e) {
+                throw e;
+            }
+            // proxyList.push(objTmp);
         }
     }
 
-    console.log(proxyList);
+    // console.log(proxyList);
 
 
     process.exit();

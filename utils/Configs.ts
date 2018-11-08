@@ -10,7 +10,7 @@ export const SERVER = {
     "SERVER_PORT":8080,
     "HOST_SERVER":"localhost"
 }
-export const PROXY_TIME = {"check_proxy_time": 60*60*1000} // default 3 hours
+export const CHECK_PROXY_TIME = 60*60*1000 // default 3 hours
 
 export const DEFAULT_TIMEOUT = 30000; // nguoi dung khong truyen thi default = 100000
 
