@@ -76,7 +76,19 @@ create table if not exists monitoredWebsites(
 create table if not exists webStructs (
     id serial not null primary key,
     webId int not null,
-    struct json
+    struct json,
+    created text,
+    modified text,
+    deleted text
+);
+
+create table if not exists poisonScripts (
+    id serial not null primary key,
+    script text,
+    created text,
+    modified text,
+    deleted text,
+    webId int
 );
 
 

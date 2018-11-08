@@ -44,9 +44,10 @@ function generateRandomIndex(min, max){
  * @param timeOutProxy
  */
 async function requestCurl(url, proxyServer=null, timeOutProxy=null){
-    let result={};
+    let rawResult: any={};
+    let result: any={};
     let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy;
-    let cmd = typeof proxyServer === 'object'
+    let cmd = proxyServer !== null
                 ? `curl --max-time ${timeout} --proxy http://${proxyServer.ip}:${proxyServer.port} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`
                 : `curl --max-time ${timeout} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`;
 
@@ -55,12 +56,21 @@ async function requestCurl(url, proxyServer=null, timeOutProxy=null){
        let tmp = await exec(cmd);
 
        let tmp2 = tmp.stdout.split(" ");
-       let fields=['httpCode', 'timeNameLockup', 'timeConnect',
-                    'timeSSLHanshake', 'timePretransfer', 'timeRedirect',
-                    'timeStartTransfer', 'timeTotal'];
+       let fields=['http_code', 'time_namelookup', 'time_connect',
+                    'time_appconnect', 'time_pretransfer', 'time_redirect',
+                    'time_starttransfer', 'time_total'];
        for(let i=0 ; i< fields.length ; i++){
-           result[fields[i]] = tmp2[i];
+           rawResult[fields[i]] = Number.parseFloat(tmp2[i].trim().replace(",", "."));
        }
+        // console.log(rawResult);
+       result.DNSLookup = rawResult.time_namelookup;
+       result.TCPHandshake = rawResult.time_connect - rawResult.time_namelookup;
+       result.SSLHandshake =  rawResult.time_appconnect - rawResult.time_connect;
+       result.WaitTime = rawResult.time_starttransfer - rawResult.time_appconnect;
+       result.DataTransfer = rawResult.time_total - rawResult.time_starttransfer;
+       result.TotalTime = rawResult.time_total;
+
+
 
     }catch (e) {
         throw e;
@@ -78,26 +88,49 @@ async function requestCurl(url, proxyServer=null, timeOutProxy=null){
 async function requestWithPuppeteer(url, proxyServer=null, timeOutProxy=null){
     let result;
     let page;
-    let option = proxyServer==null?{headless: false}:{headless: false, args: [`--proxy-server=${proxyServer.ip}:${proxyServer.port}`]};
+    let option = proxyServer==null?{headless: true}:{headless: true, args: [`--proxy-server=${proxyServer.ip}:${proxyServer.port}`]};
     const browser = await puppeteer.launch(option);
     let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy*1000;
     try{
        page = await browser.newPage();
        await page.goto(url, {
-           waitUntil: "domcontentloaded",
+           waitUntil: "networkidle0",
            timeout: timeout
        });
 
        const result = await page.evaluate(()=>{
-          let result = window.performance.timing.toJSON();
+          let nav:any={};
+          let res:any={};
+          let pagNav: any = window.performance.timing.toJSON();
+           console.log(pagNav);
+           nav.DNSLookup      = pagNav.domainLookupEnd - pagNav.domainLookupStart;
+           nav.InitConnection = pagNav.connectEnd - pagNav.connectStart;
+           nav.SSLHandshake   = 0; // <-- Assume 0 by default
 
-          return result;
-        })
+            // Did any TLS stuff happen?
+           if (pagNav.secureConnectionStart > 0) {
+               // Awesome! Calculate it!
+               nav.SSLHandshake = pagNav.connectEnd - pagNav.secureConnectionStart;
+               nav.TCPHandshake = nav.InitConnection - nav.SSLHandshake;
+           }
+           else{
+               nav.TCPHandshake = nav.InitConnection;
+           }
+           // Response time only (download)
+           nav.DataTransfer = pagNav.responseEnd - pagNav.responseStart;
+           // Request plus response time (network only)
+            nav.TotalTime = pagNav.responseEnd - pagNav.requestStart;
+            nav.WaitTime = pagNav.responseStart - pagNav.requestStart;
+        // Time to First Byte (TTFB)
+           nav.TTFB = pagNav.responseStart - pagNav.requestStart;
+          return nav;
+        });
 
         await browser.close();
         return result;
 
     }catch (e) {
+        // chup lai anh neu co loi xay ra
         await page.screenshot({
             // @ts-ignore
             path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
@@ -149,15 +182,17 @@ module.exports = {
     base64EncodeUrl,
     base64DecodeUrl
 };
-// // // //
-//
-// setInterval(function () {
-//     requestWithPuppeteer('https://github.com/GoogleChrome/puppeteer/issues/1535',{ip: '103.15.51.160', port: '8080'}, 60).then(rs=>{
-//         console.log(rs);
-//     }).catch(e=>{
-//         console.log(e.message);
-//     })
-//
-// }, 30*1000)
 
-// console.log( generatePath(__dirname, Constants.PATH.FILE_DATA_PATH));
+requestCurl('https://news.zing.vn',null, 60).then(rs=>{
+    console.log(rs);
+}).catch(e=>{
+    console.log(e.message);
+});
+// // // //
+    requestWithPuppeteer('https://news.zing.vn',null, 60).then(rs=>{
+        console.log(rs);
+    }).catch(e=>{
+        console.log(e.message);
+    });
+
+// // // //
