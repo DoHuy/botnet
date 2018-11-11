@@ -180,16 +180,8 @@ module.exports = {
     base64DecodeUrl
 };
 //
-// requestCurl('https://news.zing.vn',null, 60).then(rs=>{
-//     console.log(rs);
-// }).catch(e=>{
-//     console.log(e.message);
-// });
-// // // // // //
-//     requestWithPuppeteer('https://news.zing.vn',{ip:'109.86.196.126', port:'43103'}, 30).then(rs=>{
+// requestCurl('https://news.zing.vn', {ip: '125.234.113.170', port: '35720'}).then(
+//     (rs)=>{
 //         console.log(rs);
-//     }).catch(e=>{
-//         console.log(e.message);
-//     });
-// //
-// // // // // //
+//     }
+// )

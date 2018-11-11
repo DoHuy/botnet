@@ -99,6 +99,23 @@ ProxyDAO.prototype.modifyByIpAndPort = async function (ip, port, key, value) {
 
 }
 
+ProxyDAO.prototype.findCondition = async function(condition){
+    let result;
+    let sql = `select*from proxies where ${condition}`;
+    try{
+        result = await this.connection.query(sql);
+    }catch (e) {
+        throw e;
+
+    }
+    let proxyList = [];
+    for(let proxy of result.rows){
+        // @ts-ignore
+        proxyList.push(new Proxy(proxy.id, proxy.ip, proxy.port, proxy.proxytype, proxy.responsetime, proxy.details, proxy.status));
+    }
+
+    return proxyList;
+}
 module.exports = ProxyDAO;
 //
 // // // @ts-ignore

@@ -60,17 +60,17 @@ notification = {
 */
 create table if not exists monitoredWebsites(
     id serial primary key not null,
-    credentialId int,
     siteName text,
     url text,
-    frequently text,
+    frequently text, -- ['frequently', 'connectionTimeout', 'parent', 'modified']
     connectionTimeout text,
     parent int,
     created text,
     modified text,
     deleted text,
     responseTime json,
-    notification json
+    notification json,
+    credentialId int
 );
 
 create table if not exists webStructs (

@@ -1,4 +1,4 @@
-import* as url from 'url';
+
 // @ts-ignore
 import*as Validator from '../../domains/Validator/Validator';
 let AuthMiddleware = {};
@@ -20,7 +20,7 @@ AuthMiddleware.beforeLogin = async function (req, res, next) {
     else{
         res.status(400).send(result);
     }
-}
+};
 
 // @ts-ignore
 AuthMiddleware.beforeSignUp = async function (req, res, next) {
@@ -32,17 +32,17 @@ AuthMiddleware.beforeSignUp = async function (req, res, next) {
     else{
         res.status(400).send(result);
     }
-}
+};
 
 
 // @ts-ignore
 AuthMiddleware.beforeVerifyAccount = async function (req, res, next) {
     next();
-}
+};
 
 // @ts-ignore
 AuthMiddleware.beforeResetToken = async function (req, res, next) {
     next();
-}
+};
 
 module.exports = AuthMiddleware;

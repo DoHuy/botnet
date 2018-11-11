@@ -5,7 +5,7 @@ const Puppeteer = require('puppeteer');
 // @ts-ignore
 let fs        = require('fs');
 (async() => {
-    const browser = await Puppeteer.launch({headless: false});
+    const browser = await Puppeteer.launch({headless: true});
     const page = await browser.newPage();
     await page.goto('http://www.gatherproxy.com/proxylistbycountry');
 

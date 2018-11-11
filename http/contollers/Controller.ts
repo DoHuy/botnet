@@ -1,9 +1,6 @@
 // @ts-ignore
-let Controller={};
+let Controller: any={};
 
-// @ts-ignore
-// Controller.MonitoredWebsiteCon = require('./MonitoredWebsiteCon');
-// @ts-ignore
 Controller.AuthController = require('./AuthController');
-
+Controller.SettingCon = require('./SettingCon');
 module.exports = Controller;

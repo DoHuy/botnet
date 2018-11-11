@@ -12,7 +12,9 @@ export const SERVER = {
 }
 export const CHECK_PROXY_TIME = 60*60*1000 // default 3 hours
 
-export const DEFAULT_TIMEOUT = 30000; // nguoi dung khong truyen thi default = 100000
+export const DEFAULT_TIMEOUT = 30*1000; // nguoi dung khong truyen thi default = 100000
+
+export const FREQUENTLY_DEFAULT = 1*60*1000 // 1 phut
 
 export const SECRET_KEY = 'huy_dep_zai'; // secretKey cho JWT
 

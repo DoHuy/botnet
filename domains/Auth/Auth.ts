@@ -19,10 +19,10 @@ function Auth() {}
  * done
  * @valuesJson ={id, credentialname, created}
  *  ham nay ma hoa thong tin truyen vao
- * @param params is content want be encode
  * @return 1 JWT
+ * @param valuesJSon
  */
-function encode(valuesJSon){
+Auth.prototype.encode = (valuesJSon: any)=>{
     let header: any = {
         alg: 'sha256', // kieu ma hoa cua signature
         typ: 'JWT' // chi ra token nay la Json web token
@@ -47,7 +47,7 @@ function encode(valuesJSon){
 
     let token = `${header}.${payload}.${signature}`;
     return token;
-}
+};
 
 /**
  *  done
@@ -55,10 +55,10 @@ function encode(valuesJSon){
  * @param token is Json web token
  * @return ve thong tin  can thiet
  */
-function decode(token){
+Auth.prototype.decode = (token)=>{
     token = token.split(`.`);
     return JSON.parse(Libs.base64DecodeUrl(token[token.length-2]));
-}
+};
 
 /**
  * done
@@ -73,7 +73,7 @@ Auth.prototype.authenticate = async function (account) {
     } catch(e){
         throw e;
     }
-}
+};
 
 /**
  * done
@@ -83,24 +83,24 @@ Auth.prototype.authenticate = async function (account) {
 Auth.prototype.verifyToken = async function(token){
     let tokenDAO = new TokenDAO();
     try{
-    let rs    = await tokenDAO.findById(token);
+    let rs = await tokenDAO.findById(token);
     if(rs == null) return false;
     else return true;
     }catch (e) {
         throw e;
     }
-}
+};
 
 
 /**
  * done
  * @return 1 newtoken
- * @param la oldtoken
+ * @param oldtoken
  */
 Auth.prototype.renewToken = async function (oldToken) {
-    let infoCredential   = decode(oldToken);
+    let infoCredential   = this.decode(oldToken);
     infoCredential.created = new Date();
-    let newToken      = {token: encode(infoCredential), created: infoCredential.created};
+    let newToken      = {token: this.encode(infoCredential), created: infoCredential.created};
     let credentialDAO = new CredentialDAO();
     let tokenDAO      = new TokenDAO();
     try{
@@ -115,7 +115,7 @@ Auth.prototype.renewToken = async function (oldToken) {
         throw e;
     }
 
-}
+};
 
 /**
  * done
@@ -141,7 +141,7 @@ Auth.prototype.createCredential = async function (newCredential) {
     }catch (e) {
         throw e;
     }
-}
+};
 
 /**
  * done
@@ -174,7 +174,7 @@ Auth.prototype.verifyCredential = async function(credential){
         return false;
     }
 
-}
+};
 
 module.exports = Auth;
 

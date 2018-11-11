@@ -29,4 +29,11 @@ Validator.prototype.validateSignUp = function (rawData){
     return {flag: true, message: "OK"};
 }
 
+
+Validator.prototype.validateUrl = (url)=>{
+    let reg = /((http|https):\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
+    if(reg.test(url)) return true;
+    return false;
+}
+
 module.exports = Validator;

@@ -1,6 +1,7 @@
 
 // @ts-ignore
-function MonitoredWebsite(siteName=null, url=null,  frequently=null, connectionTimeout=null, parent=null, created=null, modified=null, deleted=null, responseTime=null,notification=null) {
+function MonitoredWebsite(id=null, siteName=null, url=null,  frequently=null, connectionTimeout=null, parent=null, created=null, modified=null, deleted=null, responseTime=null,notification=null, credentialId=null) {
+    this.id = id;
     this.siteName = siteName;
     this.url = url;
     this.connectionTimeout=connectionTimeout;
@@ -11,6 +12,7 @@ function MonitoredWebsite(siteName=null, url=null,  frequently=null, connectionT
     this.deleted  = deleted;
     this.responseTime = responseTime;
     this.notification = notification;
+    this.credentialId = credentialId;
 }
 
 module.exports = MonitoredWebsite;

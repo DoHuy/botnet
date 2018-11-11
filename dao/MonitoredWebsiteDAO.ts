@@ -9,11 +9,11 @@ function MonitoredWebsiteDAO() {
     DAO.call(this); // supper()
 }
 // ProxyDAO extends DAO
-util.inherits(ProxyDAO, DAO);
+util.inherits(MonitoredWebsiteDAO, DAO);
 
-ProxyDAO.prototype.findById = async function (id) {
+MonitoredWebsiteDAO.prototype.findById = async function (id) {
     let result;
-    let sql = `select*from monitoredwebsite where id=${id}`;
+    let sql = `select*from monitoredwebsites where id=${id}`;
     try{
         result = await this.connection.query(sql);
     }catch (e) {
@@ -23,23 +23,25 @@ ProxyDAO.prototype.findById = async function (id) {
     let site = result.rows[0];
     // @ts-ignore
     return new MonitoredWebsite(
+        site.id,
         site.sitename,
         site.url,
-        site.connectiontimeout,
         site.frequently,
+        site.connectiontimeout,
         site.parent,
         site.created,
         site.modified,
         site.deleted,
-        site.responseTime,
-        site.notification
+        site.responsetime,
+        site.notification,
+        site.credentialid
 
     );
-}
+};
 
-ProxyDAO.prototype.findAll = async function (limit=null) {
+MonitoredWebsiteDAO.prototype.findAll = async function (limit=null) {
     let result;
-    let sql = `select*from monitoredwebsite limit ${limit}`;
+    let sql = `select*from monitoredwebsites limit ${limit}`;
     try{
         result = await this.connection.query(sql);
     }catch (e) {
@@ -50,31 +52,42 @@ ProxyDAO.prototype.findAll = async function (limit=null) {
     for(let site of result.rows){
         // @ts-ignore
         websiteList.push(new MonitoredWebsite(
+            site.id,
             site.sitename,
             site.url,
-            site.connectiontimeout,
             site.frequently,
+            site.connectiontimeout,
             site.parent,
             site.created,
             site.modified,
             site.deleted,
-            site.responseTime,
-            site.notification
+            site.responsetime,
+            site.notification,
+            site.credentialid
 
         ));
     }
 
     return websiteList;
-}
+};
 
-ProxyDAO.prototype.create = async function (website) {
+MonitoredWebsiteDAO.prototype.create = async function (website) {
     let result;
-    let sql = `insert into monitoredwebsite(sitename, url, connectiontimeout, frequently,
-               parent, created, modified, deleted, responsetime, noification)
-                values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`;
-    let values = [website.siteName, website.url, website.connectionTimeout, website.frequently,
-                  website.parent, website.created, website.modified, website.deleted,
-                  website.responseTime, website.notification];
+    let sql = `insert into monitoredwebsites(sitename, url, frequently, connectiontimeout,
+               parent, created, modified, deleted, responsetime, notification, credentialid)
+                values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`;
+    let values = [website.siteName!=undefined?website.siteName:null,
+                  website.url!=undefined?website.url:null,
+                  website.frequently!=undefined?website.frequently:null,
+                  website.connectionTimeout!=undefined?website.connectionTimeout:null,
+                  website.parent!=undefined?website.parent:null,
+                  website.created!=undefined?website.created.toISOString():null,
+                  website.modified!=undefined?website.modified.toISOString():null,
+                  website.deleted!=undefined?website.deleted.toISOString():null,
+                  website.responseTime!=undefined?website.responseTime:null,
+                  website.notification!=undefined?website.notification:null,
+                  website.credentialId!=undefined?website.credentialId:null
+                ];
     try{
         result = await this.connection.query(sql, values);
     }catch(e){
@@ -83,47 +96,56 @@ ProxyDAO.prototype.create = async function (website) {
     let site = result.rows[0];
     // @ts-ignore
     return new MonitoredWebsite(
+        site.id,
         site.sitename,
         site.url,
-        site.connectiontimeout,
         site.frequently,
+        site.connectiontimeout,
         site.parent,
         site.created,
         site.modified,
         site.deleted,
         site.responseTime,
-        site.notification
+        site.notification,
+        site.credentialid
 
     );
-}
+};
 
 
-ProxyDAO.prototype.deleteById = async function (id) {
+MonitoredWebsiteDAO.prototype.deleteById = async function (id) {
     let flag;
-    let sql = `update monitoredwebsite set deleted=$1 where id=$2`;
+    let sql = `update monitoredwebsites set deleted=$1 where id=$2`;
     try{
-        await this.connection.query(sql, [new Date(), id]);
+        await this.connection.query(sql, [new Date().toISOString(), id]);
         flag=true;
     }catch (e) {
         throw e;
     }
 
     return flag;
-}
+};
 
-ProxyDAO.prototype.modifyById = async function (id, [...key], [...value]) {
+/**
+ *
+ * @param id
+ * @param keys mảng các cột
+ * @param values mảng các giá trị tương ứng với mỗi cột
+ */
+MonitoredWebsiteDAO.prototype.modifyById = async function (id, keys, values) {
     let result;
     let string="";
-    if(key.length !== value.length) throw new Error("number of key must equal value");
+    if(keys.length !== values.length) throw new Error("number of key must equal value");
 
-    for(let i=1 ; i<=key.length ; i++){
-       if(i === key.length){
-           string+=`${key[i]}=$${i} where id=$${i}`;
-       }else string+=`${key[i]}=$${i},`;
+    for(let i=0 ; i<keys.length ; i++){
+       if(i === keys.length-1){
+           string+=`${keys[i]}=$${i+1} where id=$${i+2}`;
+       }else string+=`${keys[i]}=$${i+1}, `;
     }
-    let sql = `update monitoredwebsite set ${string}`;
+    let sql = `update monitoredwebsites set ${string}`;
     try{
-        await this.connection.query(sql, [...value].push(id));
+        values.push(id);
+        await this.connection.query(sql, values);
         result = await this.findById(id);
     }catch (e) {
         throw e;
@@ -131,16 +153,51 @@ ProxyDAO.prototype.modifyById = async function (id, [...key], [...value]) {
     // @ts-ignore
     return result;
 
-}
+};
+
+MonitoredWebsiteDAO.prototype.deleteByCondition = async (condition)=>{
+    let flag;
+    let sql = `update monitoredwebsites set deleted=$1 where ${condition}`;
+    try{
+        await this.connection.query(sql, [new Date().toISOString()]);
+        flag=true;
+    }catch (e) {
+        throw e;
+    }
+
+    return flag;
+};
+
+MonitoredWebsiteDAO.prototype.findByCondition = async function(condition){
+    let result;
+    let sql = `select*from monitoredwebsites where ${condition}`;
+    try{
+        result = await this.connection.query(sql);
+    }catch (e) {
+        throw e;
+
+    }
+    let websiteList = [];
+    for(let site of result.rows){
+        // @ts-ignore
+        websiteList.push(new MonitoredWebsite(
+            site.id,
+            site.sitename,
+            site.url,
+            site.frequently,
+            site.connectiontimeout,
+            site.parent,
+            site.created,
+            site.modified,
+            site.deleted,
+            site.responsetime,
+            site.notification,
+            site.credentialid
+
+        ));
+    };
+
+    return websiteList;
+};
 
 module.exports = MonitoredWebsiteDAO;
-//
-// // // @ts-ignore
-// // const Proxy = require('../data/entities/Proxy');
-// console.log(Proxy);
-// // @ts-ignore
-// let proxydao = new ProxyDAO(new Proxy());
-//
-// proxydao.modifyById(55, 'status', 'inactive').then(rs=>{
-//     console.log(rs);
-// })
