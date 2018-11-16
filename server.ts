@@ -1,10 +1,12 @@
 // @ts-ignore
 const express = require('express');
 const server = express();
-const Router = require('../http/routes/Router');
-const Config = require('../utils/Configs');
+const Router = require('./http/routes/Router');
+const Config = require('./utils/Configs');
 const bodyParser = require('body-parser');
+const path = require('path');
 
+server.use(express.static(path.join(__dirname, 'data/store/snapshot')));
 // parse application/x-www-form-urlencoded
 server.use(bodyParser.urlencoded({ extended: false }));
 

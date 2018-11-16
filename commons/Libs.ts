@@ -16,7 +16,7 @@ const config    = require('../utils/Configs');
  */
 function generatePath (currentPath, destinationFolder, filename?:null) {
     destinationFolder = filename==null?destinationFolder:`${destinationFolder}/${filename}`;
-    return path.relative( currentPath,  destinationFolder);
+    return path.normalize(path.relative( currentPath,  destinationFolder));
 }
 
 /**
@@ -83,25 +83,29 @@ async function requestCurl(url, proxyServer=null, timeOutProxy=null){
  * @param url ls link cua website muon check
  * @param proxyServer la 1 may chu proxy
  * @param timeOutProxy
+ * @return {DNSLookUp, InitConnection, DataTransfer, ResponseTime, WaitTime, notification: {status, server, message}}
  */
-async function requestWithPuppeteer(url, proxyServer=null, timeOutProxy=null){
-    let result;
-    let page;
+async function requestWithPuppeteer(url, imagePath, proxyServer=null, timeOutProxy=null){
+    let result: any={};
+    let response: any;
+    let page: any;
+    // @ts-ignore
+    // let imagePath = generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date().toISOString()}.png`);
     let option = proxyServer==null?{headless: true}:{headless: true, args: [`--proxy-server=${proxyServer.ip}:${proxyServer.port}`]};
     const browser = await puppeteer.launch(option);
     let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy*1000;
     try{
        page = await browser.newPage();
-      let response =  await page.goto(url, {
+      response =  await page.goto(url, {
            waitUntil: "domcontentloaded",
            timeout: timeout
        });
 
-       const result = await page.evaluate(()=>{
+       result = await page.evaluate(()=>{
           let nav:any={};
           let res:any={};
           let pagNav: any = window.performance.timing.toJSON();
-           // console.log(pagNav);
+           // console.log(pagNav); {DNSLookup, InitConnection, DataTransfer, ResponseTime, WaitTime }
            nav.DNSLookup      = pagNav.domainLookupEnd - pagNav.domainLookupStart;
            nav.InitConnection = pagNav.connectEnd - pagNav.connectStart;
            nav.DataTransfer = pagNav.responseEnd - pagNav.responseStart;
@@ -110,14 +114,27 @@ async function requestWithPuppeteer(url, proxyServer=null, timeOutProxy=null){
           return nav;
         });
 
-        console.log(response["_headers"].status);
         result.status = response["_headers"].status;
         result.server = response["_headers"].server;
+        // result.header = response["_headers"];
+        // @ts-ignore
         if(result.status !== '200'){
             // chup lai anh neu loi xay ra
             await page.screenshot({
                 // @ts-ignore
-                path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
+                path: imagePath,
+                fullPage: true,
+                omitBackground: true
+
+            });
+
+        }
+        else  {
+            // chup lai anh neu loi xay ra
+            // console.log(__dirname);
+            await page.screenshot({
+                // @ts-ignore
+                path: imagePath,
                 fullPage: true,
                 omitBackground: true
 
@@ -130,14 +147,16 @@ async function requestWithPuppeteer(url, proxyServer=null, timeOutProxy=null){
         // chup lai anh neu co loi xay ra
         await page.screenshot({
             // @ts-ignore
-            path: generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date()}.png`),
+            path: imagePath,
             fullPage: true,
             omitBackground: true
 
         });
-
         await browser.close();
-        throw e;
+        return {
+            status: 500,
+            message: e.message
+        }
 
     }
 
@@ -180,8 +199,4 @@ module.exports = {
     base64DecodeUrl
 };
 //
-// requestCurl('https://news.zing.vn', {ip: '125.234.113.170', port: '35720'}).then(
-//     (rs)=>{
-//         console.log(rs);
-//     }
-// )
+

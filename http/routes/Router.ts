@@ -9,5 +9,5 @@ const SettingRouter = require('./SettingRouter');
 
 // router.use('/monitoredWebsite', MonitoredWebsiteRouter);
 router.use('/', AuthRouter);
-router.use('/credential/:credentialId', SettingRouter);
+router.use('/credential/', SettingRouter);
 module.exports = router;

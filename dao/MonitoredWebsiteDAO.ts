@@ -144,8 +144,10 @@ MonitoredWebsiteDAO.prototype.modifyById = async function (id, keys, values) {
     }
     let sql = `update monitoredwebsites set ${string}`;
     try{
-        values.push(id);
-        await this.connection.query(sql, values);
+        // values.push(id);
+        let tmp: any = values;
+        tmp.push(id);
+        await this.connection.query(sql, tmp);
         result = await this.findById(id);
     }catch (e) {
         throw e;

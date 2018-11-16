@@ -1,14 +1,14 @@
 // @ts-ignore
-import*as SettingServiceInterface from './SettingServiceInterface';
+import*as ServiceSettingManagerInterface from './ServiceSettingManagerInterface';
 import*as util from 'util';
 // @ts-ignore
 import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 let monitoredWebSiteDAO = new MonitoredWebsiteDAO();
-function SettingService() {
-    SettingServiceInterface.call(this);
+function ServiceSettingManager() {
+    ServiceSettingManagerInterface.call(this);
 }
 // implements
-util.inherits(SettingService, SettingServiceInterface);
+util.inherits(ServiceSettingManager, ServiceSettingManagerInterface);
 
 /**
  * done
@@ -17,7 +17,7 @@ util.inherits(SettingService, SettingServiceInterface);
  * @param web la thong tin
  * @return 1 doi tuong website
  */
-SettingService.prototype.createWebsite = async function (input, credentialId) {
+ServiceSettingManager.prototype.createWebsite = async function (input, credentialId) {
     input.credentialId = credentialId;
     input.created = new Date();
     try {
@@ -30,14 +30,13 @@ SettingService.prototype.createWebsite = async function (input, credentialId) {
         await monitoredWebSiteDAO.transactionRollback();
         throw e;
     }
-}
+};
 
 /**
- *
  * @param config: {parent, frequently, connectiontimeout, subList:[{siteName, url}]}
  * @return {tra ve mang cac subsite}
  */
-SettingService.prototype.addAdvanceConfigWebsite = async function (config, credentialId) {
+ServiceSettingManager.prototype.addAdvanceConfigWebsite = async function (config, credentialId) {
     let result: any=[];
     let keys = ['frequently', 'connectiontimeout', 'modified'];
     let values=[config.frequently, config.connectionTimeout, new Date().toISOString()];
@@ -73,57 +72,47 @@ SettingService.prototype.addAdvanceConfigWebsite = async function (config, crede
 }
 
 /**
- * input: {webId, updatedData:{siteName, frequently, connectionTimeout}, subSite:[{url, isDelete, isCreate}]}
- * cho phep sua siteName, connectionTimeout, frequently, subSite
- * sua subSite o day la them hoac xoa bot subSite
+ * input: {webId, updatedData:{frequently, connectionTimeout}}
+ * cho phep sua siteName, connectionTimeout, frequently
  * @return {subId: subId}
  */
-SettingService.prototype.modifyConfigWebsite = async function(input){
+ServiceSettingManager.prototype.modifyConfigWebsite = async function(input, credentialId){
     let result;
-    let keys = Object.keys(input.updatedData);
-    let values = [];
-    for(let k in input.updatedData){
-        values.push(input.updatedData[k]);
+    let keys = [];
+    let webId;
+    for(let key in input){
+        if(key == "webId"){
+            webId = input[key];
+            delete input[key];
+            break;
+        }
+    }
+    keys = Object.keys(input);
+    keys = keys.map(e=>e.toLowerCase());
+    let updateDataList = [];
+    for(let key in input){
+        updateDataList.push(input[key]);
     }
     try{
         await monitoredWebSiteDAO.transactionBegin();
 
         // cap nhat lai config cua cac subsite
-        let list: any = await monitoredWebSiteDAO.findByCondition(` parent=${input.webId}`);
+        let list: any = await monitoredWebSiteDAO.findByCondition(` parent=${webId} AND credentialid=${credentialId}`);
         for(let i=0 ; i<list.length ; i++){
-            await monitoredWebSiteDAO.modifyById(list[i].id, keys, values);
+            updateDataList=[];
+            for(let key in input){
+                updateDataList.push(input[key]);
+            }
+            await monitoredWebSiteDAO.modifyById(list[i].id, keys, updateDataList);
 
         }
-
-        // them hoac xoa di subsite
-        for(let i=0 ; i<input.subSite.length ; i++){
-            let sub = input.subSite[i];
-            if(sub.isDelete == true){
-                await monitoredWebSiteDAO.deleteByCondition(`url=${sub.url} AND parent=${input.webId}`);
-            }
-            if(sub.isCreate == true){
-                let parent = await monitoredWebSiteDAO.findByCondition(`parent=${input.webId}`);
-                await monitoredWebSiteDAO.create({
-                    url: parent.url,
-                    frequently: parent.frequently,
-                    connectionTimeout: parent.connectionTimeout,
-                    parent: parent.id,
-                    created: new Date(),
-                    credentialId: parent.credentialId
-                });
-
-            }
-        }
-
-        result = await monitoredWebSiteDAO.findByCondition(`parent=${input.webId}`);
-
         await monitoredWebSiteDAO.transactionCommit();
-        return result;
+        return true;
     }catch (e) {
         await monitoredWebSiteDAO.transactionRollback();
         throw e;
     }
-}
+};
 
 
 /**
@@ -132,7 +121,7 @@ SettingService.prototype.modifyConfigWebsite = async function(input){
  * @param id web muon xoa
  * @return true or false
  */
-SettingService.prototype.removeWebsite = async function(id){
+ServiceSettingManager.prototype.removeWebsite = async function(id){
     let result;
     try{
         await monitoredWebSiteDAO.transactionBegin();
@@ -151,5 +140,6 @@ SettingService.prototype.removeWebsite = async function(id){
 };
 
 
-module.exports = SettingService;
+
+module.exports = ServiceSettingManager;
 

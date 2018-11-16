@@ -155,7 +155,7 @@ Auth.prototype.verifyCredential = async function(credential){
     let account = await credentialDAO.findById(credential.id);
     if(account.token == null){
         // @ts-ignore
-        let token = encode(infoCredential);
+        let token = this.encode(infoCredential);
         let newToken = {token: token, created: infoCredential.created};
         try{
             await tokenDAO.transactionBegin();
@@ -177,28 +177,3 @@ Auth.prototype.verifyCredential = async function(credential){
 };
 
 module.exports = Auth;
-
-// let auth = new Auth({credentialname: 'huyabc', password: 'abcd', 'phone': '0965555555', 'email': 'dohuy171@gmail.com'});
-
-//
-// auth.renewToken(
-//     "eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.eyJpZCI6MSwiY3JlZGVudGlhbG5hbWUiOiJodXlhYmMiLCJjcmVhdGVkIjoiMjAxOC0xMS0wMVQwNjo0ODoxNi4xOTFaIn0.dmo1Q0dnT0o2Y3BTSHh5d255VGNnVGRJaE5xTnVsQ3RQRXF4dXpCVUZ0S24vWWo2UkF4NUtnK25idVpOck9IMktBRTdYZnpyazdLMnI3Y0tpYml3enc9PQ"
-//
-// ).then(rs=>{
-//     console.log(rs);
-// })
-
-// auth.verifyCredential({
-//     id: 1,
-//     credentialname: 'huyabc'
-// });
-//
-
-// auth.verifyToken('eyJh2bGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.eyJpZCI6MSwiY3JlZGVudGlhbG5hbWUiOiJodXlhYmMiLCJjcmVhdGVkIjoiMjAxOC0xMS0wMVQwNzoyNzo1OC44NTNaIn0.ODFYUy9BRzh4RmN2bHE0SXowdEZBb3NCS0tJWEViN0wxNlM2RlpvUXQ5VT0')
-// .then(rs=>{
-//     console.log(rs);
-// })
-
-// auth.authenticate().then(rs=>{
-//     console.log(rs);
-// })

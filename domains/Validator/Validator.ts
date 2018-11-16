@@ -1,4 +1,6 @@
-
+// @ts-ignore
+import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
+let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 function Validator() {}
 
 Validator.prototype.validateLogin = function (rawData){
@@ -36,4 +38,33 @@ Validator.prototype.validateUrl = (url)=>{
     return false;
 }
 
+Validator.prototype.validateChangeConfig = async (config, webId)=>{
+    if(Object.keys(config).length != 0 && Object.keys(config).length<=2) {
+        try{
+            let web = await monitoredWebsiteDAO.findById(webId);
+            if(web.id == web.parent && web.deleted == null) return true;
+            else return false;
+        }catch (e) {
+            throw e;
+        }
+
+    }
+    else return false;
+
+};
+
+Validator.prototype.validateRemoveWebsite = async (webId)=>{
+    if(1) {
+        try{
+            let web = await monitoredWebsiteDAO.findById(webId);
+            if(web.id == web.parent && web.deleted == null) return true;
+            else return false;
+        }catch (e) {
+            throw e;
+        }
+
+    }
+    else return false;
+
+};
 module.exports = Validator;

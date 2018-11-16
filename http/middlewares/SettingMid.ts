@@ -1,5 +1,7 @@
 // @ts-ignore
 import*as Validator from '../../domains/Validator/Validator';
+import*as CONFIG from '../../utils/Configs';
+// @ts-ignore
 let validator = new Validator();
 let SettingMid: any = {};
 
@@ -8,10 +10,12 @@ SettingMid.beforeAddWebsite = async function (req, res, next) {
     let check = validator.validateUrl(req.body.url);
     if(check){
         req.input = req.body;
+        req.input.frequently = CONFIG.FREQUENTLY_DEFAULT;
+        req.input.connectionTimeout = CONFIG.DEFAULT_TIMEOUT;
         next();
     }
     else {
-        return res.status(400).send({flag: false, message: "url wrong"});
+        return res.status(400).send({flag: false, message: "url is wrong"});
     }
 };
 
@@ -21,13 +25,9 @@ SettingMid.beforeAddAdvanceConfig = async function (req, res, next) {
     //
     subList.forEach((e)=>{
      let check = validator.validateUrl(e.url);
-     if(!check) return res.status(400).send({flag: false, message: "urlList wrong"});
+     if(!check) return res.status(400).send({flag: false, message: "urlList is wrong"});
     });
-    //
 
-    //
-
-    //
 
     req.config=req.body;
     next();
@@ -35,31 +35,32 @@ SettingMid.beforeAddAdvanceConfig = async function (req, res, next) {
 
 
 SettingMid.beforeChangeConfig = async function (req, res, next) {
-    next();
+    let id = req.params.id;
+    let check = await validator.validateChangeConfig(req.body, req.params.id);
+    if(check){
+        req.input = req.body;
+        req.input.webId = req.params.id;
+        next();
+    }
+    else return res.status(400).send({flag: false, message: "frequently or connectionTimeOut is wrong"});
+
 };
 
-SettingMid.afterChangeConfig = async function (req, res){
-    let subSite: any = req.subSite;
-    let rs=[];
-    subSite.forEach((e)=>{
-       rs.push(e.id);
-    });
-
-    return res.status(200).send({flag: true, subSiteIdList: rs});
+SettingMid.beforeRemoveWebsite = async function (req, res, next){
+    let check = await validator.validateRemoveWebsite(req.params.id);
+    if(check) next();
 
 };
 
 SettingMid.afterAddAdvanceConfig = async function (req, res){
-    let subSite: any = req.subSite;
+    let subSiteList: any = req.subSiteList;
     let rs=[];
-    subSite.forEach((e)=>{
-        rs.push(e.id);
+    subSiteList.forEach((e)=>{
+        rs.push({siteName: e.siteName, id: e.id, frequently: e.frequently});
     });
 
     return res.status(200).send({flag: true, subSiteIdList: rs});
 
 };
-
-
 
 module.exports = SettingMid;

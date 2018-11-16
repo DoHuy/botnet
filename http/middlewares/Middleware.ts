@@ -2,6 +2,7 @@
 import * as Validator from "../../domains/Validator/Validator";
 import * as Auth from "../../domains/Auth/Auth";
 
+// @ts-ignore
 let validator = new Validator();
 // @ts-ignore
 let auth = new Auth();

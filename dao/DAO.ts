@@ -23,8 +23,6 @@ DAO.prototype.deleteById = function(){
 
 }
 
-
-
 DAO.prototype.modifyById = function () {
 
 }

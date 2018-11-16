@@ -2,6 +2,7 @@
 // @ts-ignore
 import*as Validator from '../../domains/Validator/Validator';
 let AuthMiddleware = {};
+// @ts-ignore
 let validator = new Validator();
 
 /**

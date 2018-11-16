@@ -1,5 +1,6 @@
 // @ts-ignore
 import*as Validator from '../../domains/Validator/Validator';
+// @ts-ignore
 let validator = new Validator();
 let MonitoredWebsiteMiddleware: any={};
 

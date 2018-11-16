@@ -14,10 +14,20 @@ export const CHECK_PROXY_TIME = 60*60*1000 // default 3 hours
 
 export const DEFAULT_TIMEOUT = 30*1000; // nguoi dung khong truyen thi default = 100000
 
-export const FREQUENTLY_DEFAULT = 1*60*1000 // 1 phut
+export const FREQUENTLY_DEFAULT = 1*60*1000 // 1 phut // khoang thoi gian sau khi check xong trang web nay toi luc bat dau chek trang ke tiep
 
 export const SECRET_KEY = 'huy_dep_zai'; // secretKey cho JWT
 
 export const PAY_LOAD_FIELD = ['id', 'credentialname', 'created']; // created-la ngay tao token cac tu khoa ta truyen vao trong payload cua json web token
 
 export const EXPIRED_TOKEN = 3 // day
+
+export const NOTICE_RULE = {
+    "connectionTimeout":{
+        "threshold":{
+            "success": 15, // (s) <= 15s thi success
+        }
+    },
+    "levels":["success", "warning", "error"],
+    "state": ["up", "down"]
+}
