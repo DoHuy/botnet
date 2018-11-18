@@ -5,7 +5,7 @@ const utils  = require('util');
 const exec   = utils.promisify(require('child_process').exec);
 // @ts-ignore
 const ProxyDAO = require('../../dao/ProxyDAO');
-const Configs = require('../../utils/Configs');
+const Configs = require('../../../commons/utils/Configs');
 // @ts-ignore
 let proxyDAO = new ProxyDAO();
 

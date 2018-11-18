@@ -1,5 +1,5 @@
 import {Pool} from  'pg';
-import*as CONFIG from '../utils/Configs';
+import*as CONFIG from './Configs';
 
 
 const Connection:any = {};

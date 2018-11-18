@@ -99,7 +99,7 @@ ProxyDAO.prototype.modifyByIpAndPort = async function (ip, port, key, value) {
 
 }
 
-ProxyDAO.prototype.findCondition = async function(condition){
+ProxyDAO.prototype.findByCondition = async function(condition){
     let result;
     let sql = `select*from proxies where ${condition}`;
     try{

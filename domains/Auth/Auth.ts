@@ -5,9 +5,9 @@ import*as DAO from "../../dao/DAO";
 // @ts-ignore
 import*as TokenDAO from "../../dao/TokenDAO";
 import*as crypto from 'crypto';
-import*as CONFIG from '../../utils/Configs';
+import*as CONFIG from '../../commons/Configs';
 import*as ThirdPartyFactory from '../../domains/ThirdPartyService/ThirdPartyFactory';
-import {SERVICE_MAIL} from "../../utils/Constants";
+import {SERVICE_MAIL} from "../../commons/Constants";
 
 const Libs = require('../../commons/Libs');
 // @ts-ignore

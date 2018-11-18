@@ -1,5 +1,5 @@
 import*as Libs from '../../commons/Libs';
-import*as CONFIG from '../../utils/Configs';
+import*as CONFIG from '../../commons/Configs';
 // @ts-ignore
 import*as ProxyDAO from '../../dao/ProxyDAO';
 import*as fetch from 'node-fetch';

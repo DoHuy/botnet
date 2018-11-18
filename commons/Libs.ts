@@ -4,8 +4,8 @@ const path = require('path');
 const curl = require('curl');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
-const Constants   = require('../utils/Constants');
-const config    = require('../utils/Configs');
+const Constants   = require('./Constants');
+const config    = require('./Configs');
 
 
 /**
@@ -114,17 +114,15 @@ async function requestWithPuppeteer(url, imagePath, proxyServer=null, timeOutPro
           return nav;
         });
 
-        result.status = response["_headers"].status;
-        result.server = response["_headers"].server;
+        result.status = response["_headers"].status==undefined?response["_status"]:response["_headers"].status;
+        result.server = response["_headers"].server==undefined?"not available".toLocaleUpperCase():response["_headers"].server;
         // result.header = response["_headers"];
         // @ts-ignore
         if(result.status !== '200'){
             // chup lai anh neu loi xay ra
             await page.screenshot({
                 // @ts-ignore
-                path: imagePath,
-                fullPage: true,
-                omitBackground: true
+                path: imagePath
 
             });
 
@@ -136,7 +134,7 @@ async function requestWithPuppeteer(url, imagePath, proxyServer=null, timeOutPro
                 // @ts-ignore
                 path: imagePath,
                 fullPage: true,
-                omitBackground: true
+                omitBackground: false
 
             });
         }
@@ -147,14 +145,12 @@ async function requestWithPuppeteer(url, imagePath, proxyServer=null, timeOutPro
         // chup lai anh neu co loi xay ra
         await page.screenshot({
             // @ts-ignore
-            path: imagePath,
-            fullPage: true,
-            omitBackground: true
+            path: imagePath
 
         });
         await browser.close();
         return {
-            status: 500,
+            status: '500',
             message: e.message
         }
 

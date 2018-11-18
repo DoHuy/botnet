@@ -1,6 +1,6 @@
 // @ts-ignore
 import*as Validator from '../../domains/Validator/Validator';
-import*as CONFIG from '../../utils/Configs';
+import*as CONFIG from '../../commons/Configs';
 // @ts-ignore
 let validator = new Validator();
 let SettingMid: any = {};

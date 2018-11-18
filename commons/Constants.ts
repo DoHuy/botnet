@@ -6,6 +6,7 @@ export const LOCATION = {
 
 export const PATH = {
     FILE_DATA_PATH: path.normalize(`${__dirname}/../data/store/snapshot`)
+
 }
 
 export const WORDS = [['sky', 'ocean', 'humans', 'animals', 'drone', 'robot', 'autumn', 'education', 'environment', 'news', 'technology', 'gravity'],

@@ -2,7 +2,13 @@
 import*as ServiceSettingManagerInterface from './ServiceSettingManagerInterface';
 import*as util from 'util';
 // @ts-ignore
+import*as Killer from '../../bin/BackgroundDomainsProcesses/SubProcManager';
+// @ts-ignore
 import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
+import {spawn} from "child_process";
+import*as CONSTANT from '../../commons/Constants';
+
+let fs = util.promisify(require('fs'));
 let monitoredWebSiteDAO = new MonitoredWebsiteDAO();
 function ServiceSettingManager() {
     ServiceSettingManagerInterface.call(this);
@@ -25,11 +31,23 @@ ServiceSettingManager.prototype.createWebsite = async function (input, credentia
         let rs: any = await monitoredWebSiteDAO.create(input);
         rs = await monitoredWebSiteDAO.modifyById(rs.id, ['parent', 'modified'], [rs.id, rs.created]);
         await monitoredWebSiteDAO.transactionCommit();
+
+        // init child_process monitor_web // 4 argument : frequently, connectionTimeout, webId, url
+        // init
+        // let proc = spawn('node', [CONSTANT.PATH.CURRENT_IP_PROC, rs.frequently, rs.connectionTimeout, rs.id, rs.url],{
+        //     detached: true,
+        //     stdio: 'ignore'
+        // });
+        // //
+        // // save procId
+        // // @ts-ignore
+        // await fs.writeFile(CONSTANT.PATH.PROC_ID_FILE_PATH, 'utf8');
         return rs;
     }catch (e) {
         await monitoredWebSiteDAO.transactionRollback();
         throw e;
     }
+
 };
 
 /**

@@ -1,5 +1,5 @@
 import*as MailService from './MailService';
-import {SERVICE_MAIL} from "../../utils/Constants";
+import {SERVICE_MAIL} from "../../commons/Constants";
 
 function ThirdPartyFactory() {}
 

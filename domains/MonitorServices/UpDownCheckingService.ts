@@ -1,8 +1,8 @@
 // @ts-ignore
 import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 import*as Libs from '../../commons/Libs';
-import*as CONSTANT from '../../utils/Constants';
-import*as CONFIG from '../../utils/Configs';
+import*as CONSTANT from '../../commons/Constants';
+import*as CONFIG from '../../commons/Configs';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
