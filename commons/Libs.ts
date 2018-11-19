@@ -150,6 +150,7 @@ async function requestWithPuppeteer(url, imagePath, proxyServer=null, timeOutPro
         });
         await browser.close();
         return {
+            server: "NOT AVAILABLE",
             status: '500',
             message: e.message
         }

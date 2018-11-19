@@ -24,13 +24,13 @@ CurrentIpCheckingProc.url = process.argv[4] || "https://news.zing.vn";
 CurrentIpCheckingProc.run = async function () {
     let response: any; // {created: {DNSLookup..., averageResponseTime, minResponseTime, maxResponseTime, upTotal, downTotal, location:{}}}
     let notification: any; //{notification: {server, status, level, message}
+    let created: any = `${new Date().toISOString()}`;
     let infoIp = await exec(`curl https://ipinfo.io`);
     let location: any = JSON.parse(infoIp.stdout);
     // @ts-ignore
-    let image = `${new Date().toISOString()}.png`;
+    let image = `${created}.png`;
     // @ts-ignore
     let imagePath = Lib.generatePath(__dirname, CONSTANT.PATH.FILE_DATA_PATH, image);
-    let created: any = `${new Date().toISOString()}`;
     // co 3 level: success, warning, error
     let tmp:any={}; //{server, statusCode, code, state, level, message, img} // tmp la bien tam giu thong tin cua notification
     // @ts-ignore
@@ -84,7 +84,8 @@ CurrentIpCheckingProc.run = async function () {
                 minResponseTime: 0,
                 location: location
             };
-            let details: any = web.responseTime!=null?web.responseTime: firstResponse ; // responseTime == detials
+
+            let details: any = web.responseTime!=null?web.responseTime: firstResponse; // responseTime == detials
             details[created]=firstResponse[created];
             for(let i in details){
                 averageResponseTime += details[i].ResponseTime;

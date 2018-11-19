@@ -64,7 +64,13 @@ SubProcManager.initCurrentIpCheckingProc = (connectionTimeout, webId, url)=>{
     }catch (e) {
         throw e;
     }
-}
+};
+
+SubProcManager.initMultipleCountryCheckProc = ()=>{
+
+};
+
+SubProcManager.initMultipleIspCheckProc
 
 
 module.exports = SubProcManager;
