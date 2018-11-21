@@ -133,7 +133,6 @@ CurrentIpCheckingProc.run = async function () {
 
     };
 
-    // send kq toi parent_process sau do kill
     return {response, notification};
 
 };
@@ -149,8 +148,10 @@ CurrentIpCheckingProc.run = async function () {
 //
 //
 
-// runing
+// runing test done
 CurrentIpCheckingProc.run().then(rs=>{
+    // send kq toi parent_process sau do kill
+    // console.log(rs);
     process.send(rs);
     process.exit(0);
 });

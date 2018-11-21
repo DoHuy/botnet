@@ -55,11 +55,11 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
             // @ts-ignore
             metric= await Lib.requestWithPuppeteer(url, imagePath, {ip: proxy.ip, port: proxy.port}, connectionTimeout);
 
-            if(metric.status == '500' && count != MAX){
+            if((metric.status == '500' || metric.status == 500) && count != MAX-1){
                 count++;
             }
 
-            else if(metric.status=='500' && count == MAX){
+            else if((metric.status == '500' || metric.status == 500) && count == MAX-1){
                 // throw e/ neu co loi xay ra
                 response = {
                     DNSLookup: 0,
@@ -79,6 +79,8 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
                     img: `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
                     level: "error"
                 };
+
+                return {response, notification};
             }
             else {
                 // calculate metric
@@ -117,6 +119,7 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
         }
 
     }catch (e) {
+        console.log(e);
         throw e;
 
     };
@@ -165,8 +168,11 @@ MultipleIspCheckingProc.run = async ()=>{
         let hcmVnptMetric: any = await calculateMetric(hcmVnpt, MultipleIspCheckingProc.connectionTimeout, MultipleIspCheckingProc.url);
         let hcmVietelMetric: any = await calculateMetric(hcmVietel, MultipleIspCheckingProc.connectionTimeout, MultipleIspCheckingProc.url);
         return {
-            response: [hnVietelMetric.response, hnVnptMetric.response, hcmVnptMetric.response, hcmVietelMetric.response],
-            notification: [hnVietelMetric.notification, hnVnptMetric.notification, hcmVnptMetric.notification, hcmVietelMetric.notification]
+            isps: ['hnVietel', 'hnVnpt', 'hcmVnpt', 'hcmVietel'],
+            result: [{response: hnVietelMetric.response, notification: hnVietelMetric.notification},
+                        {response: hnVnptMetric.response, notification: hnVnptMetric.notification},
+                        {response: hcmVnptMetric.response, notification: hcmVnptMetric.notification},
+                        {response: hcmVietelMetric.response, notification: hcmVietelMetric.notification}]
         }
 
     }catch (e) {
@@ -180,7 +186,7 @@ MultipleIspCheckingProc.run = async ()=>{
 
 // run
 MultipleIspCheckingProc.run().then(rs=>{
-    // process.send(rs);
-    // process.exit();
-    console.log(rs);
+    process.send(rs);
+    process.exit(0);
+    // console.log(JSON.stringify(rs));
 });

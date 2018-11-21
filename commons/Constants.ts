@@ -61,3 +61,7 @@ export const STATUS_CODE = [
     ["504", {"code": "GATEWAY TIMEOUT", "message": "The server, while acting as a gateway or proxy, did not receive a timely response from the upstream server specified by the URI (e.g. HTTP, FTP, LDAP) or some other auxiliary server (e.g. DNS) it needed to access in attempting to complete the request"}]
 
 ];
+
+export const COUNTRIES = [['usa', 'United States'], ['uk', 'United Kingdom'], ['russia', 'Russia'], ['singapore', 'Singapore'],
+                        ['india', 'India'], ['korea', 'South Korea'], ['japan', 'Japan'], ['germany', 'Germany'], ['france', 'France'],
+                        ['sweden', 'Sweden'], ['australia', 'Australia'], ['italy', 'Italy']];
