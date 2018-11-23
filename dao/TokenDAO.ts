@@ -5,7 +5,7 @@ const util = require('util');
 // @ts-ignore
 const Token = require('../data/entities/Token');
 // @ts-ignore
-const CONFIG = require('../../commons/utils/Configs');
+const CONFIG = require('../commons/Configs');
 function TokenDAO() {
     DAO.call(this);
 }

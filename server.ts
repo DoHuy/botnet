@@ -2,7 +2,7 @@
 const express = require('express');
 const server = express();
 const Router = require('./http/routes/Router');
-const Config = require('../commons/utils/Configs');
+const Config = require('./commons/Configs');
 const bodyParser = require('body-parser');
 const path = require('path');
 

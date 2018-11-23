@@ -13,7 +13,7 @@ router.post(`/addWebsite`, Middleware.verifyToken,  Middleware.SettingMid.before
 // @ts-ignore
 router.put(`/changeConfig/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeChangeConfig, Controller.SettingCon.changeConfig);
 // @ts-ignore
-router.post(`/addAdvanceConfig`, Middleware.verifyToken, Middleware.SettingMid.beforeAddAdvanceConfig, Controller.SettingCon.addAdvanceConfig, Middleware.SettingMid.afterAddAdvanceConfig);
+router.post(`/addAdvanceConfig/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeAddAdvanceConfig, Controller.SettingCon.addAdvanceConfig, Middleware.SettingMid.afterAddAdvanceConfig);
 
 router.delete(`/remove/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeRemoveWebsite, Controller.SettingCon.removeWebsite);
 

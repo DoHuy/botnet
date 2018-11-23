@@ -41,9 +41,9 @@ AuthMiddleware.beforeVerifyAccount = async function (req, res, next) {
     next();
 };
 
-// @ts-ignore
-AuthMiddleware.beforeResetToken = async function (req, res, next) {
-    next();
-};
+// // @ts-ignore
+// AuthMiddleware.beforeResetToken = async function (req, res, next) {
+//     next();
+// };
 
 module.exports = AuthMiddleware;

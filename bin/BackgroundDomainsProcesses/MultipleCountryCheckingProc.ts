@@ -55,9 +55,13 @@ MultipleCountryCheckingProc.run = async (countriesList)=>{
     }
 
     // init sub_process check up_down country
+    // @ts-ignore
     let country1Proc: any = SubProcManager.initCalculateCountryProc(country1, MultipleCountryCheckingProc.connectionTimeout, MultipleCountryCheckingProc.url);
+    // @ts-ignore
     let country2Proc: any = SubProcManager.initCalculateCountryProc(country2, MultipleCountryCheckingProc.connectionTimeout, MultipleCountryCheckingProc.url);
+    // @ts-ignore
     let country3Proc: any = SubProcManager.initCalculateCountryProc(country3, MultipleCountryCheckingProc.connectionTimeout, MultipleCountryCheckingProc.url);
+    // @ts-ignore
     let country4Proc: any = SubProcManager.initCalculateCountryProc(country4, MultipleCountryCheckingProc.connectionTimeout, MultipleCountryCheckingProc.url);
 
     let country1Data = new Promise((resolve) =>{

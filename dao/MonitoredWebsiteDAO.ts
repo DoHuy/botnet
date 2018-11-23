@@ -179,27 +179,32 @@ MonitoredWebsiteDAO.prototype.findByCondition = async function(condition){
         throw e;
 
     }
-    let websiteList = [];
-    for(let site of result.rows){
-        // @ts-ignore
-        websiteList.push(new MonitoredWebsite(
-            site.id,
-            site.sitename,
-            site.url,
-            site.frequently,
-            site.connectiontimeout,
-            site.parent,
-            site.created,
-            site.modified,
-            site.deleted,
-            site.responsetime,
-            site.notification,
-            site.credentialid
+    if(result.rows.length == 0){
+        return null;
+    }
+    else{
+        let websiteList = [];
+        for(let site of result.rows){
+            // @ts-ignore
+            websiteList.push(new MonitoredWebsite(
+                site.id,
+                site.sitename,
+                site.url,
+                site.frequently,
+                site.connectiontimeout,
+                site.parent,
+                site.created,
+                site.modified,
+                site.deleted,
+                site.responsetime,
+                site.notification,
+                site.credentialid
 
-        ));
-    };
+            ));
+        };
 
-    return websiteList;
+        return websiteList;
+    }
 };
 
 module.exports = MonitoredWebsiteDAO;

@@ -1,36 +1,92 @@
 // @ts-ignore
+import {readFileSync, writeFileSync} from "fs";
+// import {execSync} from "child_process";
+
 const util = require('util');
 // @ts-ignore
 const fs = require('fs');
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
+const path = require('path');
 const CONSTANT = require('../../commons/Constants');
 // @ts-ignore
+import {execSync} from "child_process";
+
 const exec = require('child_process').exec;
 const spawn = require('child_process').spawn;
 const fork = require('child_process').fork;
-let writeFile: any = util.promisify(fs.writeFile);
-let readFile: any = util.promisify(fs.readFile);
-let unlink: any = util.promisify(fs.unlink);
 // @ts-ignore
 let SubProcManager: any = {};
 
 /**
  *  ham nay xoa toan bo cac child_process cua  nghiep vu cua web khi goi ham xoa
  */
-SubProcManager.killAllProc = async (webId)=>{
+SubProcManager.killAllProc = (webId)=>{
+    let procIdPath = path.join(__dirname, '..', '..', 'tmp', 'procIdtmp', `procs_${webId}.json`);
+
+    let rs: any = fs.readFileSync(procIdPath, 'utf8');
+    rs = JSON.parse(rs);
+       if(rs["normal_proc_id"].length>0){
+           rs["normal_proc_id"].forEach(e=>{
+               execSync(`kill ${e}`);
+           });
+       }
+        if(rs["advance_proc_id"].length>0){
+            rs["advance_proc_id"].forEach(e=>{
+                execSync(`kill ${e}`);
+            });
+        }
+
+        fs.unlinkSync(procIdPath);
+
+};
+
+/**
+ *  ham nay xoa toan bo cac normal child_process cua  nghiep vu cua web khi goi ham xoa
+ */
+SubProcManager.killAllNormalProc = (webId)=>{
+    let procIdPath = path.join(__dirname, '..', '..', 'tmp', 'procIdtmp', `procs_${webId}.json`);
 
     try{
-        let data: any = await readFile(`../../tmp/procIdtmp/${webId}_procs.json`, 'utf8');
-        data = JSON.parse(data);
+        let rs: any = fs.readFileSync(procIdPath, 'utf8');
+        rs = JSON.parse(rs);
+        if(rs["normal_proc_id"].length > 0){
+            rs["normal_proc_id"].forEach( e=>{
+                exec(`kill ${e}`);
+            });
+        }
+        let data: any = {
+            "normal_proc_id":[],
+            "advance_proc_id":[]
+        };
+        fs.writeFileSync(procIdPath, JSON.stringify(data), 'utf8');
 
-        // kill all process
-        data["advance_proc_id"].forEach(async (e)=>{
-            await exec(`kill ${e}`);
-        });
+    }catch (e) {
+        throw e;
+    }
 
-        data["normal_proc_id"].forEach(async (e)=>{
-            await exec(`kill ${e}`);
-        });
-        await fs.unlink(`../../tmp/procIdtmp/${webId}_procs.json`);
+};
+
+/**
+ *  ham nay xoa toan bo cac advance child_process cua  nghiep vu cua web khi goi ham xoa
+ */
+SubProcManager.killAllAdvanceProc = (webId)=>{
+    let procIdPath = path.join(__dirname, '..', '..', 'tmp', 'procIdtmp', `procs_${webId}.json`);
+
+    try{
+        let rs: any = fs.readFileSync(procIdPath, 'utf8');
+        rs = JSON.parse(rs);
+        if(rs["advance_proc_id"].length > 0){
+            rs["advance_proc_id"].forEach( e=>{
+                execSync(`kill ${e}`);
+            });
+        }
+        let data: any = {
+            "normal_proc_id":[],
+            "advance_proc_id":[]
+        };
+        fs.writeFileSync(procIdPath, JSON.stringify(data), 'utf8');
+
     }catch (e) {
         throw e;
     }
@@ -44,29 +100,39 @@ SubProcManager.killAllProc = async (webId)=>{
  * @param webId
  * @param url
  */
-SubProcManager.initNormalUpDownCheckingProc = async (frequently, connectionTimeout, webId, url)=>{
-    let proc: any = spawn('node', ['./NormalUpDownCheckingProc.js', frequently, connectionTimeout, webId, url],{
-        detached: true,
-        stdio: ['ignore']
-    });
-    // init file tmp_proc
+SubProcManager.initNormalUpDownCheckingProc = (frequently, connectionTimeout, webId, url, parentId)=>{
+
+    let proc: any = spawn('node', [ 'NormalUpDownCheckingProcess.js', frequently, connectionTimeout, webId, url],
+        {detached: true, stdio: 'ignore'});
+    // tach luong con chay doc lap so voi cha
+    proc.unref();
+    // init file tmp_proc muc dich la de luu lai pid cua process nay phuc vu cho viec quan li
+
     let data = {
         "advance_proc_id":[],
         "normal_proc_id":[proc.pid]
-    }
-    await writeFile(`../../tmp/procIdtmp/${webId}_procs.json`, data, 'utf8');
+    };
+
+    let procIdPath = path.join(__dirname, '..', '..', 'tmp', 'procIdtmp', `procs_${parentId}.json`);
+    fs.writeFileSync(procIdPath, JSON.stringify(data), 'utf8');
+    return proc;
 };
 
-SubProcManager.initAdvanceUpDownCheckingProc = async (frequently, connectionTimeout, webId, url, previousProcIdList)=>{
+SubProcManager.initAdvanceUpDownCheckingProc = (frequently, connectionTimeout, webId, url, parentId, countries)=>{
+    countries = JSON.stringify(countries);
     try{
-        let proc: any = spawn('node', ['./AdvanceUpDownCheckingProcess.js', frequently, connectionTimeout, webId, url],{
-            detached: true,
-            stdio: ['ignore']
-        });
-        let data: any =  await readFile(`../../tmp/procIdtmp/${webId}_procs.json`, 'utf8');
+        let proc: any = spawn('node', ['AdvanceUpDownCheckingProcess.js', frequently, connectionTimeout, webId, url, countries],
+            {detached: true, stdio: 'ignore'});
+        proc.unref();
+
+        let procPath = path.join(__dirname, '..', '..', 'tmp', 'procIdtmp', `procs_${parentId}.json`);
+        let data: any =  fs.readFileSync(procPath, 'utf8');
         data = JSON.parse(data);
+        console.log(data,'\n');
+        console.log(proc.pid, '\n');
         data["advance_proc_id"].push(proc.pid);
-        await writeFile(`../../tmp/procIdtmp/${webId}_procs.json`,data, 'utf8');
+        fs.writeFileSync(procPath,JSON.stringify(data), 'utf8');
+        return proc;
     }catch (e) {
         throw e;
     }
@@ -117,16 +183,5 @@ SubProcManager.initCalculateCountryProc = (arr, connectionTimeout, url)=>{
         throw e;
     }
 };
-
-//
-// SubProcManager.initCalculateIspProc = (arr, connectionTimeout, url)=>{
-//     arr = JSON.stringify(arr);
-//     try{
-//         let proc = fork(`calculateIspMetric.js`, [arr, connectionTimeout, url]);
-//         return proc;
-//     }catch (e) {
-//         throw e;
-//     }
-// };
 
 module.exports = SubProcManager;

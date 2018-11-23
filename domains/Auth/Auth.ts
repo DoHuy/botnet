@@ -8,10 +8,14 @@ import*as crypto from 'crypto';
 import*as CONFIG from '../../commons/Configs';
 import*as ThirdPartyFactory from '../../domains/ThirdPartyService/ThirdPartyFactory';
 import {SERVICE_MAIL} from "../../commons/Constants";
+// @ts-ignore
+import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
+import {EXPIRED_TOKEN} from "../../commons/Configs";
 
 const Libs = require('../../commons/Libs');
 // @ts-ignore
 let thirdFact = new ThirdPartyFactory();
+let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 
 function Auth() {}
 
@@ -69,23 +73,60 @@ Auth.prototype.authenticate = async function (account) {
     let credentialDAO = new CredentialDAO();
     try{
         let credential =  await credentialDAO.findForLogin(account.credentialname, account.password);
-        return credential;
+        if(credential != null && credential.status == 'active') return {flag: true, credential: credential};
+        else if (credential != null && credential.status == 'inactive'){
+            return {flag: false, message: "Account need be verify"};
+        }
+        else {
+            return {flag: false, message: "username or password invalid"};
+        }
     } catch(e){
         throw e;
     }
 };
 
 /**
- * done
+ *  kiem tra xem nguoi nay co quyen thao tac tren website nay hay ko
+ * @param credentialId
+ * @param webId
+ */
+Auth.prototype.authorize = async (credentialId, webId)=>{
+    let web: any = monitoredWebsiteDAO.findByCondition(`credentialid = ${credentialId} AND id=${webId}`);
+    if(web == null){
+        return {flag: false, message: "permission denied"};
+    }
+    else{
+        return {flag: true, message: "OK"};
+    }
+};
+
+/**
+ * ham nay check token xem qua han hay chua
+ * neu qua han renew token moi
+ * nguoc lai tra ve true
  * return true false
  * @param token
  */
 Auth.prototype.verifyToken = async function(token){
+    let currentDate: any = new Date();
     let tokenDAO = new TokenDAO();
     try{
     let rs = await tokenDAO.findById(token);
-    if(rs == null) return false;
-    else return true;
+    if(rs == null){
+        return {flag: false, message: "invalid token"};
+    }
+    else{
+        let tokenDate: any = new Date(rs.created);
+
+        // qua han thi renewtoken
+        if(currentDate-tokenDate >= Number.parseInt(rs.expired)){
+            await this.renewToken(token);
+            return {flag: false, message: "token expired"};
+        }
+        else{
+            return {flag: true, message: "corrected"};
+        }
+    }
     }catch (e) {
         throw e;
     }

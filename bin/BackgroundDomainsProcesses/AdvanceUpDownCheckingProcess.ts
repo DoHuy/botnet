@@ -2,7 +2,7 @@
 import *as MonitoredWebsiteDAO from "../../dao/MonitoredWebsiteDAO";
 // @ts-ignore
 import *as SubProcManager from './SubProcManager';
-
+import*as CONSTANT from '../../commons/Constants';
 
 // 4 argument : frequently, connectionTimeout, webId, url
 let AdvanceUpDownCheckingProcess: any = {};
@@ -14,7 +14,7 @@ AdvanceUpDownCheckingProcess.frequently = process.argv[2] || 1;
 AdvanceUpDownCheckingProcess.connectionTimeout = process.argv[3] || 30;
 AdvanceUpDownCheckingProcess.webId = process.argv[4] || 10;
 AdvanceUpDownCheckingProcess.url = process.argv[5] || "https://youtube.com";
-AdvanceUpDownCheckingProcess.countriesList = process.argv[6] || arrTest;
+AdvanceUpDownCheckingProcess.countries = process.argv[6] || arrTest;
 /**
  *
  * tao luong con nhan message them lai vao csdl
@@ -25,14 +25,28 @@ AdvanceUpDownCheckingProcess.countriesList = process.argv[6] || arrTest;
 AdvanceUpDownCheckingProcess.run = async function () {
     let metric = {};
     let created = new Date().toISOString();
+    let countriesList: any=[];
+    //convert countries
+    // @ts-ignore
+    let countriesMap = new Map(CONSTANT.COUNTRIES);
+    AdvanceUpDownCheckingProcess.countries = JSON.parse(AdvanceUpDownCheckingProcess.countries);
+    AdvanceUpDownCheckingProcess.countries.forEach((e)=>{
+        let kq = countriesMap.get(e);
+        countriesList.push({key: e, value: kq});
+    });
+    countriesList = JSON.stringify(countriesList);
+    //
     try{
         // get old_notification, old_responseTime
         let web: any = await monitoredWebsiteDAO.findById(AdvanceUpDownCheckingProcess.webId);
 
         // init child_process checking
+        // @ts-ignore
         let proc1 = SubProcManager.initCurrentIpCheckingProc(AdvanceUpDownCheckingProcess.connectionTimeout, AdvanceUpDownCheckingProcess.webId, AdvanceUpDownCheckingProcess.url);
+        // @ts-ignore
         let proc2 = SubProcManager.initMultipleIspCheckingProc(AdvanceUpDownCheckingProcess.connectionTimeout, AdvanceUpDownCheckingProcess.url);
-        let proc3 = SubProcManager.initMultipleCountryCheckingProc(AdvanceUpDownCheckingProcess.connectionTimeout, AdvanceUpDownCheckingProcess.url, AdvanceUpDownCheckingProcess.countriesList);
+        // @ts-ignore
+        let proc3 = SubProcManager.initMultipleCountryCheckingProc(AdvanceUpDownCheckingProcess.connectionTimeout, AdvanceUpDownCheckingProcess.url, countriesList);
 
         let dataProc1 = new Promise((resolve)=>{
             proc1.on('message', (msg)=>{
@@ -104,6 +118,11 @@ AdvanceUpDownCheckingProcess.run = async function () {
 
 };
 
-//run
+//run done
 
-AdvanceUpDownCheckingProcess.run();
+// AdvanceUpDownCheckingProcess.run();
+
+// // test done
+setInterval(async ()=>{
+    await AdvanceUpDownCheckingProcess.run();
+}, AdvanceUpDownCheckingProcess.frequently);

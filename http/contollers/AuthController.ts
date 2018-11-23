@@ -12,8 +12,12 @@ let AuthController: any = {};
 AuthController.login = async function (req, res, next) {
     try{
         let account = await auth.authenticate(req.account);
-        if(account == null) return res.status(404).send({flag: false, message: 'not found '});
-        else return res.status(200).send({flag: true, token: account.token});
+        if (account.flag == true) {
+            return res.status(200).send({flag: true, credentialname: account.credential.credentialname, token: account.credential.token});
+        }
+        else {
+            return res.status(404).send({flag: false, message: account.message});
+        }
     }catch (e) {
         return res.status(500).send({flag: false, message: e.message})
     }
@@ -40,13 +44,13 @@ AuthController.verifyAccount = async function (req, res, next) {
 }
 
 
-AuthController.resetToken = async function (req, res, next) {
-    try{
-      let credential =  await auth.renewToken(req.params.token);
-      return res.status(200).send({flag: true, token: credential.token});
-    }catch (e) {
-        throw e;
-    }
-}
+// AuthController.resetToken = async function (req, res, next) {
+//     try{
+//       let credential =  await auth.renewToken(req.params.token);
+//       return res.status(200).send({flag: true, token: credential.token});
+//     }catch (e) {
+//         throw e;
+//     }
+// }
 
 module.exports = AuthController;

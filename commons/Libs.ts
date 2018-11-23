@@ -93,7 +93,7 @@ async function requestWithPuppeteer(url, imagePath, proxyServer=null, timeOutPro
     // let imagePath = generatePath(__dirname, Constants.PATH.FILE_DATA_PATH, `${new Date().toISOString()}.png`);
     let option = proxyServer==null?{headless: true}:{headless: true, args: [`--proxy-server=${proxyServer.ip}:${proxyServer.port}`]};
     const browser = await puppeteer.launch(option);
-    let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy*1000;
+    let timeout = timeOutProxy==null?config.DEFAULT_TIMEOUT:timeOutProxy;
     try{
        page = await browser.newPage();
       response =  await page.goto(url, {

@@ -14,8 +14,8 @@ let CurrentIpCheckingProc: any = {};
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 //
 // CurrentIpCheckingProc.frequently = process.argv[2] || 1;
-CurrentIpCheckingProc.connectionTimeout = process.argv[2] || 30;
-CurrentIpCheckingProc.webId = process.argv[3] || 10;
+CurrentIpCheckingProc.connectionTimeout = process.argv[2] || '30000';
+CurrentIpCheckingProc.webId = process.argv[3] || 74;
 CurrentIpCheckingProc.url = process.argv[4] || "https://news.zing.vn";
 /**
  * done
