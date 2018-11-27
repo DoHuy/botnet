@@ -13,7 +13,7 @@ Connection.connectDb = function () {
                 database: CONFIG['DB_CONFIG'].PG_DATABASE,
                 password: CONFIG['DB_CONFIG'].PG_PASSWORD,
                 port: CONFIG['DB_CONFIG'].PG_PORT,
-                max: 100,
+                max: 1000,
                 idleTimeoutMillis: 30000,
                 connectionTimeoutMillis: 2000,
             });

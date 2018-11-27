@@ -4,18 +4,9 @@ function Monitor(service) {
     this.service = service;
 }
 
-Monitor.prototype.executeCheckingUpDown = function () {
-
+Monitor.prototype.executeStratergy = async function (jsonData)  {
+    let data: any = await this.service.doOperation(jsonData);
+    return data;
 }
 
-Monitor.prototype.executeDetectDeface = function () {
-
-}
-
-Monitor.prototype.executeDetectPoisonScript = function () {
-    
-}
-
-Monitor.prototype.executeDetectHackedDNS = function () {
-    
-}
+module.exports = Monitor;

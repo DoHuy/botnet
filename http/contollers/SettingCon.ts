@@ -20,12 +20,13 @@ SettingCon.addWebSite = async function (req, res) {
 };
 
 SettingCon.changeConfig = async function (req, res, next) {
-    let check;
+    let updatedList;
     try{
-        check = await configor.modifyConfigWebsite(req.input, req.credentialId);
-        return res.status(200).send({flage: check, message: "changeConfig successfully"});
+        updatedList = await configor.modifyConfigWebsite(req.input, req.credentialId);
+        req.updatedList = updatedList;
+        next();
     }catch (e) {
-        return res.status(500).send({flage: false, message: e.message});
+        return res.status(500).send({flag: false, message: e.message});
     }
 };
 
@@ -40,7 +41,7 @@ SettingCon.addAdvanceConfig = async function (req, res, next) {
     }
 };
 
-SettingCon.removeWebsite = async function (req, res, next){
+SettingCon.removeWebsite = async function (req, res){
     let check;
     try{
         check = await configor.removeWebsite(req.params.id);

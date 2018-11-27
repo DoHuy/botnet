@@ -123,8 +123,8 @@ const calculateMetric = async (country, connectionTimeout, url) => {
 };
 
 let arr = JSON.parse(process.argv[2]);
-let connectionTimeout = process.argv[3] || 30;
-let url = process.argv[4] || 'https://news.zong.vn';
+let connectionTimeout = process.argv[3];
+let url = process.argv[4];
 calculateMetric(arr, connectionTimeout, url)
     .then(rs => {
         process.send(rs);

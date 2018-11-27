@@ -141,74 +141,84 @@ ServiceSettingManager.prototype.addAdvanceConfigWebsite = async function (config
 
 /**
  * input: {webId, updatedData:{siteName, frequently, connectionTimeout}}
- * cho phep sua siteName, connectionTimeout, frequently, subList, countries
+ * cho phep sua siteName, connectionTimeout, frequently, countries
  * @return {subId: subId}
  */
 ServiceSettingManager.prototype.modifyConfigWebsite = async function (input, credentialId) {
 
+    let countries = input.countries;
+    delete input.countries;
+    let modifiedKeys = Object.keys(input);
     try{
-        let frequently = input.frequently;
-        let connectionTimeout = input.connectionTimeout;
-        let siteName = input.siteName;
-        let subList: any = input.subList;
-        let parentSite: any;
-        // update lai config cho cha
-        await monitoredWebSiteDAO.transactionBegin();
-        let siteList: any = await monitoredWebSiteDAO.findByCondition(`parent = ${input.parent} AND credentialid=${input.credentialId} AND deleted IS NULL`);
-        for(let i=0 ; i<siteList.length ; i++){
-            if(siteList.id == input.parent){
-                parentSite = await monitoredWebSiteDAO.modifyById(input.parent, ['sitename', 'frequently', 'connectiontimeout'], [siteName, frequently, connectionTimeout]);
-            }
-            else{
-                await monitoredWebSiteDAO.deleteById(siteList.id);
-            }
-        }
+        let list: any = await monitoredWebSiteDAO.findByCondition(`parent=${input.parent} AND credentialid = ${credentialId}`);
+        if(modifiedKeys.length == 0){ // neu ko co truong nao muon update
+            // remove all advance child_proc
+            // @ts-ignore
+            SubProcManager.killAllAdvanceProc(input.parent);
 
-        // tao lai child_process cho cha
-        // @ts-ignore
-        SubProcManager.killAllAdvanceProc(input.parent);
-        let parentPath = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${input.parent}.json`);
-        let parentData: any = {
-            frequently: frequently,
-            connectionTimeout: connectionTimeout,
-            webId: input.parent,
-            url: parentSite.url,
-            parentId: input.parent,
-            countries: input.countries
-        };
-        parentData = JSON.stringify(parentData);
-        await writeFile(parentPath, parentData, 'utf8');
-        // tao cac site con cho cha va tao child_process cho moi site
-        for(let i=0 ; i<subList.length ; i++){
-            let subSite: any = await monitoredWebSiteDAO.create({
-                siteName: subList[i].siteName,
-                url: subList[i].url,
-                connectionTimeout: connectionTimeout,
-                frequently: frequently,
-                parent: input.parent,
-                created: new Date(),
-                credentialId: input.credentialId
+            // init advance child_process for all site
+            for(let i=0 ; i< list.length ; i++){
+                let procPath = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${list[i].id}.json`);
+                let data: any = {
+                    cmd: CMD[1],
+                    data: {
+                        frequently: list[i].frequently,
+                        connectionTimeout: list[i].connectionTimeout,
+                        webId: list[i].id,
+                        url: list[i].url,
+                        countries: countries,
+                        parentId: list[i].parent
+                    }
+
+                };
+                data = JSON.stringify(data);
+                await writeFile(procPath, data, 'utf8');
+            }
+
+            return list;
+        }
+        else{
+            let updatedList = []; // luu tru lai cac site da duoc update
+            let modifiedValues = [];
+            modifiedKeys.forEach(e=>{
+               modifiedValues.push(input[e]);
             });
+            modifiedKeys = modifiedKeys.map(e=>e.toLowerCase());
+            // uodate lai all site of credential
+            for(let i=0 ; i<list.length ; i++){
+                let tmp: any = await monitoredWebSiteDAO.modifyById(list[i].id, modifiedKeys, modifiedValues );
+                updatedList.push(tmp);
+                modifiedValues.pop();
+            }
 
-            let subData: any = {
-                frequently: frequently,
-                connectionTimeout: connectionTimeout,
-                webId: subSite.id,
-                url: subSite.url,
-                parentId: input.parent,
-                countries: input.countries
-            };
-            subData = JSON.stringify(subData);
-            let subPath = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${subSite.id}.json`);
-            await writeFile(subPath, subData, 'utf8');
+            // remove all advance child_proc
+            // @ts-ignore
+            SubProcManager.killAllAdvanceProc(input.parent);
 
+            // init advance child_process for all site
+            for(let i=0 ; i< updatedList.length ; i++){
+                let procPath = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${updatedList[i].id}.json`);
+                let data: any = {
+                    cmd: CMD[1],
+                    data: {
+                        frequently: updatedList[i].frequently,
+                        connectionTimeout: updatedList[i].connectionTimeout,
+                        webId: updatedList[i].id,
+                        url: updatedList[i].url,
+                        countries: countries,
+                        parentId: updatedList[i].parent
+                    }
+
+                };
+                data = JSON.stringify(data);
+                await writeFile(procPath, data, 'utf8');
+            }
+            //
+            return updatedList;
         }
-        await monitoredWebSiteDAO.transactionCommit();
     }catch (e) {
-        await monitoredWebSiteDAO.transactionRollback();
         throw e;
     }
-
 };
 
 

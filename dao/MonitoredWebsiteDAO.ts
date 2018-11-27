@@ -16,6 +16,7 @@ MonitoredWebsiteDAO.prototype.findById = async function (id) {
     let sql = `select*from monitoredwebsites where id=${id}`;
     try{
         result = await this.connection.query(sql);
+        if(result.rows.length == 0) return null;
     }catch (e) {
         throw e;
     }
@@ -204,7 +205,7 @@ MonitoredWebsiteDAO.prototype.findByCondition = async function(condition){
         };
 
         return websiteList;
-    }
+    }``
 };
 
 module.exports = MonitoredWebsiteDAO;

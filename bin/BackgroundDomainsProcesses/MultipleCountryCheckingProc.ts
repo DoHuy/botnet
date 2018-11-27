@@ -10,22 +10,23 @@ import*as SubProcManager from './SubProcManager';
 let proxyDAO = new ProxyDAO();
 let MultipleCountryCheckingProc: any = {};
 let arrTest = JSON.stringify([{key: 'usa', value: 'United States'}, {key: 'japan', value: 'Japan'}, {key: 'uk', value: 'United Kingdom'}, {key: 'russia', value: 'Russia'}]);
-MultipleCountryCheckingProc.connectionTimeout = process.argv[2] || 30;
+MultipleCountryCheckingProc.connectionTimeout = process.argv[2] || 30000;
 MultipleCountryCheckingProc.url = process.argv[3] || "https://youtube.com";
-MultipleCountryCheckingProc.countriesList = process.argv[4];
+MultipleCountryCheckingProc.countriesList = process.argv[4] || arrTest;
 /**
  *input: countriesList = [{key:, value:}, [{}]];
  * @retun process.exit()
  */
-MultipleCountryCheckingProc.run = async (countriesList)=>{
+MultipleCountryCheckingProc.run = async (countriesList: any)=>{
     let country1=[], country2=[], country3=[], country4=[];
     let countries = [];
     countriesList = JSON.parse(countriesList);
     countriesList = JSON.parse(countriesList);
-    // console.log(typeof countriesList, countriesList);
-    countriesList.forEach((e)=>{
+
+    for(let i=0 ; i<countriesList.length ; i++){
+        let e = countriesList[i];
         countries.push(e.key);
-    });
+    }
 
     let sql = `details->>'country' like '%United States%' OR details->>'country' like '%${countriesList[0].value}%'
             OR details->>'country' like '%${countriesList[1].value}%' OR details->>'country' like '%${countriesList[2].value}%'
@@ -93,5 +94,5 @@ MultipleCountryCheckingProc.run = async (countriesList)=>{
 
 };
 
-// run
+// run done
 MultipleCountryCheckingProc.run(MultipleCountryCheckingProc.countriesList);

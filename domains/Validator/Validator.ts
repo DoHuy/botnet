@@ -10,10 +10,10 @@ function Validator() {}
 
 Validator.prototype.validateLogin = function (rawData){
     if(rawData.credentialname == undefined){
-        return {flag: false, message: "thiếu credentialname"};
+        return {flag: false, message: "credentialname is not empty"};
     }
     if(rawData.password == undefined){
-        return {flag: false, message: "thiếu password"};
+        return {flag: false, message: "password is not empty"};
     }
 
     return {flag: true, message: "OK"};
@@ -21,16 +21,16 @@ Validator.prototype.validateLogin = function (rawData){
 
 Validator.prototype.validateSignUp = function (rawData){
     if(rawData.credentialname == undefined){
-         return {flag: false, message: "thiếu credentialname"};
+         return {flag: false, message: "credentialname is not empty"};
     }
     if(rawData.password == undefined){
-        return {flag: false, message: "thiếu password"};
+        return {flag: false, message: "password is not empty"};
     }
     if(rawData.email == undefined){
-        return {flag: false, message: "thiếu email"};
+        return {flag: false, message: "email is not empty"};
     }
     if(rawData.phone == undefined){
-        return {flag: false, message: "thiếu phone"};
+        return {flag: false, message: "phone is not empty"};
     }
 
     return {flag: true, message: "OK"};
@@ -50,34 +50,44 @@ Validator.prototype.validateAddWebsite = (data)=>{
 };
 
 Validator.prototype.validateChangeConfig = async (rawData)=>{
-    for(let key in rawData){
-        if(key != 'parent' && rawData[key] != undefined){
-            return {flag: true, message: "OK"};
-        }
-        else {
-            return {flag: false, message: "please, enter something u want update"};
-        }
+    if(rawData.countries == undefined){
+        return {flag: false, message: " countries are not empty"};
     }
+    return {flag: true, message: "OK"};
 };
 
 Validator.prototype.validateRemoveWebsite = async (webId)=>{
-    if(1) {
-        try{
-            let web = await monitoredWebsiteDAO.findById(webId);
-            if(web.id == web.parent && web.deleted == null) return true;
-            else return false;
-        }catch (e) {
-            throw e;
+
+    try{
+        let webParent: any = await monitoredWebsiteDAO.findById(webId);
+        if(webParent.id == webParent.parent && webParent.deleted == null) {
+            return {flag: true, message: "OK"};
         }
-
+        else{
+            return {flag: false, message: "webId invalid"};
+        }
+    }catch (e) {
+        throw e;
     }
-    else return false;
-
 };
 
-Validator.prototype.validateAddAdvanceConfig = (rawData)=>{
+Validator.prototype.validateAddAdvanceConfig = async (rawData)=>{
+    let isOne=0;
     if(rawData.parent == undefined) {
         return {flag: false, message: "parent is not empty"};
+    }
+    else{ // neu co parent kiem tra xem neu api nay da duoc goi thi ko cho goi cac lan khac
+       let site: any = await monitoredWebsiteDAO.findByCondition(`parent=${rawData.parent} AND deleted IS NULL`);
+
+       if (site != null && site.length == 1){
+           isOne=1;
+       }
+       else if(site == null){
+           isOne=2;
+       }
+       else if(site.length > 1){
+           isOne=3;
+       }
     }
     if(rawData.frequently == undefined){
         return {flag: false, message: "frequently is not empty"};
@@ -105,20 +115,62 @@ Validator.prototype.validateAddAdvanceConfig = (rawData)=>{
     if(rawData.subList == undefined || ! Array.isArray(rawData.subList)){
         return {flag: false, message: "subList invalid"};
     }
-    return {flag: true, message: "OK"};
+    if(isOne==1)return {flag: true, message: "OK"};
+    else if(isOne == 3){
+        return {flag: false, message: "this api only be use once"};
+    }
+    else if(isOne==2){
+        return {flag: false, message: "not existed this site"};
+    }
 
 };
 
-Validator.prototype.validateToken = async (token)=>{
-   try{
-       let checked = await auth.verifyToken(token);
-       if(checked.flag == true) return true;
-       else {
-           return checked;
-       }
-   }catch (e) {
-       throw e;
-   }
+Validator.prototype.validateGetNormalUpDownInfo = async (webId, credentialId)=>{
+
+    try{
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+
+        // check existed
+        if(web == null){
+            return {flag: false, message: `not found website has id is ${webId}`};
+        }
+        // check existed
+        if(web.deleted != null){
+            return {flag: false, message: `not found website has id is ${webId}`};
+        }
+
+        //check permission
+        if(web.credentialId != credentialId){
+            return {flag: false, message: "permisson denied"};
+        }
+        return {flag: true, message: "OK"};
+    }catch (e) {
+        throw e;
+    }
+
+};
+
+Validator.prototype.validateGetCountriesInfo = async (webId, credentialId)=>{
+    try{
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+
+        // check existed
+        if(web == null){
+            return {flag: false, message: `not found website has id is ${webId}`};
+        }
+        // check existed
+        if(web.deleted != null){
+            return {flag: false, message: `not found website has id is ${webId}`};
+        }
+
+        //check permission
+        if(web.credentialId != credentialId){
+            return {flag: false, message: "permisson denied"};
+        }
+        return {flag: true, message: "OK"};
+    }catch (e) {
+        throw e;
+    }
 };
 
 module.exports = Validator;

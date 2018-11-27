@@ -16,7 +16,7 @@ const Libs = require('../../commons/Libs');
 // @ts-ignore
 let thirdFact = new ThirdPartyFactory();
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
-
+let tokenDAO = new TokenDAO();
 function Auth() {}
 
 /**
@@ -78,7 +78,7 @@ Auth.prototype.authenticate = async function (account) {
             return {flag: false, message: "Account need be verify"};
         }
         else {
-            return {flag: false, message: "username or password invalid"};
+            return {flag: false, message: "Account invalid"};
         }
     } catch(e){
         throw e;
@@ -91,7 +91,7 @@ Auth.prototype.authenticate = async function (account) {
  * @param webId
  */
 Auth.prototype.authorize = async (credentialId, webId)=>{
-    let web: any = monitoredWebsiteDAO.findByCondition(`credentialid = ${credentialId} AND id=${webId}`);
+    let web: any = await monitoredWebsiteDAO.findByCondition(`credentialid = ${credentialId} AND id=${webId}`);
     if(web == null){
         return {flag: false, message: "permission denied"};
     }
@@ -109,7 +109,6 @@ Auth.prototype.authorize = async (credentialId, webId)=>{
  */
 Auth.prototype.verifyToken = async function(token){
     let currentDate: any = new Date();
-    let tokenDAO = new TokenDAO();
     try{
     let rs = await tokenDAO.findById(token);
     if(rs == null){
