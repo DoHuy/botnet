@@ -15,40 +15,52 @@ util.inherits(NormalUpDownCheckingService, ServiceInterface);
 //
 
 NormalUpDownCheckingService.prototype.doOperation = async (jsonData) => {
-    let result:any = {upDown:{}}; // {resp, notification}
+    let result:any = {siteName: "", url:"", upDown:{}}; // {resp, notification}
     let webId = jsonData.webId;
-    let web: any = await monitoredWebsiteDAO.findById(webId);
 
-    let response: any = JSON.stringify(web.responseTime);
-    response =  JSON.parse(response);
+    try{
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+        let siteName: any = web.siteName;
+        let url: any = web.url;
 
-    let notification: any = JSON.stringify(web.notification);
-    notification = JSON.parse(notification);
+        let response: any = web.responseTime;
+        let notification: any = web.notification;
 
-    // console.log(response, notification);
-    let countUp=0;
-    let countDown=0;
+        let upResp: any = 0;
+        let downResp: any = 0;
 
-    for(let key in response){
-        result[key] = {
-            response: response[key],
-            notification: notification[key]
-        };
+        for(let i in response){
+            result[i] = {response:{}, notification:{}};
+            if(response[i].multipleCountries !== undefined){
+                // console.log(response[i].multipleCountries);
+                delete response[i].multipleCountries;
+                delete response[i].multipleIsp;
+                delete notification[i].multipleCountries;
+                delete notification[i].multipleIsp;
+            }
 
-        // console.log(notification[key].level);
-        if(notification[key]["level"] == 'error'){
-            countDown++;
+            // console.log(response[i]);
+            result[i].response = response[i];
+            result[i].notification = notification[i];
+
+            if(notification[i].level == 'error'){
+                downResp++;
+            }
+            else{
+                upResp++;
+            }
         }
-        else{
-            countUp++;
-        }
+
+        result.upDown.totalUp = upResp;
+        result.upDown.totalDown = downResp;
+        result.siteName = siteName;
+        result.url = url;
+
+        return result;
+    }catch (e) {
+        throw e;
     }
 
-    result.upDown.up = countUp;
-    result.upDown.down = countDown;
-
-
-    return result;
 
 };
 

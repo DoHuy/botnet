@@ -9,7 +9,7 @@ const SettingRouter = require('./SettingRouter');
 // @ts-ignore
 const UpDownCheckingRouter = require('./UpDownCheckingRouter');
 
-router.use('/monitoredWebsite/', UpDownCheckingRouter);
+router.use('/', UpDownCheckingRouter);
 router.use('/', AuthRouter);
 router.use('/credential/', SettingRouter);
 module.exports = router;

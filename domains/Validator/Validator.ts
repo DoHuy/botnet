@@ -173,6 +173,29 @@ Validator.prototype.validateGetCountriesInfo = async (webId, credentialId)=>{
     }
 };
 
+Validator.prototype.validateGetIspsInfo = async (webId, credentialId)=>{
+    try{
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+
+        // check existed
+        if(web == null){
+            return {flag: false, message: `not found website has id is ${webId}`};
+        }
+        // check existed
+        if(web.deleted != null){
+            return {flag: false, message: `not found website has id is ${webId}`};
+        }
+
+        //check permission
+        if(web.credentialId != credentialId){
+            return {flag: false, message: "permisson denied"};
+        }
+        return {flag: true, message: "OK"};
+    }catch (e) {
+        throw e;
+    }
+};
+
 module.exports = Validator;
 
 // let validator = new Validator();

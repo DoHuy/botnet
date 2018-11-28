@@ -7,8 +7,9 @@ const Controller = require('../contollers/Controller');
 const UpDownCheckingRouter = require('express').Router();
 
 //api
-UpDownCheckingRouter.get('/normal/:id', Middleware.verifyToken, Middleware.UpDownCheckingMid.beforeGetNormalUpDownInfo, Controller.UpDownCheckingCon.getNormalUpDownInfo);
-UpDownCheckingRouter.get(`/countries/:id`, Middleware.verifyToken, Middleware.UpDownCheckingMid.beforeGetCountriesInfo, Controller.UpDownCheckingCon.getCountriesInfo);
+UpDownCheckingRouter.get('/currentLocation/monitoredWebsite/:id', Middleware.verifyToken, Middleware.UpDownCheckingMid.beforeGetNormalUpDownInfo, Controller.UpDownCheckingCon.getNormalUpDownInfo);
+UpDownCheckingRouter.get(`/multipleCountries/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.UpDownCheckingMid.beforeGetCountriesInfo, Controller.UpDownCheckingCon.getCountriesInfo);
+UpDownCheckingRouter.get(`/multipleIsps/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.UpDownCheckingMid.beforeGetIspsInfo, Controller.UpDownCheckingCon.getIspsInfo);
 //
 
 module.exports = UpDownCheckingRouter;

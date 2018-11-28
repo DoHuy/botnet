@@ -15,7 +15,7 @@ let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 //
 // CurrentIpCheckingProc.frequently = process.argv[2] || 1;
 CurrentIpCheckingProc.connectionTimeout = process.argv[2] || '30000';
-CurrentIpCheckingProc.webId = process.argv[3] || 74;
+CurrentIpCheckingProc.webId = process.argv[3] || 127;
 CurrentIpCheckingProc.url = process.argv[4] || "https://news.zing.vn";
 /**
  * done
@@ -40,7 +40,7 @@ CurrentIpCheckingProc.run = async function () {
         // @ts-ignore
         metric = await Lib.requestWithPuppeteer(CurrentIpCheckingProc.url, imagePath, null, CurrentIpCheckingProc.connectionTimeout);
         // tong hop du lieu {DNSLookup, InitConnection, DataTransfer, ResponseTime, WaitTime }
-        let web: any = await monitoredWebsiteDAO.findById(CurrentIpCheckingProc.webId);
+        let web: any = await monitoredWebsiteDAO.findById(CurrentIpCheckingProc.webId); //
 
         if(metric.status == '500'){
             // throw e/ neu co loi xay ra
@@ -70,8 +70,8 @@ CurrentIpCheckingProc.run = async function () {
         else{
             // calculate metric
             let averageResponseTime:any = 0;
-            let maxResponseTime: Number = -1;
-            let minResponseTime: Number = 99999999999;
+            let maxResponseTime: Number = Number.MIN_SAFE_INTEGER;
+            let minResponseTime: Number = Number.MAX_SAFE_INTEGER;
             let firstResponse: Object={};
             firstResponse[created]={
                 DNSLookup: metric.DNSLookup,
@@ -87,10 +87,18 @@ CurrentIpCheckingProc.run = async function () {
 
             let details: any = web.responseTime!=null?web.responseTime: firstResponse; // responseTime == detials
             details[created]=firstResponse[created];
+            let totalResp: any = 0;
             for(let i in details){
-                averageResponseTime += details[i].ResponseTime;
-                maxResponseTime = maxResponseTime>=details[i].ResponseTime?maxResponseTime:details[i].ResponseTime;
-                minResponseTime = minResponseTime<=details[i].ResponseTime?minResponseTime:details[i].ResponseTime;
+                if(details[i].multipleCountries == undefined){
+                    averageResponseTime += details[i].ResponseTime;
+                    maxResponseTime = maxResponseTime>=details[i].ResponseTime?maxResponseTime:details[i].ResponseTime;
+                    minResponseTime = minResponseTime<=details[i].ResponseTime?minResponseTime:details[i].ResponseTime;
+                }
+                else{
+                    averageResponseTime += details[i].response.ResponseTime;
+                    maxResponseTime = maxResponseTime>=details[i].response.ResponseTime?maxResponseTime:details[i].response.ResponseTime;
+                    minResponseTime = minResponseTime<=details[i].response.ResponseTime?minResponseTime:details[i].response.ResponseTime;
+                }
             }
             averageResponseTime = averageResponseTime/(Object.keys(details).length);
             //

@@ -183,7 +183,29 @@ function base64DecodeUrl(str){
     return Buffer.from(str, 'base64').toString('ascii');
 }
 
-// function conver
+// function paginate page 100 record
+
+async function paginate (jsonData, skip, limit){
+  let keys=Object.keys(jsonData);
+  let countSkip=0;
+  let countLimit=0;
+  let rs: any ={};
+  for(let i=0 ; i<keys.length ; i++){
+      //xoa di tat ca ban ghi tu 0-->skip-1
+      if(countSkip <= skip-1){
+          delete jsonData[i];
+          countSkip++;
+      }
+      else{
+         if(countLimit <= limit-1){
+             rs[i] = jsonData[i];
+             countLimit++;
+         }
+      }
+  }
+  return rs;
+};
+//
 
 
 module.exports = {
@@ -193,7 +215,8 @@ module.exports = {
     requestCurl,
     requestWithPuppeteer,
     base64EncodeUrl,
-    base64DecodeUrl
+    base64DecodeUrl,
+    paginate
 };
 //
 
