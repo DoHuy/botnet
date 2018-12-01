@@ -1,6 +1,6 @@
 // @ts-ignore
 import *as Validator from '../../domains/Validator/Validator';
-
+import*as Lib from '../../commons/Libs';
 // @ts-ignore
 let validator = new Validator();
 let UpDownCheckingMid: any={};
@@ -9,8 +9,12 @@ UpDownCheckingMid.beforeGetNormalUpDownInfo = async (req, res, next)=>{
     try{
         let check: any = await validator.validateGetNormalUpDownInfo(req.params.id, req.credentialId);
         if(check.flag == true){
+            // @ts-ignore
+            let query = Lib.getQueryUrl(req.url, 'start', 'end');
             req.jsonData = {
-                webId: req.params.id
+                webId: req.params.id,
+                start: query.start,
+                end: query.end
             };
             next();
         }
@@ -26,8 +30,12 @@ UpDownCheckingMid.beforeGetCountriesInfo = async (req, res, next)=>{
     try{
         let check: any = await validator.validateGetCountriesInfo(req.params.id, req.credentialId);
         if(check.flag == true){
+            // @ts-ignore
+            let query = Lib.getQueryUrl(req.url, 'start', 'end');
             req.jsonData = {
-                webId: req.params.id
+                webId: req.params.id,
+                start: query.start,
+                end: query.end
             };
             next();
         }
@@ -43,8 +51,12 @@ UpDownCheckingMid.beforeGetIspsInfo = async (req, res, next)=>{
     try{
         let check: any = await validator.validateGetIspsInfo(req.params.id, req.credentialId);
         if(check.flag == true){
+            // @ts-ignore
+            let query = Lib.getQueryUrl(req.url, 'start', 'end');
             req.jsonData = {
-                webId: req.params.id
+                webId: req.params.id,
+                start: query.start,
+                end: query.end
             };
             next();
         }

@@ -1,5 +1,5 @@
 // @ts-ignore
-import *as MonitoredWebsiteDAO from "../../dao/MonitoredWebsiteDAO";
+import *as ResponseStateDAO from "../../dao/ResponseStateDAO";
 // @ts-ignore
 import *as SubProcManager from './SubProcManager';
 import*as CONSTANT from '../../commons/Constants';
@@ -7,7 +7,8 @@ import {log} from "util";
 
 // 4 argument : frequently, connectionTimeout, webId, url
 let AdvanceUpDownCheckingProcess: any = {};
-let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
+// @ts-ignore
+let responseStateDAO = new ResponseStateDAO();
 let arrTest = JSON.stringify(['usa', 'uk', 'russia', 'japan']);
 
 // input arguments
@@ -41,9 +42,6 @@ AdvanceUpDownCheckingProcess.run = async function () {
     countriesList = JSON.stringify(countriesList);
     //
     try{
-        // get old_notification, old_responseTime
-        let web: any = await monitoredWebsiteDAO.findById(AdvanceUpDownCheckingProcess.webId);
-
         // init child_process checking
         // @ts-ignore
         let proc1 = SubProcManager.initCurrentIpCheckingProc(AdvanceUpDownCheckingProcess.connectionTimeout, AdvanceUpDownCheckingProcess.webId, AdvanceUpDownCheckingProcess.url);
@@ -75,8 +73,6 @@ AdvanceUpDownCheckingProcess.run = async function () {
 
         Promise.all([dataProc1, dataProc2, dataProc3]).then(async vals=>{
 
-            console.log(vals);
-
             let multipleIspResp = [];
             let multipleCountriesResp=[];
             let multipleIspNoti = [];
@@ -92,26 +88,31 @@ AdvanceUpDownCheckingProcess.run = async function () {
                 multipleIspNoti.push([isp, result.notification]);
                 multipleCountriesNoti.push([country, result2.notification]);
             }
+            //
 
-            let newResponse: any;
-            let newNotification: any;
+            // newResponse = web.responseTime==null?{}:web.responseTime;
+            // newNotification=web.notification==null?{}:web.notification;
 
-            newResponse = web.responseTime==null?{}:web.responseTime;
-            newNotification=web.notification==null?{}:web.notification;
-
-            newResponse[created]={
+            let newResponse = {
                 response: vals[0]["response"],
                 multipleIsp: multipleIspResp,
                 multipleCountries: multipleCountriesResp
             };
 
-            newNotification[created]={
+            let newNotification = {
                 notification: vals[0]["notification"],
                 multipleIsp: multipleIspNoti,
                 multipleCountries: multipleCountriesNoti
             };
 
-            await monitoredWebsiteDAO.modifyById(AdvanceUpDownCheckingProcess.webId, ["responsetime", "notification"], [newResponse, newNotification]);
+            await responseStateDAO.create(
+                {
+                    response: newResponse,
+                    notification: newNotification,
+                    created: created,
+                    webId: AdvanceUpDownCheckingProcess.webId
+                }
+            );
 
         });
     }catch (e) {
@@ -124,7 +125,7 @@ AdvanceUpDownCheckingProcess.run = async function () {
 
 // AdvanceUpDownCheckingProcess.run();
 
-// // test done
+// // // test done
 setInterval(()=>{
     AdvanceUpDownCheckingProcess.run();
 }, AdvanceUpDownCheckingProcess.frequently);

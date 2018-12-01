@@ -1,5 +1,5 @@
 // @ts-ignore
-import*as MonitoredWebsiteDAO from "../../dao/MonitoredWebsiteDAO";
+import*as ResponseStateDAO from "../../dao/ResponseStateDAO";
 import*as Lib from "../../commons/Libs";
 import*as CONFIG from "../../commons/Configs";
 import *as CONSTANT from "../../commons/Constants";
@@ -7,15 +7,13 @@ import*as util from "util";
 import {NOTICE_RULE} from "../../commons/Configs";
 
 const exec = util.promisify(require('child_process').exec);
-
-
 // 3 argument : connectionTimeout, webId, url
 let CurrentIpCheckingProc: any = {};
-let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
-//
+// @ts-ignore
+let responseStateDAO = new ResponseStateDAO();
 // CurrentIpCheckingProc.frequently = process.argv[2] || 1;
 CurrentIpCheckingProc.connectionTimeout = process.argv[2] || '30000';
-CurrentIpCheckingProc.webId = process.argv[3] || 127;
+CurrentIpCheckingProc.webId = process.argv[3] || 1;
 CurrentIpCheckingProc.url = process.argv[4] || "https://news.zing.vn";
 /**
  * done
@@ -39,9 +37,6 @@ CurrentIpCheckingProc.run = async function () {
     try{
         // @ts-ignore
         metric = await Lib.requestWithPuppeteer(CurrentIpCheckingProc.url, imagePath, null, CurrentIpCheckingProc.connectionTimeout);
-        // tong hop du lieu {DNSLookup, InitConnection, DataTransfer, ResponseTime, WaitTime }
-        let web: any = await monitoredWebsiteDAO.findById(CurrentIpCheckingProc.webId); //
-
         if(metric.status == '500'){
             // throw e/ neu co loi xay ra
             response = {
@@ -69,10 +64,29 @@ CurrentIpCheckingProc.run = async function () {
         }
         else{
             // calculate metric
+            // tong hop du lieu {DNSLookup, InitConnection, DataTransfer, ResponseTime, WaitTime }
+            let respStateData: any = await responseStateDAO.findByCondition(` webid = ${CurrentIpCheckingProc.webId}`); //
+            // adapter new => old response=>responseTime, notification => notification
+            let web: any;
+            if(respStateData != null){
+                web={responseTime:{}, notification:{}};
+                respStateData.forEach((e)=>{
+                   web.responseTime[e.created] = e.response;
+                   web.notification[e.created] = e.notification;
+                });
+
+            }
+            else{
+                web={responseTime:null, notification: null};
+            }
+
+            //
+
             let averageResponseTime:any = 0;
             let maxResponseTime: Number = Number.MIN_SAFE_INTEGER;
             let minResponseTime: Number = Number.MAX_SAFE_INTEGER;
             let firstResponse: Object={};
+
             firstResponse[created]={
                 DNSLookup: metric.DNSLookup,
                 InitConnection: metric.InitConnection,
@@ -144,17 +158,6 @@ CurrentIpCheckingProc.run = async function () {
     return {response, notification};
 
 };
-
-//test
-// CurrentIpCheckingProc.run().then(rs=>{
-//     console.log(rs);
-// })
-//
-// setInterval(async ()=>{
-//    await CurrentIpCheckingProc.run();
-// }, CurrentIpCheckingProc.frequently);
-//
-//
 
 // runing test done
 CurrentIpCheckingProc.run().then(rs=>{

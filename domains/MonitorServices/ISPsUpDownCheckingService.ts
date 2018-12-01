@@ -3,8 +3,11 @@ import *as util from "util";
 import*as ServiceInterface from './ServiceIneterface';
 // @ts-ignore
 import*as MonitoredWebssiteDAO from '../../dao/MonitoredWebsiteDAO';
+// @ts-ignore
+import*as ResponseStateDAO from '../../dao/ResponseStateDAO';
 
 const monitoredWebsiteDAO = new MonitoredWebssiteDAO();
+const responseStateDAO = new ResponseStateDAO();
 
 function ISPsUpDownCheckingService(){
     ServiceInterface.call(this);
@@ -14,11 +17,39 @@ function ISPsUpDownCheckingService(){
 util.inherits(ISPsUpDownCheckingService, ServiceInterface);
 //
 
+
+// adapt data to old data
+async function adaptData (webId, start=null, end=null){
+    let rs: any = {siteName:"", url:"", responseTime:{}, notification:{}};
+    let condition;
+    if(start != null && end != null){
+        condition = `webid=${webId} AND created between '${start}' AND '${end}' ORDER BY id DESC`;
+    }
+    else{
+        condition=`webid=${webId} ORDER BY id DESC limit 100`;
+    }
+    try{
+        let site: any = await monitoredWebsiteDAO.findById(webId);
+        let respState: any = await responseStateDAO.findByCondition(condition);
+        respState.forEach(e=>{
+            rs.responseTime[e.created] = e.response;
+            rs.notification[e.created] = e.notification;
+        });
+
+        rs.siteName = site.siteName;
+        rs.url = site.url;
+
+    }catch (e) {
+        throw e;
+    }
+
+    return rs;
+}
 // thong ke duoc so luong min max average responseTime trong lan check hien tai cua
 ISPsUpDownCheckingService.prototype.doOperation = async (jsonData)=>{
     let result: any={siteName:"", url:"", upDown:{}};
-    let webId = jsonData.webId;
-    let web: any = await monitoredWebsiteDAO.findById(webId);
+    let webId = jsonData.webId; // {webId, skip, limit}
+    let web: any = await adaptData(webId);
 
     let response: any = web.responseTime;
     let notification: any = web.notification;

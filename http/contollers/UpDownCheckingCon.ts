@@ -13,7 +13,7 @@ let UpDownCheckingCon: any = {};
 
 UpDownCheckingCon.getNormalUpDownInfo = async (req, res)=>{
    try{
-       let rs: any = await monitor.executeStratergy(req.jsonData);
+       let rs: any = await monitor.executeMonitoringService(req.jsonData);
        return res.status(200).send({flag: true, result: rs});
    }catch (e) {
        return res.status(500).send({flag: false, message: e.message});
@@ -22,7 +22,7 @@ UpDownCheckingCon.getNormalUpDownInfo = async (req, res)=>{
 
 UpDownCheckingCon.getCountriesInfo = async (req, res)=>{
     try{
-        let rs: any = await monitorCountries.executeStratergy(req.jsonData);
+        let rs: any = await monitorCountries.executeMonitoringService(req.jsonData);
         return res.status(200).send({flag:  true, result: rs});
     }catch (e) {
         return res.status(500).send({flag: false, message: e.message});
@@ -31,7 +31,7 @@ UpDownCheckingCon.getCountriesInfo = async (req, res)=>{
 
 UpDownCheckingCon.getIspsInfo = async (req, res)=>{
     try{
-        let rs: any = await monitorIsps.executeStratergy(req.jsonData);
+        let rs: any = await monitorIsps.executeMonitoringService(req.jsonData);
         return res.status(200).send({flag:  true, result: rs});
     }catch (e) {
         return res.status(500).send({flag: false, message: e.message});

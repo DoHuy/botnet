@@ -2,19 +2,20 @@
 // @ts-ignore
 import *as SubProcManager from './SubProcManager';
 // @ts-ignore
-import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
-let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
+import*as ResponseStateDAO from '../../dao/ResponseStateDAO';
+// @ts-ignore
+let responseStateDAO = new ResponseStateDAO();
 let NormalUpDownCheckingProcess: any = {};
 
-NormalUpDownCheckingProcess.frequently = process.argv[2] //|| '18000';
-NormalUpDownCheckingProcess.connectionTimeout = process.argv[3] //|| '30000';
-NormalUpDownCheckingProcess.webId = process.argv[4] //|| 74;
-NormalUpDownCheckingProcess.url = process.argv[5] //|| 'https://vnexpress.net';
+NormalUpDownCheckingProcess.frequently = process.argv[2] || '18000';
+NormalUpDownCheckingProcess.connectionTimeout = process.argv[3] || '30000';
+NormalUpDownCheckingProcess.webId = process.argv[4] || 7;
+NormalUpDownCheckingProcess.url = process.argv[5] || 'https://www.techcombank.com.vn/trang-chu';
 /**
  * init
  */
 NormalUpDownCheckingProcess.run = async ()=>{
-    console.log(process.argv);
+
     let newResponse: any={};
     let newNotification: any={};
     let created: any = new Date().toISOString();
@@ -22,7 +23,7 @@ NormalUpDownCheckingProcess.run = async ()=>{
     // @ts-ignore
     let proc: any = SubProcManager.initCurrentIpCheckingProc(NormalUpDownCheckingProcess.connectionTimeout, NormalUpDownCheckingProcess.webId, NormalUpDownCheckingProcess.url);
 
-    // neu nhan duoc message thi insert vao csdl
+    // neu nhan duoc message thi insert vao csdl, data {responsetime, notification}
     let data: any = await new Promise((resolve) => {
         proc.on('message', async (message)=>{
             resolve(message);
@@ -30,13 +31,14 @@ NormalUpDownCheckingProcess.run = async ()=>{
     });
 
     try{
+       let rs =  await responseStateDAO.create( {
+            response: data.response,
+            notification: data.notification,
+            created: new Date().toISOString(),
+            webId: NormalUpDownCheckingProcess.webId
+        });
 
-        let web: any = await monitoredWebsiteDAO.findById(NormalUpDownCheckingProcess.webId);
-        newResponse = web.responseTime==null?{}:web.responseTime;
-        newNotification = web.notification==null?{}:web.notification;
-        newNotification[created]=data.notification;
-        newResponse[created]=data.response;
-        await monitoredWebsiteDAO.modifyById(NormalUpDownCheckingProcess.webId, ['responsetime', 'notification'], [newResponse, newNotification]);
+       return rs;
 
     }catch (e) {
         throw e;
@@ -45,8 +47,10 @@ NormalUpDownCheckingProcess.run = async ()=>{
 
 };
 
-//test done
-// NormalUpDownCheckingProcess.run();
+// //test done
+// NormalUpDownCheckingProcess.run().then(rs=>{
+//     console.log(rs);
+// });
 
 // // test done
 setInterval(async ()=>{

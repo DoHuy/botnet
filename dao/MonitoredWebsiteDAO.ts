@@ -33,8 +33,6 @@ MonitoredWebsiteDAO.prototype.findById = async function (id) {
         site.created,
         site.modified,
         site.deleted,
-        site.responsetime,
-        site.notification,
         site.credentialid
 
     );
@@ -62,8 +60,6 @@ MonitoredWebsiteDAO.prototype.findAll = async function (limit=null) {
             site.created,
             site.modified,
             site.deleted,
-            site.responsetime,
-            site.notification,
             site.credentialid
 
         ));
@@ -75,8 +71,8 @@ MonitoredWebsiteDAO.prototype.findAll = async function (limit=null) {
 MonitoredWebsiteDAO.prototype.create = async function (website) {
     let result;
     let sql = `insert into monitoredwebsites(sitename, url, frequently, connectiontimeout,
-               parent, created, modified, deleted, responsetime, notification, credentialid)
-                values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`;
+               parent, created, modified, deleted, credentialid)
+                values($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
     let values = [website.siteName!=undefined?website.siteName:null,
                   website.url!=undefined?website.url:null,
                   website.frequently!=undefined?website.frequently:null,
@@ -85,8 +81,6 @@ MonitoredWebsiteDAO.prototype.create = async function (website) {
                   website.created!=undefined?website.created.toISOString():null,
                   website.modified!=undefined?website.modified.toISOString():null,
                   website.deleted!=undefined?website.deleted.toISOString():null,
-                  website.responseTime!=undefined?website.responseTime:null,
-                  website.notification!=undefined?website.notification:null,
                   website.credentialId!=undefined?website.credentialId:null
                 ];
     try{
@@ -106,8 +100,6 @@ MonitoredWebsiteDAO.prototype.create = async function (website) {
         site.created,
         site.modified,
         site.deleted,
-        site.responseTime,
-        site.notification,
         site.credentialid
 
     );
@@ -197,15 +189,13 @@ MonitoredWebsiteDAO.prototype.findByCondition = async function(condition){
                 site.created,
                 site.modified,
                 site.deleted,
-                site.responsetime,
-                site.notification,
                 site.credentialid
 
             ));
         };
 
         return websiteList;
-    }``
+    }
 };
 
 module.exports = MonitoredWebsiteDAO;

@@ -34,61 +34,57 @@ create table if not exists tokens(
     expired text
 );
 
-/*
-responeTime = {
-    {
-    connectionTime:
-    sslHanshakeTime:
-    waitTime:
-    dowloadingTime:,
-    totalTime:,
-    created:
-    }
-}
-
-notification = {
-    {
-        statusCode:,
-        state:,
-        message:,
-        level:,
-        image,
-        created:
-    }
-}
-
-*/
-create table if not exists monitoredWebsites(
+create table if not exists MonitoredWebsites(
     id serial primary key not null,
     siteName text,
     url text,
-    frequently text, -- ['frequently', 'connectionTimeout', 'parent', 'modified']
+    frequently text,
     connectionTimeout text,
     parent int,
     created text,
     modified text,
     deleted text,
-    responseTime json,
-    notification json,
     credentialId int
 );
 
-create table if not exists webStructs (
+create table if not exists ResponseStates (
     id serial not null primary key,
-    webId int not null,
-    struct json,
+    response json,
+    notification json,
     created text,
-    modified text,
-    deleted text
+    webId int
 );
 
-create table if not exists poisonScripts (
+create table if not exists Structures(
     id serial not null primary key,
-    script text,
+    structure json,
     created text,
     modified text,
     deleted text,
     webId int
+);
+
+create table if not exists StructureStates (
+    id serial not null primary key,
+    notification json,
+    created text,
+    structureId int
+);
+
+create table if not exists Domains (
+    id serial not null primary key,
+    domains json,
+    created text,
+    modified text,
+    deleted text,
+    webId int
+);
+
+create table if not exists DomainsStates (
+    id serial not null primary key,
+    notification json,
+    created text,
+    domainsId int
 );
 
 

@@ -2,9 +2,11 @@
 import*as ServiceInterface from './ServiceIneterface';
 // @ts-ignore
 import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
+// @ts-ignore
+import*as ResponseStateDAO from '../../dao/ResponseStateDAO';
 import*as util from 'util';
 const monitoredWebsiteDAO = new MonitoredWebsiteDAO();
-
+const responseStateDAO = new ResponseStateDAO();
 function MultipleCountryUpDownCheckingService() {
     ServiceInterface.call(this);
 }
@@ -13,10 +15,40 @@ function MultipleCountryUpDownCheckingService() {
 util.inherits(MultipleCountryUpDownCheckingService, ServiceInterface);
 //
 
+
+// adapt data to old data
+async function adaptData (webId, start=null, end=null){
+    let rs: any = {siteName:"", url:"", responseTime:{}, notification:{}};
+    let condition;
+    if(start != null && end != null){
+        condition = `webid=${webId} AND created between '${start}' AND '${end}' ORDER BY id DESC`;
+    }
+    else{
+        condition=`webid=${webId} ORDER BY id DESC limit 100`;
+    }
+
+    try{
+        let site: any = await monitoredWebsiteDAO.findById(webId);
+        let respState: any = await responseStateDAO.findByCondition(condition);
+        respState.forEach(e=>{
+            rs.responseTime[e.created] = e.response;
+            rs.notification[e.created] = e.notification;
+        });
+
+        rs.siteName = site.siteName;
+        rs.url = site.url;
+
+    }catch (e) {
+        throw e;
+    }
+
+    return rs;
+}
+
 MultipleCountryUpDownCheckingService.prototype.doOperation = async (jsonData)=>{
     let result: any={ siteName:"", url:""};
     let webId = jsonData.webId;
-    let web: any = await monitoredWebsiteDAO.findById(webId);
+    let web: any = await adaptData(webId);
 
     let response: any = web.responseTime;
     let notification: any = web.notification;

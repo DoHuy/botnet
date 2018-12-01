@@ -3,8 +3,11 @@ import *as util from "util";
 import*as ServiceInterface from './ServiceIneterface';
 // @ts-ignore
 import*as MonitoredWebssiteDAO from '../../dao/MonitoredWebsiteDAO';
+// @ts-ignore
+import*as ResponseStateDAO from '../../dao/ResponseStateDAO';
 
 const monitoredWebsiteDAO = new MonitoredWebssiteDAO();
+const responseStateDAO = new ResponseStateDAO();
 
 function NormalUpDownCheckingService (){
     ServiceInterface.call(this);
@@ -14,12 +17,42 @@ function NormalUpDownCheckingService (){
 util.inherits(NormalUpDownCheckingService, ServiceInterface);
 //
 
+// adapt data to old data
+async function adaptData (webId, start=null, end=null){
+    let rs: any = {siteName:"", url:"", responseTime:{}, notification:{}};
+    let condition;
+    if(start != null && end != null){
+        condition = `webid=${webId} AND created between '${start}' AND '${end}' ORDER BY id DESC`;
+    }
+    else{
+        condition=`webid=${webId} ORDER BY id DESC limit 100`;
+    }
+    try{
+        let site: any = await monitoredWebsiteDAO.findById(webId);
+        let respState: any = await responseStateDAO.findByCondition(condition);
+        console.log(respState);
+        respState.forEach(e=>{
+           rs.responseTime[e.created] = e.response;
+           rs.notification[e.created] = e.notification;
+        });
+
+        rs.siteName = site.siteName;
+        rs.url = site.url;
+
+    }catch (e) {
+        throw e;
+    }
+
+    return rs;
+}
+
 NormalUpDownCheckingService.prototype.doOperation = async (jsonData) => {
     let result:any = {siteName: "", url:"", upDown:{}}; // {resp, notification}
     let webId = jsonData.webId;
 
     try{
-        let web: any = await monitoredWebsiteDAO.findById(webId);
+        let web: any = await adaptData (webId);
+        console.log(web);
         let siteName: any = web.siteName;
         let url: any = web.url;
 
@@ -38,7 +71,6 @@ NormalUpDownCheckingService.prototype.doOperation = async (jsonData) => {
                 delete notification[i].multipleCountries;
                 delete notification[i].multipleIsp;
             }
-
             // console.log(response[i]);
             result[i].response = response[i];
             result[i].notification = notification[i];

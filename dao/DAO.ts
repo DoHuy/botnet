@@ -4,6 +4,7 @@ function DAO () {
     let self = this;
     // @ts-ignore
     self.connection = Connection.connectDb();
+    // console.log(self.connection);
 }
 
 
@@ -26,6 +27,9 @@ DAO.prototype.deleteById = function(){
 DAO.prototype.modifyById = function () {
 
 }
+
+DAO.prototype.findByCondition = function(){}
+DAO.prototype.count = (webId)=>{};
 
 DAO.prototype.finished = async function(){
     // @ts-ignore

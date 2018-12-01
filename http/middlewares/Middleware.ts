@@ -12,6 +12,7 @@ let Middleware: any={};
 Middleware.AuthMiddleware = require('./AuthMiddleware');
 Middleware.SettingMid = require('./SettingMid');
 Middleware.UpDownCheckingMid = require('./UpDownCheckingMid');
+Middleware.SearchingMid = require('./SearchingMid');
 Middleware.verifyToken = async function (req, res, next){
     try{
         let token = req.headers.authorization.split(" ")[1];

@@ -185,25 +185,22 @@ function base64DecodeUrl(str){
 
 // function paginate page 100 record
 
-async function paginate (jsonData, skip, limit){
-  let keys=Object.keys(jsonData);
-  let countSkip=0;
-  let countLimit=0;
-  let rs: any ={};
-  for(let i=0 ; i<keys.length ; i++){
-      //xoa di tat ca ban ghi tu 0-->skip-1
-      if(countSkip <= skip-1){
-          delete jsonData[i];
-          countSkip++;
-      }
-      else{
-         if(countLimit <= limit-1){
-             rs[i] = jsonData[i];
-             countLimit++;
-         }
-      }
-  }
-  return rs;
+function getQueryUrl (url, ...params){
+    let result={};
+    let query = url.split('/')[url.split('/').length - 1];
+    let tmp = new URLSearchParams(query);
+    params.forEach(key=>{
+        let value = tmp.get(key);
+       if( key != null){
+           result[key] = value;
+       }
+       else{
+           result[key] = null;
+       }
+    });
+
+    return result;
+
 };
 //
 
@@ -216,7 +213,7 @@ module.exports = {
     requestWithPuppeteer,
     base64EncodeUrl,
     base64DecodeUrl,
-    paginate
+    getQueryUrl
 };
 //
 

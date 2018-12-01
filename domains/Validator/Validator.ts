@@ -196,6 +196,27 @@ Validator.prototype.validateGetIspsInfo = async (webId, credentialId)=>{
     }
 };
 
+// query la object
+Validator.prototype.validateSearchByDate = async (webId, credentialId, query)=>{
+    // check exist
+    let web: any = await monitoredWebsiteDAO.findById(webId);
+    if(web == null || web.deleted != null){
+        return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+    }
+    // check permission
+    let checkPermission = await auth.authorize(credentialId, webId);
+    if(checkPermission.flag == false){
+        return {flag: false, message: "permission denied", statusCode: 403};
+    }
+
+    // validate
+    if(query.start == null || query.end == null){
+        return {flag: false, message: "query wrong", statusCode: 400}
+    }
+
+    return {flag: true, message:"OK"};
+};
+
 module.exports = Validator;
 
 // let validator = new Validator();
