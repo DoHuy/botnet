@@ -6,12 +6,16 @@ import*as SubProcManager from '../../bin/BackgroundDomainsProcesses/SubProcManag
 // @ts-ignore
 import *as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 import *as CONSTANT from '../../commons/Constants';
+// @ts-ignore
+import *as DomainsDAO from '../../dao/DomainsDAO';
 
 const path = require('path');
 const fs = require('fs');
 const writeFile = util.promisify(fs.writeFile);
-const CMD = ["normal", "advance"];
+const CMD = ["normal", "advance", "dns", "deface"];
+
 let monitoredWebSiteDAO = new MonitoredWebsiteDAO();
+let domainsDAO = new DomainsDAO();
 
 function ServiceSettingManager() {
     ServiceSettingManagerInterface.call(this);
@@ -50,7 +54,7 @@ ServiceSettingManager.prototype.createWebsite = async function (input, credentia
 
         data = JSON.stringify(data);
         let pathProc = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${rs.id}.json`);
-        await writeFile(pathProc, data, 'utf8');
+         fs.writeFileSync(pathProc, data, 'utf8');
         //
         await monitoredWebSiteDAO.transactionCommit();
         return rs;
@@ -105,7 +109,7 @@ ServiceSettingManager.prototype.addAdvanceConfigWebsite = async function (config
                   }
                 };
                 parentData = JSON.stringify(parentData);
-                await writeFile(pathParentProc, parentData, 'utf8');
+                fs.writeFileSync(pathParentProc, parentData, 'utf8');
                 //
                 //
                 result.forEach(async (e) => {
@@ -122,7 +126,7 @@ ServiceSettingManager.prototype.addAdvanceConfigWebsite = async function (config
                        }
                    };
                    subData = JSON.stringify(subData);
-                   await writeFile(subPath, subData, 'utf8');
+                    fs.writeFileSync(subPath, subData, 'utf8');
                 });
 
                 //
@@ -172,7 +176,7 @@ ServiceSettingManager.prototype.modifyConfigWebsite = async function (input, cre
 
                 };
                 data = JSON.stringify(data);
-                await writeFile(procPath, data, 'utf8');
+                fs.writeFileSync(procPath, data, 'utf8');
             }
 
             return list;
@@ -211,7 +215,7 @@ ServiceSettingManager.prototype.modifyConfigWebsite = async function (input, cre
 
                 };
                 data = JSON.stringify(data);
-                await writeFile(procPath, data, 'utf8');
+                 fs.writeFileSync(procPath, data, 'utf8');
             }
             //
             return updatedList;
@@ -246,6 +250,53 @@ ServiceSettingManager.prototype.removeWebsite = async function (id) {
 
     } catch (e) {
         await monitoredWebSiteDAO.transactionRollback();
+        throw e;
+    }
+};
+
+/**
+ *  khoi tao process detect hacked dns
+ * @param input = {domains:[]}
+ * @param webId
+ */
+ServiceSettingManager.prototype.turnOnHackedDNSDetecting = async (input, webId)=>{
+    // tao ms vao csdl
+    try{
+        let domains: any = await domainsDAO.create({domains: input.domains, ip: input.ip, created: new Date().toISOString(), webId: webId});
+
+        // khoi tao process detect hacked dns
+        let content = {
+            cmd: CMD[2],
+            data: {
+                frequently: input.frequently,
+                domainsList: JSON.stringify(input.domains),
+                ip:JSON.stringify(input.ip),
+                domainsId:domains.id
+            }
+        }
+        let procPath = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${webId}.json`);
+        await writeFile(procPath, JSON.stringify(content), 'utf8');
+        //
+        return true;
+    }catch (e) {
+        throw e;
+    }
+};
+
+/**
+ *  huy toan bo process detect hackedDns
+ * @param webId
+ */
+ServiceSettingManager.prototype.destroyHackedDNSDetecting = async (webId)=>{
+    try{
+        let domains: any = await domainsDAO.findByCondition(`webid=${webId} order by id desc`);
+
+        // delete domains
+        let rs = await domainsDAO.deleteById(domains[0].id);
+        //
+        // @ts-ignore
+        SubProcManager.destroyHackedDNSDetectingProcess(domains[0].id);
+    }catch (e) {
         throw e;
     }
 };

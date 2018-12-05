@@ -73,7 +73,8 @@ create table if not exists StructureStates (
 
 create table if not exists Domains (
     id serial not null primary key,
-    domains json,
+    domains text[],
+    ip text[],
     created text,
     modified text,
     deleted text,

@@ -184,4 +184,31 @@ SubProcManager.initCalculateCountryProc = (arr, connectionTimeout, url)=>{
     }
 };
 
+// hackedDNS
+SubProcManager.initHackedDNSDetectingProcess = (frequently, domainsList, ip, domainsId)=>{
+    try{
+        let proc: any = spawn('node', ['HackedDNSDetectingProcess.js', frequently, domainsList, ip, domainsId],
+            {detached: true, stdio: 'ignore'});
+        proc.unref();
+
+        let procPath = path.join(__dirname, '..', '..', 'tmp', 'procDNSTmp', `procs_${domainsId}.txt`);
+        fs.writeFileSync(procPath,proc.pid, 'utf8');
+        return proc;
+    }catch (e) {
+        throw e;
+    }
+
+};
+
+SubProcManager.destroyHackedDNSDetectingProcess = (domainsId)=>{
+    let procPath = path.join(__dirname, '..', '..', 'tmp', 'procDNSTmp', `procs_${domainsId}.txt`);
+    try{
+        let pid = fs.readFileSync(procPath, 'utf8');
+        execSync(`kill ${pid}`);
+        fs.unlinkSync(procPath);
+    }catch (e) {
+        throw e;
+    }
+};
+//
 module.exports = SubProcManager;

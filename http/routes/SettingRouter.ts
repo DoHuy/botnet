@@ -11,11 +11,11 @@ const router = require('express').Router();
 // @ts-ignore
 router.post(`/addWebsite`, Middleware.verifyToken,  Middleware.SettingMid.beforeAddWebsite, Controller.SettingCon.addWebSite);
 // @ts-ignore
-router.put(`/changeConfig/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeChangeConfig, Controller.SettingCon.changeConfig, Middleware.SettingMid.afterChangeConfig);
+router.put(`/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeChangeConfig, Controller.SettingCon.changeConfig, Middleware.SettingMid.afterChangeConfig);
 // @ts-ignore
-router.post(`/addAdvanceConfig/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeAddAdvanceConfig, Controller.SettingCon.addAdvanceConfig, Middleware.SettingMid.afterAddAdvanceConfig);
+router.post(`/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeAddAdvanceConfig, Controller.SettingCon.addAdvanceConfig, Middleware.SettingMid.afterAddAdvanceConfig);
 
-router.delete(`/remove/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeRemoveWebsite, Controller.SettingCon.removeWebsite);
+router.delete(`/monitoredWebsite/:id`, Middleware.verifyToken, Middleware.SettingMid.beforeRemoveWebsite, Controller.SettingCon.removeWebsite);
 
 
 module.exports = router;

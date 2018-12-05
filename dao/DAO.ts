@@ -24,6 +24,8 @@ DAO.prototype.deleteById = function(){
 
 }
 
+DAO.prototype.deleteByCondition = ()=>{};
+
 DAO.prototype.modifyById = function () {
 
 }

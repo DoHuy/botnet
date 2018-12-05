@@ -9,10 +9,13 @@ const SettingRouter = require('./SettingRouter');
 // @ts-ignore
 const UpDownCheckingRouter = require('./UpDownCheckingRouter');
 const SearchingRouter = require('./SearchingRouter');
+// @ts-ignore
+const HackedDNSDetectingRouter = require('./HackedDNSDetectingRouter');
 
 router.use('/', UpDownCheckingRouter);
 router.use('/', AuthRouter);
-router.use('/credential/', SettingRouter);
-router.use('/credential/', SearchingRouter);
+router.use('/', SettingRouter);
+router.use('/', SearchingRouter);
+router.use('/', HackedDNSDetectingRouter);
 
 module.exports = router;

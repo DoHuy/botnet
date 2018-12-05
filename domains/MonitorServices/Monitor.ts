@@ -12,6 +12,11 @@ Monitor.prototype.executeMonitoringService = async function (jsonData)  {
 Monitor.prototype.executeFilteringService = async function (jsonData) {
     let data: any = await  this.service.filter(jsonData);
     return data;
-}
+};
+
+Monitor.prototype.executeDetectingService = async function (jsonData){
+  let data: any = await this.service.doDetection(jsonData);
+  return data;
+};
 
 module.exports = Monitor;

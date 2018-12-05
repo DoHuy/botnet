@@ -3,7 +3,7 @@ import *as fs from 'fs';
 // @ts-ignore
 import *as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 
-const CMD = ['normal', 'advance'];
+const CMD = ['normal', 'advance', 'dns',  'deface'];
 const monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 let counter=0;
 setInterval(() => {
@@ -27,6 +27,10 @@ setInterval(() => {
                             case CMD[1]:
                                 // @ts-ignore frequently, connectionTimeout, webId, url, parentId, countries
                                 SubProcManager.initAdvanceUpDownCheckingProc(chanvl.data.frequently, chanvl.data.connectionTimeout, chanvl.data.webId, chanvl.data.url, chanvl.data.parentId, chanvl.data.countries);
+                                break;
+                            case CMD[2]:
+                                // @ts-ignore
+                                SubProcManager.initHackedDNSDetectingProcess(chanvl.data.frequently, chanvl.data.domainsList, chanvl.data.ip, chanvl.data.domainsId);
                                 break;
                         }
                         fs.unlink(path, (err)=>{

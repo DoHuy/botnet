@@ -1,3 +1,4 @@
+// @ts-ignore
 function DomainsState(id=null, notification=null, created=null, domainsId=null) {
     this.id=id;
     this.notification = notification;

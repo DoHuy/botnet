@@ -1,11 +1,15 @@
 // @ts-ignore
 import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
+// @ts-ignore
+import*as DomainsDAO from '../../dao/DomainsDAO';
 import*as Auth from '../Auth/Auth';
 import*as CONFIG from '../../commons/Configs';
-
+import*as path from 'path';
+import*as fs from 'fs';
 // @ts-ignore
 let auth = new Auth();
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
+let domainsDAO = new DomainsDAO();
 function Validator() {}
 
 Validator.prototype.validateLogin = function (rawData){
@@ -215,6 +219,99 @@ Validator.prototype.validateSearchByDate = async (webId, credentialId, query)=>{
     }
 
     return {flag: true, message:"OK"};
+};
+
+Validator.prototype.validateAddConfigDNS = async (rawData, webId, credentialId)=>{
+    //check exist
+    try{
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+        if(web == null || web.deleted !=null){
+            return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+        }
+        //check permission
+        if(credentialId != web.credentialId){
+            return {flag: false, message:"permission denied", statusCode: 403};
+        }
+
+        // check tricks
+        let pathProc = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${webId}.json`);
+        let checkPath = fs.existsSync(pathProc);
+        if(checkPath == true){
+            return {flag: false, message: "add config DNS fail, please add again", statusCode: 500};
+        }
+
+        // check only use once
+        let domains: any = await domainsDAO.findByCondition(`webid=${webId}`);
+
+        if(domains !== null){
+            for(let i=0 ; i<domains.length ; i++){
+                if(domains[i].deleted == null){
+                    return {flag: false, message: "you only can addConfigDNS unique once", statusCode: 400};
+                }
+            }
+        }
+        //
+        console.log("fuck");
+        //check logic domains
+        if(rawData.domains !== undefined && !Array.isArray(rawData.domains)){
+            return {flag: false, message:"domains must be array", statusCode: 400};
+        }
+        if(rawData.ip == undefined){
+            return {flag: false, message:"ip not empty", statusCode: 400};
+        }
+
+        if(rawData.ip != undefined && !Array.isArray(rawData.ip)){
+            return {flag: false, message:"ip must be array", statusCode: 400};
+        }
+
+        return {flag: true, message: "OK"};
+    }catch (e) {
+        throw e;
+    }
+};
+
+Validator.prototype.validateCheckDNS = async (webId, credentialId)=>{
+  try{
+      let web: any = await monitoredWebsiteDAO.findById(webId);
+      if(web == null || web.deleted !=null){
+          return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+      }
+      //check permission
+      if(credentialId != web.credentialId){
+          return {flag: false, message:"permission denied", statusCode: 403};
+      }
+
+      // check exist domains
+      let domains: any = await domainsDAO.findByCondition(`webid=${webId} order by id desc`);
+      // console.log(domains[0]);
+      if(domains == null || domains[0].deleted !== null){
+          return {flag: false, message: "you deleted this feature or this website  is not registered", statusCode: 404};
+      }
+      //
+
+      return {flag:  true, message: "OK"};
+
+  }  catch (e) {
+      throw e;
+  }
+};
+
+Validator.prototype.validateDelete = async (webId, credentialId)=>{
+    try{
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+        if(web == null || web.deleted !=null){
+            return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+        }
+        //check permission
+        if(credentialId != web.credentialId){
+            return {flag: false, message:"permission denied", statusCode: 403};
+        }
+
+        return {flag:  true, message: "OK"};
+
+    }  catch (e) {
+        throw e;
+    }
 };
 
 module.exports = Validator;
