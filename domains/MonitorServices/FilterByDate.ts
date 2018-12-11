@@ -18,7 +18,7 @@ function FilterByDate(){
 util.inherits(FilterByDate, FilteringServiceInterface);
 //
 
-FilterByDate.prototype.filter = async (jsonData)=>{
+FilterByDate.prototype.doFiltering = async (jsonData)=>{
     let rs: any = {siteName:"", url:"", images:[]}
 
     try{

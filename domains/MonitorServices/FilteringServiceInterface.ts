@@ -10,7 +10,7 @@ function FilteringServiceInterface(){
 util.inherits(FilteringServiceInterface, ServiceInterface);
 //
 
-FilteringServiceInterface.prototype.filter = async ()=>{};
+FilteringServiceInterface.prototype.doFiltering = async ()=>{};
 
 
 module.exports = FilteringServiceInterface;

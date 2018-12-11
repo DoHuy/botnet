@@ -1,5 +1,5 @@
 import * as puppeteer from "puppeteer";
-import * as Fs from "fs";
+import * as fs from "fs";
 const path = require('path');
 const curl = require('curl');
 const util = require('util');
@@ -183,7 +183,7 @@ function base64DecodeUrl(str){
     return Buffer.from(str, 'base64').toString('ascii');
 }
 
-// function paginate page 100 record
+// function convert query ?=abc thanh object
 
 function getQueryUrl (url, ...params){
     let result={};
@@ -202,7 +202,23 @@ function getQueryUrl (url, ...params){
     return result;
 
 };
-//
+// tao moi 1 csv file
+function convertDataToCsv(fields, data){
+    let csv ="";
+    fields = fields.join(',');
+    data = data.map((value, index)=>{
+       let tmp:any =[];
+       for(let key in value){
+           tmp.push(value[key]);
+       }
+       tmp = tmp.join(',');
+       return tmp;
+    });
+    data = data.join('\n');
+    csv = `${fields}\n${data}`;
+    return csv;
+
+}
 
 
 module.exports = {
@@ -213,7 +229,7 @@ module.exports = {
     requestWithPuppeteer,
     base64EncodeUrl,
     base64DecodeUrl,
-    getQueryUrl
+    getQueryUrl,
+    convertDataToCsv
 };
 //
-

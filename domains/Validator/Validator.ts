@@ -214,7 +214,7 @@ Validator.prototype.validateSearchByDate = async (webId, credentialId, query)=>{
     }
 
     // validate
-    if(query.start == null || query.end == null){
+    if(!(query.start == null && query.end == null)){
         return {flag: false, message: "query wrong", statusCode: 400}
     }
 
@@ -314,6 +314,46 @@ Validator.prototype.validateDelete = async (webId, credentialId)=>{
     }
 };
 
+
+// query la object
+Validator.prototype.validateSearchComparison = async (webId, credentialId, query)=>{
+    // check exist
+    let web: any = await monitoredWebsiteDAO.findById(webId);
+    if(web == null || web.deleted != null){
+        return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+    }
+    // check permission
+    let checkPermission = await auth.authorize(credentialId, webId);
+    if(checkPermission.flag == false){
+        return {flag: false, message: "permission denied", statusCode: 403};
+    }
+
+    // validate
+    if(query.start == null && query.end != null || query.start != null && query.end == null){
+        return {flag: false, message: "query wrong", statusCode: 400}
+    }
+
+    return {flag: true, message:"OK"};
+};
+
+Validator.prototype.validateGetMonitoredWebSite = async (webId, credentialId)=>{
+    // check exist
+    let web: any = await monitoredWebsiteDAO.findById(webId);
+    if(web == null || web.deleted != null){
+        return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+    }
+    // check parent
+    if(web.parent != webId){
+        return {flag: false, message: `This website is not parent`, statusCode: 400};
+    }
+    // check permission
+    let checkPermission = await auth.authorize(credentialId, webId);
+    if(checkPermission.flag == false){
+        return {flag: false, message: "permission denied", statusCode: 403};
+    }
+
+    return {flag: true, message: "ok"};
+};
 module.exports = Validator;
 
 // let validator = new Validator();

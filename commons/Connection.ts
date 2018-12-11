@@ -18,16 +18,12 @@ Connection.connectDb = function () {
                 connectionTimeoutMillis: 2000,
             });
 
-            Connection.pool.connect();
+            // Connection.pool.connect();
         }
     }catch(e){
         throw e;
     }
     return Connection.pool;
-}
-
-Connection.closeDb = async function(){
-    await Connection.pool.end();
 }
 
 module.exports = Connection;

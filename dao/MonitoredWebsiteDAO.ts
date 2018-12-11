@@ -5,7 +5,9 @@ const util  = require('util');
 // @ts-ignore
 const MonitoredWebsite = require('../data/entities/MonitoredWebsite');
 // @ts-ignore
-function MonitoredWebsiteDAO() {
+const ResponseState = require('../data/entities/ResponseState');
+// @ts-ignore
+ function MonitoredWebsiteDAO() {
     DAO.call(this); // supper()
 }
 // ProxyDAO extends DAO
@@ -15,7 +17,8 @@ MonitoredWebsiteDAO.prototype.findById = async function (id) {
     let result;
     let sql = `select*from monitoredwebsites where id=${id}`;
     try{
-        result = await this.connection.query(sql);
+        let execution = await this.connection.connect();
+        result = await execution.query(sql);
         if(result.rows.length == 0){
             return null;
         }
@@ -44,7 +47,8 @@ MonitoredWebsiteDAO.prototype.findAll = async function (limit=null) {
     let result;
     let sql = `select*from monitoredwebsites limit ${limit}`;
     try{
-        result = await this.connection.query(sql);
+        let execution = await this.connection.connect();
+        result = await execution.query(sql);
     }catch (e) {
         throw e;
 
@@ -86,7 +90,8 @@ MonitoredWebsiteDAO.prototype.create = async function (website) {
                   website.credentialId!=undefined?website.credentialId:null
                 ];
     try{
-        result = await this.connection.query(sql, values);
+        let execution = await this.connection.connect();
+        result = await execution.query(sql, values);
     }catch(e){
         throw e;
     }
@@ -112,7 +117,8 @@ MonitoredWebsiteDAO.prototype.deleteById = async function (id) {
     let flag;
     let sql = `update monitoredwebsites set deleted=$1 where id=$2`;
     try{
-        await this.connection.query(sql, [new Date().toISOString(), id]);
+        let execution = await this.connection.connect();
+        await execution.query(sql, [new Date().toISOString(), id]);
         flag=true;
     }catch (e) {
         throw e;
@@ -121,6 +127,18 @@ MonitoredWebsiteDAO.prototype.deleteById = async function (id) {
     return flag;
 };
 
+MonitoredWebsiteDAO.prototype.findDataJoinWithResponseStates = async (id)=>{
+    let sql = `SELECT* FROM monitoredwebsites JOIN responsestates
+                ON monitoredwebsites.id = responsestates.webid
+                WHERE id=$1`;
+    try{let execution = await this.connection.connect();
+
+        let rs: any = await execution.query(sql, [id]);
+        return rs.rows;
+    }catch (e) {
+        throw e;
+    }
+};
 /**
  *
  * @param id
@@ -142,7 +160,8 @@ MonitoredWebsiteDAO.prototype.modifyById = async function (id, keys, values) {
         // values.push(id);
         let tmp: any = values;
         tmp.push(id);
-        await this.connection.query(sql, tmp);
+        let execution = await this.connection.connect();
+        await execution.query(sql, tmp);
         result = await this.findById(id);
     }catch (e) {
         throw e;
@@ -156,7 +175,8 @@ MonitoredWebsiteDAO.prototype.deleteByCondition = async (condition)=>{
     let flag;
     let sql = `update monitoredwebsites set deleted=$1 where ${condition}`;
     try{
-        await this.connection.query(sql, [new Date().toISOString()]);
+        let execution = await this.connection.connect();
+        await execution.query(sql, [new Date().toISOString()]);
         flag=true;
     }catch (e) {
         throw e;
@@ -169,7 +189,9 @@ MonitoredWebsiteDAO.prototype.findByCondition = async function(condition){
     let result;
     let sql = `select*from monitoredwebsites where ${condition}`;
     try{
-        result = await this.connection.query(sql);
+
+        let execution = await this.connection.connect();
+        result = await execution.query(sql);
     }catch (e) {
         throw e;
 
@@ -200,4 +222,52 @@ MonitoredWebsiteDAO.prototype.findByCondition = async function(condition){
     }
 };
 
+MonitoredWebsiteDAO.prototype.findDataJoinWithResponseState = async function(condition){
+    let result;
+    let sql = `SELECT monitoredwebsites.id as monitoredwebid,
+                monitoredwebsites.sitename as sitename,
+                monitoredwebsites.url as url,
+                monitoredwebsites.frequently,
+                monitoredwebsites.connectiontimeout,
+                monitoredwebsites.parent,
+                monitoredwebsites.created as webcreated,
+                monitoredwebsites.modified,
+                monitoredwebsites.deleted,
+                monitoredwebsites.credentialid,
+                responsestates.id as respid,
+                responsestates.response,
+                responsestates.notification,
+                responsestates.created as respcreated,
+                responsestates.webid FROM monitoredwebsites
+                JOIN responsestates ON monitoredwebsites.id = responsestates.webid
+                WHERE ${condition}`;
+    try{
+
+        let execution = await this.connection.connect();
+        result = await execution.query(sql);
+    }catch (e) {
+        throw e;
+
+    }
+    if(result.rows.length == 0){
+        return null;
+    }
+    //
+    let kq: any = [];
+    result.rows.forEach(e=>{
+        let web: any = new MonitoredWebsite(e.monitoredwebid, e.sitename, e.url, e.frequently, e.connectiontimeout, e.parent, e.webcreated, e.modified, e.deleted, e.credentialid);
+        let responseState: any = new ResponseState(e.respid, e.response, e.notification, e.respcreated, e.webid);
+        kq.push({monitoredWeb: web, responseState: responseState});
+    });
+    return kq;
+};
+
+
 module.exports = MonitoredWebsiteDAO;
+
+// // @ts-ignore
+// let tests = new MonitoredWebsiteDAO();
+//
+// tests.findDataJoinWithResponseState(18).then(rs=>{
+//     console.log(rs);
+// })

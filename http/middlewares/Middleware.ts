@@ -14,9 +14,17 @@ Middleware.SettingMid = require('./SettingMid');
 Middleware.UpDownCheckingMid = require('./UpDownCheckingMid');
 Middleware.SearchingMid = require('./SearchingMid');
 Middleware.HackedDNSDetectingMid = require('./HackedDNSDetectingMid');
+Middleware.OtherMid = require('./OtherMid');
 Middleware.verifyToken = async function (req, res, next){
+    let token;
     try{
-        let token = req.headers.authorization.split(" ")[1];
+
+        if(req.header.authorization != null){
+            token = req.headers.authorization.split(" ")[1];
+        }
+        else{
+            return res.status(400).send({flag: false, message: 'empty token'});
+        }
 
         let checked = await auth.verifyToken(token);
         if(checked.flag == true) {
