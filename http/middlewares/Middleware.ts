@@ -19,7 +19,7 @@ Middleware.verifyToken = async function (req, res, next){
     let token;
     try{
 
-        if(req.header.authorization != null){
+        if(req.headers.authorization != null){
             token = req.headers.authorization.split(" ")[1];
         }
         else{
