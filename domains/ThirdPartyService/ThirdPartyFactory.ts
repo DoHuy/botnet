@@ -1,5 +1,5 @@
 import*as MailService from './MailService';
-import {SERVICE_MAIL} from "../../commons/Constants";
+import*as CONSTANT from "../../commons/Constants";
 
 function ThirdPartyFactory() {}
 
@@ -10,7 +10,7 @@ function ThirdPartyFactory() {}
  */
 ThirdPartyFactory.prototype.getThirdPartyService = function (SERVICE) {
     switch (SERVICE) {
-        case SERVICE_MAIL["VERIFY_MAIL"]:
+        case CONSTANT.SERVICE["MAIL"]:
             // @ts-ignore
             return new MailService();
             break;

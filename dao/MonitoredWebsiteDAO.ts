@@ -19,6 +19,8 @@ MonitoredWebsiteDAO.prototype.findById = async function (id) {
     try{
         let execution = await this.connection.connect();
         result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
+
         if(result.rows.length == 0){
             return null;
         }
@@ -49,6 +51,7 @@ MonitoredWebsiteDAO.prototype.findAll = async function (limit=null) {
     try{
         let execution = await this.connection.connect();
         result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
 
@@ -92,6 +95,8 @@ MonitoredWebsiteDAO.prototype.create = async function (website) {
     try{
         let execution = await this.connection.connect();
         result = await execution.query(sql, values);
+        this.ConnectionOBJ.endConnect(execution);
+        // result = await this.connection.query(sql, values);
     }catch(e){
         throw e;
     }
@@ -119,6 +124,8 @@ MonitoredWebsiteDAO.prototype.deleteById = async function (id) {
     try{
         let execution = await this.connection.connect();
         await execution.query(sql, [new Date().toISOString(), id]);
+        this.ConnectionOBJ.endConnect(execution);
+        // await this.connection.query(sql, [new Date().toISOString(), id]);
         flag=true;
     }catch (e) {
         throw e;
@@ -131,9 +138,10 @@ MonitoredWebsiteDAO.prototype.findDataJoinWithResponseStates = async (id)=>{
     let sql = `SELECT* FROM monitoredwebsites JOIN responsestates
                 ON monitoredwebsites.id = responsestates.webid
                 WHERE id=$1`;
-    try{let execution = await this.connection.connect();
-
-        let rs: any = await execution.query(sql, [id]);
+    try{
+        let execution = await this.connection.connect();
+        let rs:any = await execution.query(sql, [id]);
+        this.ConnectionOBJ.endConnect(execution);
         return rs.rows;
     }catch (e) {
         throw e;
@@ -161,7 +169,9 @@ MonitoredWebsiteDAO.prototype.modifyById = async function (id, keys, values) {
         let tmp: any = values;
         tmp.push(id);
         let execution = await this.connection.connect();
-        await execution.query(sql, tmp);
+        let rs:any = await execution.query(sql, tmp);
+        // let rs: any = await this.connection.query(sql, tmp);
+        this.ConnectionOBJ.endConnect(execution);
         result = await this.findById(id);
     }catch (e) {
         throw e;
@@ -176,7 +186,9 @@ MonitoredWebsiteDAO.prototype.deleteByCondition = async (condition)=>{
     let sql = `update monitoredwebsites set deleted=$1 where ${condition}`;
     try{
         let execution = await this.connection.connect();
-        await execution.query(sql, [new Date().toISOString()]);
+        await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
+        // await this.connection.query(sql);
         flag=true;
     }catch (e) {
         throw e;
@@ -192,6 +204,8 @@ MonitoredWebsiteDAO.prototype.findByCondition = async function(condition){
 
         let execution = await this.connection.connect();
         result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
+
     }catch (e) {
         throw e;
 
@@ -242,9 +256,9 @@ MonitoredWebsiteDAO.prototype.findDataJoinWithResponseState = async function(con
                 JOIN responsestates ON monitoredwebsites.id = responsestates.webid
                 WHERE ${condition}`;
     try{
-
         let execution = await this.connection.connect();
         result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
 
@@ -268,6 +282,6 @@ module.exports = MonitoredWebsiteDAO;
 // // @ts-ignore
 // let tests = new MonitoredWebsiteDAO();
 //
-// tests.findDataJoinWithResponseState(18).then(rs=>{
+// tests.modifyById(5, ['frequently'], ['200000']).then(rs=>{
 //     console.log(rs);
-// })
+// });

@@ -25,7 +25,7 @@ AuthMiddleware.beforeLogin = async function (req, res, next) {
 
 // @ts-ignore
 AuthMiddleware.beforeSignUp = async function (req, res, next) {
-    let result = validator.validateSignUp(req.body);
+    let result = await validator.validateSignUp(req.body);
     if(result.flag == true){
         req.newAccount = req.body;
         next();

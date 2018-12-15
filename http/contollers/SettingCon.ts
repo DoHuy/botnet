@@ -1,14 +1,14 @@
 import*as Configor from '../../domains/MonitorServices/ServiceSettingManager';
+import*as CONSTANT from '../../commons/Constants';
 // @ts-ignore
 const configor = new Configor();
+// @ts-ignore
 let SettingCon: any = {};
-
 
 SettingCon.addWebSite = async function (req, res) {
     let site;
     try{
         site = await configor.createWebsite(req.input, req.credentialId);
-        let a = site;
         return res.status(200).send({
             flag: true,
             webId: site.id,

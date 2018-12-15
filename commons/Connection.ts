@@ -6,7 +6,7 @@ const Connection:any = {};
 Connection.pool = null;
 Connection.connectDb = function () {
     try{
-        if(Connection.pool == null){
+        if(Connection.pool === null){
             Connection.pool = new Pool({
                 user: CONFIG['DB_CONFIG'].PG_USER,
                 host: CONFIG['DB_CONFIG'].PG_HOST,
@@ -18,12 +18,15 @@ Connection.connectDb = function () {
                 connectionTimeoutMillis: 2000,
             });
 
-            // Connection.pool.connect();
         }
     }catch(e){
         throw e;
     }
     return Connection.pool;
+}
+
+Connection.endConnect = (clientInstance:any)=>{
+    clientInstance.release(true);
 }
 
 module.exports = Connection;

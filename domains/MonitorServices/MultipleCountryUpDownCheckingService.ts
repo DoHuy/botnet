@@ -17,14 +17,17 @@ util.inherits(MultipleCountryUpDownCheckingService, ServiceInterface);
 
 
 // adapt data to old data
-async function adaptData (webId, start=null, end=null){
+async function adaptData (webId, limit=null, start=null, end=null){
     let rs: any = {siteName:"", url:"", responseTime:{}, notification:{}};
     let condition;
-    if(start != null && end != null){
+    if((start != null && end != null) && limit == null){
         condition = `webid=${webId} AND created between '${start}' AND '${end}' ORDER BY id DESC`;
     }
+    else if(limit != null && !(start != null && end != null)){
+        condition = `webid=${webId} ORDER BY id DESC limit ${limit}`;
+    }
     else{
-        condition=`webid=${webId} ORDER BY id DESC limit 100`;
+        condition=`webid=${webId} ORDER BY id DESC`;
     }
 
     try{
@@ -48,7 +51,7 @@ async function adaptData (webId, start=null, end=null){
 MultipleCountryUpDownCheckingService.prototype.doOperation = async (jsonData)=>{
     let result: any={ siteName:"", url:""};
     let webId = jsonData.webId;
-    let web: any = await adaptData(webId);
+    let web: any = await adaptData(webId, jsonData.limit, jsonData.start, jsonData.end);
 
     let response: any = web.responseTime;
     let notification: any = web.notification;

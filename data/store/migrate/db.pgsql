@@ -88,4 +88,11 @@ create table if not exists DomainsStates (
     domainsId int
 );
 
+create table if not exists logs (
+    id serial not null primary key,
+    log text,
+    created text,
+    credentialid int
+);
+
 

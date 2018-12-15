@@ -26,8 +26,8 @@ AuthController.login = async function (req, res, next) {
 AuthController.signUp = async function (req, res, next) {
     try{
         let accountFlag = await auth.createCredential(req.newAccount);
-        if(accountFlag) return res.status(200).send({flag: true, message: 'Tạo tài khoản thành công !'});
-        else return res.status(500).send({flag: false, message: 'Tạo tài khoản ko thành công !'});
+        if(accountFlag) return res.status(200).send({flag: true, message: 'sign up successfully !'});
+        else return res.status(500).send({flag: false, message: 'something wrong !'});
     }catch (e) {
         return res.status(500).send({flag: false, message: e.message});
     }
@@ -36,7 +36,7 @@ AuthController.signUp = async function (req, res, next) {
 AuthController.verifyAccount = async function (req, res, next) {
     try{
         let result = await auth.verifyCredential(req.params);
-        if(result) return res.status(200).send({flag: true, message: 'Chứng thực tài khoản thành công!'});
+        if(result) return res.status(200).send({flag: true, message: 'Authenticate successfully !!'});
         else return  res.status(500);
     }catch (e) {
         return res.status(500).send({flag: false, message: e.message})

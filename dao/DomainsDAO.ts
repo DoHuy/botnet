@@ -24,7 +24,10 @@ DomainsDAO.prototype.create = async function (newDomains) {
         newDomains.webId!=undefined?newDomains.webId:null
     ];
     try{
-        result = await this.connection.query(sql, values);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql, values);
+        this.ConnectionOBJ.endConnect(execution);
+        // result = await this.connection.query(sql, values);
     }catch(e){
         throw e;
     }
@@ -45,11 +48,16 @@ DomainsDAO.prototype.findByCondition = async function(condition){
     let result;
     let sql = `select*from domains where ${condition}`;
     try{
-        result = await this.connection.query(sql);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
 
     }
+    // // destroy this connection db
+    // this.ConnectionOBJ.endConnectDb(this.connection);
+    // //
     if(result.rows.length == 0){
         return null;
     }
@@ -76,7 +84,10 @@ DomainsDAO.prototype.deleteById = async function(id){
     let deleted = new Date().toISOString();
     let sql = `UPDATE domains SET deleted=$2 WHERE id = $1`;
     try{
-        await this.connection.query(sql, [id, deleted]);
+        let execution: any = await this.connection.connect();
+        await execution.query(sql, [id, deleted]);
+        this.ConnectionOBJ.endConnect(execution);
+        // await this.connection.query(sql, [id, deleted]);
 
     }catch (e) {
         throw e;

@@ -30,7 +30,7 @@ export const LINKS =[
     `https://github.com/`
 ];
 
-export const SERVICE_MAIL = ['VERIFY_MAIL'];
+export const SERVICE = ['MAIL'];
 
 export const STATUS_CODE = [
 
@@ -65,3 +65,12 @@ export const STATUS_CODE = [
 export const COUNTRIES = [['usa', 'United States'], ['uk', 'United Kingdom'], ['russia', 'Russia'], ['singapore', 'Singapore'],
                         ['india', 'India'], ['korea', 'South Korea'], ['japan', 'Japan'], ['germany', 'Germany'], ['france', 'France'],
                         ['sweden', 'Sweden'], ['australia', 'Australia'], ['italy', 'Italy']];
+
+export const LOG_FEATURES = {
+    createaMonitoredWebsite: "createaMonitoredWebsite",
+    addMonitoredWebsite: "addMonitoredWebsite",
+    modifyMonitoredWebsite: "modifyMonitoredWebsite",
+    removeMonitoredWebsite: "removeMonitoredWebsite",
+    createDNS: "createDNS",
+    removeDNS: "removeDNS"
+};

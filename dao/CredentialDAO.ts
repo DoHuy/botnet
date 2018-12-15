@@ -17,7 +17,11 @@ CredentialDAO.prototype.findById = async function (id) {
     let result;
     let sql = `select*from credentials where id=$1`;
     try{
-        result = await this.connection.query(sql, [id]);
+        // console.log(this.connection.connect());
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql, [id]);
+        this.ConnectionOBJ.endConnect(execution);
+
     }catch (e) {
         throw e;
     }
@@ -35,7 +39,9 @@ CredentialDAO.prototype.findForLogin = async function (credentialname, password)
     let sql = `select*from credentials
                 where credentialname=$1 and password=$2`;
     try{
-        result = await this.connection.query(sql, [credentialname, password]);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql, [credentialname, password]);
+        this.ConnectionOBJ.endConnect(execution);
         if(result.rows.length == 0) return null;
     }catch (e) {
         throw e;
@@ -51,7 +57,7 @@ CredentialDAO.prototype.findForLogin = async function (credentialname, password)
 //     let sql = `select*from credentials
 //                 limit ${limit}`;
 //     try{
-//         result = await this.connection.query(sql);
+//         result = await this.connection.connect().query(sql);
 //     }catch (e) {
 //         throw e;
 //
@@ -74,7 +80,10 @@ CredentialDAO.prototype.create = async function (newCredential) {
                   null, null, null, 'inactive'
                  ];
     try{
-        result = await this.connection.query(sql, values);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql, values);
+        this.ConnectionOBJ.endConnect(execution);
+        // result = await this.connection.query(sql, values);
     }catch(e){
         throw e;
     }
@@ -89,7 +98,7 @@ CredentialDAO.prototype.create = async function (newCredential) {
 //     let values = [new Date(), id];
 //     let flag;
 //     try{
-//         await this.connection.query(sql, values);
+//         await this.connection.connect().query(sql, values);
 //         flag=true;
 //     }catch (e) {
 //         throw e;
@@ -107,10 +116,13 @@ CredentialDAO.prototype.create = async function (newCredential) {
 CredentialDAO.prototype.modifyById = async function (object, id) {
     let result;
     let sql = `update credentials set ${object.key}=$1, modified=$2 where id=$3`;
-    console.log(sql);
+    // console.log(sql);
     let tmp = [object.value, new Date().toISOString(), id];
     try{
-        await this.connection.query(sql, tmp);
+        let execution: any = await this.connection.connect();
+        await execution.query(sql, tmp);
+        this.ConnectionOBJ.endConnect(execution);
+        // await this.connection.query(sql, tmp);
         result = await this.findById(id);
     }catch (e) {
         throw e;
@@ -119,6 +131,41 @@ CredentialDAO.prototype.modifyById = async function (object, id) {
     // @ts-ignore
     return result;
 
-}
+};
+
+
+CredentialDAO.prototype.findByCondition = async function(condition){
+    let result;
+    let sql = `select*from credentials where ${condition}`;
+    try{
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
+    }catch (e) {
+        throw e;
+
+    }
+    if(result.rows.length == 0){
+        return null;
+    }
+    else{
+        let websiteList = [];
+        for(let credential of result.rows){
+            // @ts-ignore
+            websiteList.push(new Credential(credential.id,
+                credential.credentialname,
+                credential.password,
+                credential.email,
+                credential.phone,
+                credential.created,
+                credential.modified,
+                credential.deleted,
+                credential.token,
+                credential.status));
+        };
+
+        return websiteList;
+    }
+};
 
 module.exports = CredentialDAO;

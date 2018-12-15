@@ -10,9 +10,10 @@ UpDownCheckingMid.beforeGetNormalUpDownInfo = async (req, res, next)=>{
         let check: any = await validator.validateGetNormalUpDownInfo(req.params.id, req.credentialId);
         if(check.flag == true){
             // @ts-ignore
-            let query = Lib.getQueryUrl(req.url, 'start', 'end');
+            let query = Lib.getQueryUrl(req.url, 'limit', 'start', 'end');
             req.jsonData = {
                 webId: req.params.id,
+                limit: query.limit,
                 start: query.start,
                 end: query.end
             };
@@ -31,9 +32,10 @@ UpDownCheckingMid.beforeGetCountriesInfo = async (req, res, next)=>{
         let check: any = await validator.validateGetCountriesInfo(req.params.id, req.credentialId);
         if(check.flag == true){
             // @ts-ignore
-            let query = Lib.getQueryUrl(req.url, 'start', 'end');
+            let query = Lib.getQueryUrl(req.url, 'limit', 'start', 'end');
             req.jsonData = {
                 webId: req.params.id,
+                limit: query.limit,
                 start: query.start,
                 end: query.end
             };
@@ -52,9 +54,10 @@ UpDownCheckingMid.beforeGetIspsInfo = async (req, res, next)=>{
         let check: any = await validator.validateGetIspsInfo(req.params.id, req.credentialId);
         if(check.flag == true){
             // @ts-ignore
-            let query = Lib.getQueryUrl(req.url, 'start', 'end');
+            let query = Lib.getQueryUrl(req.url, 'limit', 'start', 'end');
             req.jsonData = {
                 webId: req.params.id,
+                limit: query.limit,
                 start: query.start,
                 end: query.end
             };

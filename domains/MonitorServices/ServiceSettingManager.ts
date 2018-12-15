@@ -38,7 +38,7 @@ ServiceSettingManager.prototype.createWebsite = async function (input, credentia
     try {
         await monitoredWebSiteDAO.transactionBegin();
         let rs: any = await monitoredWebSiteDAO.create(input);
-        rs = await monitoredWebSiteDAO.modifyById(rs.id, ['parent', 'modified'], [rs.id, rs.created]);
+        let rsUpdate = await monitoredWebSiteDAO.modifyById(rs.id, ['parent', 'modified'], [rs.id, rs.created]);
 
         // init child_process by way save data to file id.json , purpose create new child_process
         let data: any = {
@@ -261,8 +261,9 @@ ServiceSettingManager.prototype.removeWebsite = async function (id) {
  */
 ServiceSettingManager.prototype.turnOnHackedDNSDetecting = async (input, webId)=>{
     // tao ms vao csdl
+    let domains: any;
     try{
-        let domains: any = await domainsDAO.create({domains: input.domains, ip: input.ip, created: new Date().toISOString(), webId: webId});
+        domains = await domainsDAO.create({domains: input.domains, ip: input.ip, created: new Date().toISOString(), webId: webId});
 
         // khoi tao process detect hacked dns
         let content = {
@@ -277,7 +278,7 @@ ServiceSettingManager.prototype.turnOnHackedDNSDetecting = async (input, webId)=
         let procPath = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${webId}.json`);
         await writeFile(procPath, JSON.stringify(content), 'utf8');
         //
-        return true;
+        return domains;
     }catch (e) {
         throw e;
     }

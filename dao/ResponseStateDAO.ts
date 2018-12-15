@@ -22,7 +22,10 @@ ResponseStateDAO.prototype.create = async function (newResponseState) {
         newResponseState.webId!=undefined?newResponseState.webId:null
     ];
     try{
-        result = await this.connection.query(sql, values);
+        let execution = await this.connection.connect();
+        result = await execution.query(sql, values);
+        this.ConnectionOBJ.endConnect(execution);
+        // result = await this.connection.query(sql, values);
     }catch(e){
         throw e;
     }
@@ -41,7 +44,9 @@ ResponseStateDAO.prototype.findByCondition = async function(condition){
     let result;
     let sql = `select*from responsestates where ${condition}`;
     try{
-        result = await this.connection.query(sql);
+        let execution = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
 

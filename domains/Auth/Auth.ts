@@ -7,7 +7,7 @@ import*as TokenDAO from "../../dao/TokenDAO";
 import*as crypto from 'crypto';
 import*as CONFIG from '../../commons/Configs';
 import*as ThirdPartyFactory from '../../domains/ThirdPartyService/ThirdPartyFactory';
-import {SERVICE_MAIL} from "../../commons/Constants";
+import {SERVICE} from "../../commons/Constants";
 // @ts-ignore
 import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 import {EXPIRED_TOKEN} from "../../commons/Configs";
@@ -16,6 +16,7 @@ const Libs = require('../../commons/Libs');
 // @ts-ignore
 let thirdFact = new ThirdPartyFactory();
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
+let credentialDAO = new CredentialDAO();
 let tokenDAO = new TokenDAO();
 function Auth() {}
 
@@ -70,7 +71,6 @@ Auth.prototype.decode = (token)=>{
  * @return credential or null neu khong tim thay
  */
 Auth.prototype.authenticate = async function (account) {
-    let credentialDAO = new CredentialDAO();
     try{
         let credential =  await credentialDAO.findForLogin(account.credentialname, account.password);
         if(credential != null && credential.status == 'active') return {flag: true, credential: credential};
@@ -141,8 +141,6 @@ Auth.prototype.renewToken = async function (oldToken) {
     let infoCredential   = this.decode(oldToken);
     infoCredential.created = new Date();
     let newToken      = {token: this.encode(infoCredential), created: infoCredential.created};
-    let credentialDAO = new CredentialDAO();
-    let tokenDAO      = new TokenDAO();
     try{
         await tokenDAO.transactionBegin();
         await tokenDAO.deleteById(oldToken);
@@ -163,8 +161,6 @@ Auth.prototype.renewToken = async function (oldToken) {
  * @return true ne thanh cong
  */
 Auth.prototype.createCredential = async function (newCredential) {
-    // @ts-ignore
-    let credentialDAO = new CredentialDAO();
     try{
        let credential = await credentialDAO.create(newCredential);
        let link = `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/verifyAccount/${credential.id}/${credential.credentialname}`;
@@ -173,9 +169,9 @@ Auth.prototype.createCredential = async function (newCredential) {
             <a id="verify" href="${link}"><strong>${Libs.base64EncodeUrl(link)}</strong></a>            
        `;
         // console.log(form);
-        let info =  await thirdFact.getThirdPartyService(SERVICE_MAIL["VERIFY_MAIL"]).sendMail(
-            'Outlook', {user: 'huy.dv146328@sis.hust.edu.vn', pass: 'anhhuy12'},
-            {from: 'huy.dv146328@sis.hust.edu.vn', to: credential.email, subject: "XÁC THỰC LẠI TÀI KHOẢN ĐĂNG KÍ CỦA DỊCH VỤ WEBCHECKER", html: form}
+        let info =  await thirdFact.getThirdPartyService(SERVICE["MAIL"]).sendMail(
+            'Outlook', {user: CONFIG.MAIL_SERVER.user, pass: CONFIG.MAIL_SERVER.pass},
+            {from: CONFIG.MAIL_SERVER.user, to: credential.email, subject: "XÁC THỰC LẠI TÀI KHOẢN ĐĂNG KÍ CỦA DỊCH VỤ WEBCHECKER", html: form}
         );
         return true;
     }catch (e) {
@@ -189,8 +185,6 @@ Auth.prototype.createCredential = async function (newCredential) {
  * @return false neu khong ton tai hoac da ton tai token, tra ve true, neu ton tai thi tao new token update status la active
  */
 Auth.prototype.verifyCredential = async function(credential){
-    let credentialDAO = new CredentialDAO();
-    let tokenDAO = new TokenDAO();
     let infoCredential = {id: credential.id, credentialname: credential.credentialname, created: new Date()};
     let account = await credentialDAO.findById(credential.id);
     if(account.token == null){

@@ -15,7 +15,9 @@ ProxyDAO.prototype.findById = async function (id) {
     let result;
     let sql = `select*from proxies where id=${id}`;
     try{
-        result = await this.connection.query(sql);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
     }
@@ -29,7 +31,9 @@ ProxyDAO.prototype.findAll = async function (limit=null) {
     let result;
     let sql = `select*from proxies limit ${limit}`;
     try{
-        result = await this.connection.query(sql);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
 
@@ -49,7 +53,10 @@ ProxyDAO.prototype.create = async function (proxy) {
                 values ($1, $2, $3, $4, $5, $6) RETURNING *`;
     let values = [proxy.ip, proxy.port, proxy.proxyType, proxy.responseTime, proxy.details, proxy.status];
     try{
-        result = await this.connection.query(sql, values);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql, values);
+        this.ConnectionOBJ.endConnect(execution);
+        // result = await this.connection.query(sql, values);
     }catch(e){
         throw e;
     }
@@ -69,7 +76,10 @@ ProxyDAO.prototype.modifyById = async function (id, key, value) {
     let sql = `update proxies set ${key}=$1 where id=$2`;
     let tmp = [value, id];
     try{
-      await this.connection.query(sql, tmp);
+      let execution: any = await this.connection.connect();
+      await execution.query(sql, tmp);
+      this.ConnectionOBJ.endConnect(execution);
+      // await this.connection.query(sql, tmp);
       result = await this.findById(id);
     }catch (e) {
         throw e;
@@ -88,14 +98,17 @@ ProxyDAO.prototype.modifyByIpAndPort = async function (ip, port, key, value) {
     let sql = `update proxies set ${key}=$1 where ip=$2 and port=$3`;
     let tmp = [value, ip, port];
     try{
-        await this.connection.query(sql, tmp);
-        result = await this.findById();
+        let execution: any = await this.connection.connect();
+        await execution.query(sql, tmp);
+        this.ConnectionOBJ.endConnect(execution);
+        // await this.connection.query(sql, tmp);
+        // result = await this.findById();
     }catch (e) {
         throw e;
     }
 
     // @ts-ignore
-    return result;
+    // return result;
 
 }
 
@@ -103,7 +116,9 @@ ProxyDAO.prototype.findByCondition = async function(condition){
     let result;
     let sql = `select*from proxies where ${condition}`;
     try{
-        result = await this.connection.query(sql);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
 

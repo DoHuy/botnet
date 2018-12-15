@@ -7,9 +7,12 @@ import*as CONFIG from '../../commons/Configs';
 import*as path from 'path';
 import*as fs from 'fs';
 // @ts-ignore
+import*as CredentialDAO from '../../dao/CredentialDAO';
+// @ts-ignore
 let auth = new Auth();
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 let domainsDAO = new DomainsDAO();
+let credentialDAO = new CredentialDAO();
 function Validator() {}
 
 Validator.prototype.validateLogin = function (rawData){
@@ -23,9 +26,18 @@ Validator.prototype.validateLogin = function (rawData){
     return {flag: true, message: "OK"};
 }
 
-Validator.prototype.validateSignUp = function (rawData){
+Validator.prototype.validateSignUp = async function (rawData){
+
+    // check chi ton tai 1 account
+    //
     if(rawData.credentialname == undefined){
          return {flag: false, message: "credentialname is not empty"};
+    }
+    else{
+        let credential = await credentialDAO.findByCondition(`credentialname='${rawData.credentialname}'`);
+        if(credential != null){
+            return {flag: false, message: "account existed"};
+        }
     }
     if(rawData.password == undefined){
         return {flag: false, message: "password is not empty"};

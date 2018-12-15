@@ -21,7 +21,10 @@ DomainsStateDAO.prototype.create = async function (newDomainsState) {
         newDomainsState.domainsId!=undefined?newDomainsState.domainsId:null
     ];
     try{
-        result = await this.connection.query(sql, values);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql, values);
+        this.ConnectionOBJ.endConnect(execution);
+        // result = await this.connection.query(sql, values);
     }catch(e){
         throw e;
     }
@@ -39,7 +42,9 @@ DomainsStateDAO.prototype.findByCondition = async function(condition){
     let result;
     let sql = `select*from domainsstates where ${condition}`;
     try{
-        result = await this.connection.query(sql);
+        let execution: any = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
 

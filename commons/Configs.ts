@@ -39,3 +39,8 @@ export const NOTICE_RULE = {
     "levels": ["success", "warning", "error"],
     "state": ["up", "down"]
 }
+
+export const MAIL_SERVER = {
+    user: 'huy.dv146328@sis.hust.edu.vn',
+    pass: 'anhhuy12'
+}

@@ -18,14 +18,18 @@ util.inherits(NormalUpDownCheckingService, ServiceInterface);
 //
 
 // adapt data to old data
-async function adaptData (webId, start=null, end=null){
+async function adaptData (webId, limit=null, start=null, end=null){
     let rs: any = {siteName:"", url:"", responseTime:{}, notification:{}};
     let condition;
-    if(start != null && end != null){
+    if((start != null && end != null) && limit == null){
         condition = `webid=${webId} AND created between '${start}' AND '${end}' ORDER BY id DESC`;
     }
+    else if(limit != null && !(start != null && end != null)){
+        // console.log(typeof limit);
+        condition = `webid=${webId}  ORDER BY id DESC limit ${limit}`;
+    }
     else{
-        condition=`webid=${webId} ORDER BY id DESC limit 100`;
+        condition=`webid=${webId} ORDER BY id DESC`;
     }
     try{
         let site: any = await monitoredWebsiteDAO.findById(webId);
@@ -51,8 +55,8 @@ NormalUpDownCheckingService.prototype.doOperation = async (jsonData) => {
     let webId = jsonData.webId;
 
     try{
-        let web: any = await adaptData (webId);
-        console.log(web);
+        let web: any = await adaptData (webId, jsonData.limit, jsonData.start, jsonData.end);
+        // console.log(web);
         let siteName: any = web.siteName;
         let url: any = web.url;
 

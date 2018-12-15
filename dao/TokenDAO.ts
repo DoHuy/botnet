@@ -17,7 +17,9 @@ TokenDAO.prototype.findAll = async function (limit=null) {
     let result;
     let sql = `select*from tokens`;
     try{
-        result = await this.connection.query(sql);
+        let execution = await this.connection.connect();
+        result = await execution.query(sql);
+        this.ConnectionOBJ.endConnect(execution);
     }catch (e) {
         throw e;
     }
@@ -31,7 +33,9 @@ TokenDAO.prototype.findAll = async function (limit=null) {
 TokenDAO.prototype.findById = async function (id) {
 
     try{
-        let result = await this.connection.query(`select*from tokens where token=$1`, [id]);
+        let execution = await this.connection.connect();
+        let result:any = await execution.query(`select*from tokens where token=$1`, [id]);
+        this.ConnectionOBJ.endConnect(execution);
         if(result.rows.length == 0) return null;
         else {
             result = result.rows[0];
@@ -47,7 +51,10 @@ TokenDAO.prototype.create = async function (newToken) {
         let sql   = `insert into tokens (token, created, expired)
                      values ($1, $2, $3) RETURNING *`;
         let value = [newToken.token, newToken.created.toISOString(), ""+CONFIG.EXPIRED_TOKEN*24*60*60*1000];
-        let result = await this.connection.query(sql, value);
+        let execution = await this.connection.connect();
+        let result = await execution.query(sql, value);
+        this.ConnectionOBJ.endConnect(execution);
+        // let result = await this.connection.query(sql, value);
         result = result.rows[0];
 
         return new Token(result.token, result.created, result.expired);
@@ -60,7 +67,10 @@ TokenDAO.prototype.create = async function (newToken) {
 TokenDAO.prototype.deleteById = async function(id){
     let sql = `DELETE FROM tokens WHERE token = $1`;
     try{
-        await this.connection.query(sql, [id.trim()]);
+        let execution = await this.connection.connect();
+        await execution.query(sql, [id.trim()]);
+        this.ConnectionOBJ.endConnect(execution);
+        // await this.connection.query(sql, [id.trim()]);
 
     }catch (e) {
         throw e;

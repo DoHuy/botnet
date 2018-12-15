@@ -4,6 +4,7 @@ function DAO () {
     let self = this;
     // @ts-ignore
     self.connection = Connection.connectDb();
+    self.ConnectionOBJ = Connection;
 }
 
 
@@ -46,3 +47,6 @@ DAO.prototype.transactionRollback = async function(){
 }
 
 module.exports = DAO;
+
+// let test = new DAO();
+// console.log(test.ConnectionOBJ);
