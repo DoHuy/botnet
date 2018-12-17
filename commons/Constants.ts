@@ -67,10 +67,10 @@ export const COUNTRIES = [['usa', 'United States'], ['uk', 'United Kingdom'], ['
                         ['sweden', 'Sweden'], ['australia', 'Australia'], ['italy', 'Italy']];
 
 export const LOG_FEATURES = {
-    createaMonitoredWebsite: "createaMonitoredWebsite",
-    addMonitoredWebsite: "addMonitoredWebsite",
-    modifyMonitoredWebsite: "modifyMonitoredWebsite",
-    removeMonitoredWebsite: "removeMonitoredWebsite",
-    createDNS: "createDNS",
-    removeDNS: "removeDNS"
+    addAdvanceConfigMonitoredWebsite: "Thêm mới các trang con, thêm cấu hình cài đặt đa quốc gia",
+    addMonitoredWebsite: "Tạo mới website giám sát",
+    modifyMonitoredWebsite: "Sửa một vài cấu hình website đang được giám sát",
+    removeMonitoredWebsite: "Xóa  website đang được giám sát (bao gồm cả việc xóa tất cả các trang con của website này)",
+    createDNS: "Tạo cấu hình cho việc phát hiện domain bị hacker tấn công",
+    removeDNS: "Xóa cấu hình phát hiện domain bị hacker tấn công đang tồn tại"
 };

@@ -7,7 +7,7 @@ const Controller = require('../contollers/Controller');
 const router = require('express').Router();
 
 // @ts-ignore
-router.post(`/authenticate`, Middleware.AuthMiddleware.beforeLogin, Controller.AuthController.login);
+router.post(`/getToken`, Middleware.AuthMiddleware.beforeLogin, Controller.AuthController.login);
 // @ts-ignore
 router.post(`/signUp`, Middleware.AuthMiddleware.beforeSignUp, Controller.AuthController.signUp);
 // @ts-ignore

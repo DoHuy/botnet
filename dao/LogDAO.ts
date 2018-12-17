@@ -3,7 +3,7 @@ const DAO = require('./DAO');
 // @ts-ignore
 const util  = require('util');
 // @ts-ignore
-const Domains = require('../data/entities/Log');
+const Log = require('../data/entities/Log');
 // @ts-ignore
 function LogDAO() {
     DAO.call(this); // supper()

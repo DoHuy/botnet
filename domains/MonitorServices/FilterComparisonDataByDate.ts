@@ -112,7 +112,7 @@ function calculateDataCurrentLocation(data) {
             bestPage = {
                 siteName: metrics[0].monitoredWeb.siteName,
                 url: metrics[0].monitoredWeb.url,
-                averageResponseTime: metrics[0].responseState.response.response.averageResponseTime,
+                averageResponseTime: metrics[0].responseState.response.averageResponseTime,
                 maxResponseTime: Number.MIN_SAFE_INTEGER,
                 minResponseTime: Number.MAX_SAFE_INTEGER,
                 totalUp: null,
@@ -120,29 +120,55 @@ function calculateDataCurrentLocation(data) {
             };
             //
             metrics.forEach(metric => {
+                if(metric.responseState.response.response != undefined){
+                    // calculate totalUp, totalDown
+                    if (metric.responseState.notification.notification.state == 'up') {
+                        totalUp++;
+                    }
+                    else {
+                        totalDown++;
+                    }
+                    //
+                    let tmpWeb: any = {
+                        siteName: metric.monitoredWeb.siteName,
+                        url: metric.monitoredWeb.url,
+                        averageResponseTime: metric.responseState.response.response.averageResponseTime,
+                        maxResponseTime: metric.responseState.response.response.maxResponseTime,
+                        minResponseTime: metric.responseState.response.response.minResponseTime,
+                        totalUp: 0,
+                        totalDown: 0
+                    };
 
-                // calculate totalUp, totalDown
-                if (metric.responseState.notification.notification.state == 'up') {
-                    totalUp++;
-                }
-                else {
-                    totalDown++;
-                }
-                //
-                let tmpWeb: any = {
-                    siteName: metric.monitoredWeb.siteName,
-                    url: metric.monitoredWeb.url,
-                    averageResponseTime: metric.responseState.response.response.averageResponseTime,
-                    maxResponseTime: metric.responseState.response.response.maxResponseTime,
-                    minResponseTime: metric.responseState.response.response.minResponseTime,
-                    totalUp: 0,
-                    totalDown: 0
-                };
+                    bestPage = bestPage.maxResponseTime > tmpWeb.maxResponseTime
+                        ? bestPage : tmpWeb;
 
-                bestPage = bestPage.maxResponseTime > tmpWeb.maxResponseTime
-                    ? bestPage : tmpWeb;
+                }
+                else{
+                    // calculate totalUp, totalDown
+                    if (metric.responseState.notification.state == 'up') {
+                        totalUp++;
+                    }
+                    else {
+                        totalDown++;
+                    }
+                    //
+                    let tmpWeb: any = {
+                        siteName: metric.monitoredWeb.siteName,
+                        url: metric.monitoredWeb.url,
+                        averageResponseTime: metric.responseState.response.averageResponseTime,
+                        maxResponseTime: metric.responseState.response.maxResponseTime,
+                        minResponseTime: metric.responseState.response.minResponseTime,
+                        totalUp: 0,
+                        totalDown: 0
+                    };
+
+                    bestPage = bestPage.maxResponseTime > tmpWeb.maxResponseTime
+                        ? bestPage : tmpWeb;
+
+                }
 
             });
+
             //
             bestPage.totalUp = totalUp;
             bestPage.totalDown = totalDown;

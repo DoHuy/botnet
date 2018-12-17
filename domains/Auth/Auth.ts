@@ -18,6 +18,8 @@ let thirdFact = new ThirdPartyFactory();
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 let credentialDAO = new CredentialDAO();
 let tokenDAO = new TokenDAO();
+// @ts-ignore
+let dao = new DAO();
 function Auth() {}
 
 /**
@@ -192,14 +194,14 @@ Auth.prototype.verifyCredential = async function(credential){
         let token = this.encode(infoCredential);
         let newToken = {token: token, created: infoCredential.created};
         try{
-            await tokenDAO.transactionBegin();
+            // await tokenDAO.transactionBegin();
             let token = await tokenDAO.create(newToken);
             await credentialDAO.modifyById({key: 'token', value: token.token}, credential.id);
             await credentialDAO.modifyById({key: 'status', value: 'active'}, credential.id);
-            await tokenDAO.transactionCommit();
+            // await tokenDAO.transactionCommit();
             return true;
         } catch(e){
-            await tokenDAO.transactionRollback();
+            // await tokenDAO.transactionRollback();
             throw e;
         }
 

@@ -36,7 +36,7 @@ ServiceSettingManager.prototype.createWebsite = async function (input, credentia
     input.credentialId = credentialId;
     input.created = new Date();
     try {
-        await monitoredWebSiteDAO.transactionBegin();
+        // await monitoredWebSiteDAO.transactionBegin();
         let rs: any = await monitoredWebSiteDAO.create(input);
         let rsUpdate = await monitoredWebSiteDAO.modifyById(rs.id, ['parent', 'modified'], [rs.id, rs.created]);
 
@@ -56,10 +56,10 @@ ServiceSettingManager.prototype.createWebsite = async function (input, credentia
         let pathProc = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${rs.id}.json`);
          fs.writeFileSync(pathProc, data, 'utf8');
         //
-        await monitoredWebSiteDAO.transactionCommit();
+        // await monitoredWebSiteDAO.transactionCommit();
         return rs;
     } catch (e) {
-        await monitoredWebSiteDAO.transactionRollback();
+        // await monitoredWebSiteDAO.transactionRollback();
         throw e;
     }
 
@@ -76,7 +76,7 @@ ServiceSettingManager.prototype.addAdvanceConfigWebsite = async function (config
     let values = [config.frequently, config.connectionTimeout, new Date().toISOString()];
 
     try {
-        await monitoredWebSiteDAO.transactionBegin();
+        // await monitoredWebSiteDAO.transactionBegin();
 
         let rs = await monitoredWebSiteDAO.modifyById(config.parent, keys, values);
         for (let i = 0; i < config.subList.length; i++) {
@@ -135,10 +135,10 @@ ServiceSettingManager.prototype.addAdvanceConfigWebsite = async function (config
                 throw e;
             }
         }
-        await monitoredWebSiteDAO.transactionCommit();
+        // await monitoredWebSiteDAO.transactionCommit();
         return result;
     } catch (e) {
-        await monitoredWebSiteDAO.transactionRollback();
+        // await monitoredWebSiteDAO.transactionRollback();
         throw e;
     }
 }
@@ -235,13 +235,13 @@ ServiceSettingManager.prototype.modifyConfigWebsite = async function (input, cre
 ServiceSettingManager.prototype.removeWebsite = async function (id) {
     let result;
     try {
-        await monitoredWebSiteDAO.transactionBegin();
+        // await monitoredWebSiteDAO.transactionBegin();
         await monitoredWebSiteDAO.deleteById(id);
         let sub: any = await monitoredWebSiteDAO.findByCondition(` parent = ${id}`);
         for (let i = 0; i < sub.length; i++) {
             await monitoredWebSiteDAO.deleteById(sub[i].id);
         }
-        await monitoredWebSiteDAO.transactionCommit();
+        // await monitoredWebSiteDAO.transactionCommit();
         // delete all child_process of this web and sub_web of this web
         // @ts-ignore
         SubProcManager.killAllProc(id);
@@ -249,7 +249,7 @@ ServiceSettingManager.prototype.removeWebsite = async function (id) {
         return true;
 
     } catch (e) {
-        await monitoredWebSiteDAO.transactionRollback();
+        // await monitoredWebSiteDAO.transactionRollback();
         throw e;
     }
 };
@@ -297,6 +297,7 @@ ServiceSettingManager.prototype.destroyHackedDNSDetecting = async (webId)=>{
         //
         // @ts-ignore
         SubProcManager.destroyHackedDNSDetectingProcess(domains[0].id);
+        return true;
     }catch (e) {
         throw e;
     }

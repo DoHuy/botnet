@@ -30,7 +30,7 @@ HackedDNSDetectingMid.beforeAddConfigDNS = async function (req, res, next) {
             let web: any = await monitoredWebsiteDAO.findById(req.params.id);
             let defaultDomain = web.url.match(/^(?:https?:)?(?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)/igm)[0];
             defaultDomain = defaultDomain.split('/')[defaultDomain.split('/').length -1];
-            req.input.domains.push(defaultDomain);
+            req.input.domains.push({domain: defaultDomain, expired: req.body.expiredOfMainDNS});
             //
             if(req.body.domains != undefined){
                 for(let i=0 ; i<req.body.domains.length ; i++){
@@ -39,7 +39,7 @@ HackedDNSDetectingMid.beforeAddConfigDNS = async function (req, res, next) {
             }
             //
             req.input.ip = req.body.ip;
-            req.input.frequently = FREQUENTLY;
+            req.input.frequently = req.body.frequently != undefined?req.body.frequently:FREQUENTLY;
 
             next();
         }

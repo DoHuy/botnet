@@ -40,14 +40,14 @@ CurrentIpCheckingProc.run = async function () {
         if(metric.status == '500'){
             // throw e/ neu co loi xay ra
             response = {
-                DNSLookup: 0,
-                InitConnection: 0,
-                DataTransfer: 0,
-                ResponseTime: 0,
-                WaitTime: 0,
-                averageResponseTime: 0,
-                maxResponseTime: 0,
-                minResponseTime: 0,
+                DNSLookup: Number.MIN_SAFE_INTEGER,
+                InitConnection: Number.MIN_SAFE_INTEGER,
+                DataTransfer: Number.MIN_SAFE_INTEGER,
+                ResponseTime: Number.MIN_SAFE_INTEGER,
+                WaitTime: Number.MIN_SAFE_INTEGER,
+                averageResponseTime: Number.MIN_SAFE_INTEGER,
+                maxResponseTime: Number.MIN_SAFE_INTEGER,
+                minResponseTime: Number.MIN_SAFE_INTEGER,
                 location: location
 
             };
@@ -103,15 +103,17 @@ CurrentIpCheckingProc.run = async function () {
             details[created]=firstResponse[created];
             let totalResp: any = 0;
             for(let i in details){
-                if(details[i].multipleCountries == undefined){
-                    averageResponseTime += details[i].ResponseTime;
-                    maxResponseTime = maxResponseTime>=details[i].ResponseTime?maxResponseTime:details[i].ResponseTime;
-                    minResponseTime = minResponseTime<=details[i].ResponseTime?minResponseTime:details[i].ResponseTime;
-                }
-                else{
-                    averageResponseTime += details[i].response.ResponseTime;
-                    maxResponseTime = maxResponseTime>=details[i].response.ResponseTime?maxResponseTime:details[i].response.ResponseTime;
-                    minResponseTime = minResponseTime<=details[i].response.ResponseTime?minResponseTime:details[i].response.ResponseTime;
+                if(details[i].ResponseTime != Number.MIN_SAFE_INTEGER){
+                    if(details[i].multipleCountries == undefined){
+                        averageResponseTime += details[i].ResponseTime;
+                        maxResponseTime = maxResponseTime>=details[i].ResponseTime?maxResponseTime:details[i].ResponseTime;
+                        minResponseTime = minResponseTime<=details[i].ResponseTime?minResponseTime:details[i].ResponseTime;
+                    }
+                    else{
+                        averageResponseTime += details[i].response.ResponseTime;
+                        maxResponseTime = maxResponseTime>=details[i].response.ResponseTime?maxResponseTime:details[i].response.ResponseTime;
+                        minResponseTime = minResponseTime<=details[i].response.ResponseTime?minResponseTime:details[i].response.ResponseTime;
+                    }
                 }
             }
             averageResponseTime = averageResponseTime/(Object.keys(details).length);

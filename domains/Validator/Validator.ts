@@ -226,7 +226,7 @@ Validator.prototype.validateSearchByDate = async (webId, credentialId, query)=>{
     }
 
     // validate
-    if(!(query.start == null && query.end == null)){
+    if((query.start == null && query.end == null)){
         return {flag: false, message: "query wrong", statusCode: 400}
     }
 
@@ -274,6 +274,9 @@ Validator.prototype.validateAddConfigDNS = async (rawData, webId, credentialId)=
 
         if(rawData.ip != undefined && !Array.isArray(rawData.ip)){
             return {flag: false, message:"ip must be array", statusCode: 400};
+        }
+        if(rawData.expiredOfMainDNS == undefined){
+            return {flag: false, message: "expiredOfMainDNS not empty", statusCode: 400}
         }
 
         return {flag: true, message: "OK"};

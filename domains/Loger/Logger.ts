@@ -39,6 +39,7 @@ Logger.prototype.createLog = async (feature, jsonData, credentialId)=>{
             case CONSTANT.LOG_FEATURES.createDNS:
                 // @ts-ignore
                 let creatingLogServiceD = new CreatingLogService(jsonData, credentialId);
+                console.log(creatingLogServiceD);
                 logToMail = await creatingLogServiceD.logCreatingDNS();
                 break;
             case CONSTANT.LOG_FEATURES.removeDNS:
@@ -48,8 +49,8 @@ Logger.prototype.createLog = async (feature, jsonData, credentialId)=>{
         }
 
         // send to mail credential
-        let form = `<h1>Tính năng:  ${feature}</h1> <br>
-                    <h2>Thời gian thực hiện:  ${new Date(logToMail.created).toDateString()}</h2> <br>`;
+        let form = `<h2>Chức năng:  ${feature}</h2>
+                    <h4><i>Đã được tài khoản của bạn thực hiện lúc:  ${new Date(logToMail.created)}</i></h4> <br>`;
 
         let credential: any = await credentialDAO.findById(credentialId);
         factory.getThirdPartyService(CONSTANT.SERVICE['MAIL']).sendMail(
@@ -64,3 +65,14 @@ Logger.prototype.createLog = async (feature, jsonData, credentialId)=>{
 };
 
 module.exports = Logger;
+
+//test done  logger
+// //
+// let logger = new Logger();
+// let jsonLogData = {
+//     log: CONSTANT.LOG_FEATURES.createDNS,
+//     created: new Date().toISOString()
+// };
+// logger.createLog(CONSTANT.LOG_FEATURES.createDNS, jsonLogData, 33).then(rs=>{
+//
+// });

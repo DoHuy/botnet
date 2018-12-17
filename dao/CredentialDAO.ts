@@ -27,6 +27,7 @@ CredentialDAO.prototype.findById = async function (id) {
     }
     // @ts-ignore
     let credential = result.rows[0];
+    if(credential == undefined) return null;
     console.log(credential);
     // @ts-ignore
     return new Credential(credential.id, credential.credentialname, credential.password, credential.email, credential.phone, credential.created, credential.modified,credential.deleted, credential.token, credential.status);

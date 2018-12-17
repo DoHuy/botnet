@@ -10,7 +10,7 @@ function Other() {}
 Other.prototype.getMonitoredWebsite = async (id)=>{
     let kq: any = {parent:{}, sub:[]};
     try{
-        let webs = await monitoredWebsiteDAO.findByCondition(`parent=${id}`);
+        let webs = await monitoredWebsiteDAO.findByCondition(`parent=${id} AND deleted IS NULL`);
         //convert data
         webs.forEach(element=>{
             if(element.parent == element.id){
@@ -40,7 +40,7 @@ Other.prototype.getMonitoredWebsite = async (id)=>{
 Other.prototype.getAllParentMonitoredWebsite = async (credentialId)=>{
     let list=[];
     try{
-        let webs = await monitoredWebsiteDAO.findByCondition(`credentialid=${credentialId}`);
+        let webs = await monitoredWebsiteDAO.findByCondition(`credentialid=${credentialId} AND deleted IS NULL`);
         //convert data
         webs.forEach(element=>{
             if(element.parent == element.id){
