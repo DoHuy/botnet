@@ -26,6 +26,11 @@ Logger.prototype.createLog = async (feature, jsonData, credentialId)=>{
                 let creatingLogServiceM = new CreatingLogService(jsonData, credentialId);
                 logToMail = await creatingLogServiceM.logCreatingMonitoredWebsite();
                 break;
+            case CONSTANT.LOG_FEATURES.addAdvanceConfigMonitoredWebsite:
+                // @ts-ignore
+                let creatingLogServiceT = new CreatingLogService(jsonData, credentialId);
+                logToMail = await creatingLogServiceT.logCreatingMonitoredWebsite();
+                break;
             case CONSTANT.LOG_FEATURES.modifyMonitoredWebsite:
                 // @ts-ignore
                 let modifyingLogService = new ModifyingLogService(jsonData, credentialId);

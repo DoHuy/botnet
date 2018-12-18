@@ -9,9 +9,20 @@ const domainsStateDAO = new DomainsStateDAO();
 
 
 const frequently = process.argv[2] ||  180000 ;
-const domainsList = process.argv[3] || JSON.stringify([{domain: 'facebook.com', expired:"2019-01-01T00:00:00.000Z"},{domain: 'fb.com', expired:"2018-09-01T00:00:00.000Z"}]);
-const ipList          = process.argv[4] || JSON.stringify(['157.240.15.35']);
-const domainsId   = process.argv[5] || 5
+const domainsList = process.argv[3] || JSON.stringify([{"domain":"www.techcombank.com.vn","expired":"2017-12-18T04:18:23.308Z"}]);
+const ipList          = process.argv[4] || JSON.stringify(["103.4.128.120"]);
+const domainsId   = process.argv[5] || 11
+
+
+async function getIpOfDNS(domain) {
+    let rs;
+    try{
+        rs = await exec(`ping -c 1 ${domain}`);
+        return rs.stdout;
+    } catch (e) {
+        return e.stdout;
+    }
+}
 
 const detectHack = async ()=>{
     let rs=[];
@@ -23,9 +34,9 @@ const detectHack = async ()=>{
         for(let i=0 ; i<domainsArr.length ; i++){
             let currentDate: any = new Date();
             let expiredDate: any = new Date(domainsArr[i].expired);
-            let tmp: any = await exec(`ping -c 1 ${domainsArr[i].domain}`);
+            let tmp: any = await getIpOfDNS(domainsArr[i].domain);
             // convert tmp
-            tmp = tmp.stdout.match(/(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)/gm)[0];
+            tmp = tmp.match(/(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)/gm)[0];
 
             // insert kq to db
             let notification={};

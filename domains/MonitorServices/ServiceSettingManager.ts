@@ -290,13 +290,15 @@ ServiceSettingManager.prototype.turnOnHackedDNSDetecting = async (input, webId)=
  */
 ServiceSettingManager.prototype.destroyHackedDNSDetecting = async (webId)=>{
     try{
-        let domains: any = await domainsDAO.findByCondition(`webid=${webId} order by id desc`);
+        let domains: any = await domainsDAO.findByCondition(`webid=${webId} AND deleted IS NULL order by id desc`);
 
-        // delete domains
-        let rs = await domainsDAO.deleteById(domains[0].id);
-        //
-        // @ts-ignore
-        SubProcManager.destroyHackedDNSDetectingProcess(domains[0].id);
+        if(domains != null){
+            // delete domains
+            let rs = await domainsDAO.deleteById(domains[0].id);
+            //
+            // @ts-ignore
+            SubProcManager.destroyHackedDNSDetectingProcess(domains[0].id);
+        }
         return true;
     }catch (e) {
         throw e;
