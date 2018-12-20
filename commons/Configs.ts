@@ -6,10 +6,16 @@ export const DB_CONFIG = {
     "PG_PORT": 5432,
 }
 
+export const REDIS_CONFIG = {
+    "PORT":6379,
+    "HOST":'localhost'
+}
+
 export const SERVER = {
     "SERVER_PORT": 8080,
     "HOST_SERVER": "localhost"
 }
+
 export const CHECK_PROXY_TIME = 3*60 * 60 * 1000 // default 3 hours
 
 export const DEFAULT_TIMEOUT = 30 * 1000; // nguoi dung khong truyen thi default = 100000

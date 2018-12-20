@@ -12,6 +12,7 @@ Other.prototype.getMonitoredWebsite = async (id)=>{
     try{
         let webs = await monitoredWebsiteDAO.findByCondition(`parent=${id} AND deleted IS NULL`);
         //convert data
+        if(webs == null) return null;
         webs.forEach(element=>{
             if(element.parent == element.id){
                 kq.parent.id = element.id;
@@ -42,6 +43,7 @@ Other.prototype.getAllParentMonitoredWebsite = async (credentialId)=>{
     try{
         let webs = await monitoredWebsiteDAO.findByCondition(`credentialid=${credentialId} AND deleted IS NULL`);
         //convert data
+        if(webs == null) return null;
         webs.forEach(element=>{
             if(element.parent == element.id){
                 let tmp:any = {id: "", siteName:"", url: "", frequently:"", connectionTimeout: ""};

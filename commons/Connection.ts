@@ -4,6 +4,7 @@ import*as redis from 'redis';
 
 const Connection:any = {};
 Connection.pool = null;
+Connection.clientRedis =null;
 Connection.connectDb = function () {
     try{
         if(Connection.pool === null){
@@ -25,12 +26,16 @@ Connection.connectDb = function () {
     return Connection.pool;
 }
 
-Connection.connectRedis = ()=>{
-
-}
-
 Connection.endConnect = (clientInstance:any)=>{
     clientInstance.release(true);
+}
+
+Connection.connectRedis = ()=>{
+    if(Connection.clientRedis == null){
+        Connection.clientRedis = redis.createClient(`redis://${CONFIG.REDIS_CONFIG.HOST}:${CONFIG.REDIS_CONFIG.PORT}`);
+    }
+
+    return Connection.clientRedis;
 }
 
 module.exports = Connection;

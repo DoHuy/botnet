@@ -11,6 +11,8 @@ import {SERVICE} from "../../commons/Constants";
 // @ts-ignore
 import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 import {EXPIRED_TOKEN} from "../../commons/Configs";
+import *as Connection from '../../commons/Connection';
+import*as util from 'util';
 
 const Libs = require('../../commons/Libs');
 // @ts-ignore
@@ -20,6 +22,9 @@ let credentialDAO = new CredentialDAO();
 let tokenDAO = new TokenDAO();
 // @ts-ignore
 let dao = new DAO();
+// @ts-ignore
+const redis: any = Connection.connectRedis();
+
 function Auth() {}
 
 /**
@@ -112,13 +117,26 @@ Auth.prototype.authorize = async (credentialId, webId)=>{
 Auth.prototype.verifyToken = async function(token){
     let currentDate: any = new Date();
     try{
-    let rs = await tokenDAO.findById(token);
+    // kiem tra trong cache
+    let rs:any = await new Promise((resolve, reject)=>{
+        redis.get(token, (err, data)=>{
+            if(err) reject(err);
+            if(!data){
+                resolve(null);
+            }
+            else{
+                resolve(data);
+            }
+        });
+    });
+        // console.log(typeof rs);
+        rs = rs==null?null:JSON.parse(rs);
+        //
     if(rs == null){
         return {flag: false, message: "invalid token"};
     }
     else{
         let tokenDate: any = new Date(rs.created);
-
         // qua han thi renewtoken
         if(currentDate-tokenDate >= Number.parseInt(rs.expired)){
             await this.renewToken(token);
@@ -144,14 +162,18 @@ Auth.prototype.renewToken = async function (oldToken) {
     infoCredential.created = new Date();
     let newToken      = {token: this.encode(infoCredential), created: infoCredential.created};
     try{
-        await tokenDAO.transactionBegin();
+        // await tokenDAO.transactionBegin();
         await tokenDAO.deleteById(oldToken);
         await tokenDAO.create(newToken);
         let credential = await credentialDAO.modifyById({key: 'token', value: newToken.token}, infoCredential.id);
-        await tokenDAO.transactionCommit();
+        // await tokenDAO.transactionCommit();
+        // xoa token cu trong cache, add new token to  cache
+        redis.del(oldToken);
+        redis.set(newToken.token, JSON.stringify({created: newToken.created, expired:259200000}));
+        //
         return credential;
     }catch (e) {
-        await tokenDAO.transactionRollback();
+        // await tokenDAO.transactionRollback();
         throw e;
     }
 
@@ -199,6 +221,9 @@ Auth.prototype.verifyCredential = async function(credential){
             await credentialDAO.modifyById({key: 'token', value: token.token}, credential.id);
             await credentialDAO.modifyById({key: 'status', value: 'active'}, credential.id);
             // await tokenDAO.transactionCommit();
+            // save createdToken to cache
+            redis.set(newToken.token, JSON.stringify({created: newToken.created, expired:259200000}));
+            //
             return true;
         } catch(e){
             // await tokenDAO.transactionRollback();
