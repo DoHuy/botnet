@@ -10,7 +10,7 @@ create table if not exists proxies(
     port text not null,
     proxyType text ,
     responseTime text,
-    details json,
+    details jsonb,
     status text
 
 );
@@ -49,15 +49,15 @@ create table if not exists MonitoredWebsites(
 
 create table if not exists ResponseStates (
     id serial not null primary key,
-    response json,
-    notification json,
+    response jsonb,
+    notification jsonb,
     created text,
     webId int
 );
 
 create table if not exists Structures(
     id serial not null primary key,
-    structure json,
+    structure jsonb,
     created text,
     modified text,
     deleted text,
@@ -66,7 +66,7 @@ create table if not exists Structures(
 
 create table if not exists StructureStates (
     id serial not null primary key,
-    notification json,
+    notification jsonb,
     created text,
     structureId int
 );
@@ -83,7 +83,7 @@ create table if not exists Domains (
 
 create table if not exists DomainsStates (
     id serial not null primary key,
-    notification json,
+    notification jsonb,
     created text,
     domainsId int
 );
@@ -96,3 +96,8 @@ create table if not exists logs (
 );
 
 
+-- create INDEX
+
+CREATE INDEX ON responsestates(webid);
+CREATE INDEX ON domainsstates(domainsid);
+--

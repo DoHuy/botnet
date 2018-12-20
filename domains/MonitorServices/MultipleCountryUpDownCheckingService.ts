@@ -33,6 +33,7 @@ async function adaptData (webId, limit=null, start=null, end=null){
     try{
         let site: any = await monitoredWebsiteDAO.findById(webId);
         let respState: any = await responseStateDAO.findByCondition(condition);
+        if(respState == null) return null;
         respState.forEach(e=>{
             rs.responseTime[e.created] = e.response;
             rs.notification[e.created] = e.notification;
@@ -52,7 +53,7 @@ MultipleCountryUpDownCheckingService.prototype.doOperation = async (jsonData)=>{
     let result: any={ siteName:"", url:""};
     let webId = jsonData.webId;
     let web: any = await adaptData(webId, jsonData.limit, jsonData.start, jsonData.end);
-
+    if(web == null) return null;
     let response: any = web.responseTime;
     let notification: any = web.notification;
     let siteName: any = web.siteName;

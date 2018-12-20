@@ -34,7 +34,8 @@ async function adaptData (webId, limit=null, start=null, end=null){
     try{
         let site: any = await monitoredWebsiteDAO.findById(webId);
         let respState: any = await responseStateDAO.findByCondition(condition);
-        console.log(respState);
+        // console.log(respState);
+        if(respState == null) return null;
         respState.forEach(e=>{
            rs.responseTime[e.created] = e.response;
            rs.notification[e.created] = e.notification;
@@ -57,6 +58,7 @@ NormalUpDownCheckingService.prototype.doOperation = async (jsonData) => {
     try{
         let web: any = await adaptData (webId, jsonData.limit, jsonData.start, jsonData.end);
         // console.log(web);
+        if (web == null) return null;
         let siteName: any = web.siteName;
         let url: any = web.url;
 

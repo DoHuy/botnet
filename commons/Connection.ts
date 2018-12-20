@@ -1,6 +1,6 @@
 import {Pool} from  'pg';
 import*as CONFIG from './Configs';
-
+import*as redis from 'redis';
 
 const Connection:any = {};
 Connection.pool = null;
@@ -23,6 +23,10 @@ Connection.connectDb = function () {
         throw e;
     }
     return Connection.pool;
+}
+
+Connection.connectRedis = ()=>{
+
 }
 
 Connection.endConnect = (clientInstance:any)=>{
