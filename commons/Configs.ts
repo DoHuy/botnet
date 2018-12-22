@@ -13,7 +13,7 @@ export const REDIS_CONFIG = {
 
 export const SERVER = {
     "SERVER_PORT": 8080,
-    "HOST_SERVER": "localhost"
+    "HOST_NAME": "localhost"
 }
 
 export const CHECK_PROXY_TIME = 3*60 * 60 * 1000 // default 3 hours
