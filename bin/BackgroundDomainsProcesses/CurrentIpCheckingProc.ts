@@ -57,7 +57,7 @@ CurrentIpCheckingProc.run = async function () {
                 code: map.get(`${metric.status}`).code,
                 message: metric.message,
                 state: NOTICE_RULE.state[1],
-                img: `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
+                img: `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
                 level: "error"
             };
 
@@ -137,7 +137,7 @@ CurrentIpCheckingProc.run = async function () {
             tmp.code = map.get(`${metric.status}`).code;
             tmp.message= map.get(`${metric.status}`).message;
             tmp.state = NOTICE_RULE.state[0];
-            tmp.img = `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/${image}`;
+            tmp.img = `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`;
 
             if(tmp.statusCode =='200' && metric.ResponseTime <= CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success){
                 tmp.level = "success";
