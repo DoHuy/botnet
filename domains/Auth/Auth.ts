@@ -187,7 +187,7 @@ Auth.prototype.renewToken = async function (oldToken) {
 Auth.prototype.createCredential = async function (newCredential) {
     try{
        let credential = await credentialDAO.create(newCredential);
-       let link = `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/verifyAccount/${credential.id}/${credential.credentialname}`;
+       let link = `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/verifyAccount/${credential.id}/${credential.credentialname}`;
        let form = `
             <h1>Link verify account:</h1> <br>
             <a id="verify" href="${link}"><strong>${Libs.base64EncodeUrl(link)}</strong></a>            

@@ -72,7 +72,7 @@ const calculateMetric = async (country, connectionTimeout, url) => {
                     code: map.get(`${metric.status}`).code,
                     message: metric.message,
                     state: NOTICE_RULE.state[1],
-                    img: `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
+                    img: `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
                     level: "error"
                 };
 
@@ -100,7 +100,7 @@ const calculateMetric = async (country, connectionTimeout, url) => {
                     code: map.get(`${metric.status}`).code,
                     message: map.get(`${metric.status}`).message,
                     state: NOTICE_RULE.state[0],
-                    img: `http://${CONFIG.SERVER.HOST_SERVER}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
+                    img: `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
                     level: level
                 };
 
