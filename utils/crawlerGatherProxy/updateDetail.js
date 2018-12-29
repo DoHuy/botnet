@@ -53,7 +53,7 @@ function getDetailsLocationProxy(proxy) {
 (() => __awaiter(this, void 0, void 0, function* () {
     try {
         console.log("Bat dau update details cua cac proxy server ....");
-        let rs = yield proxyDAO.findCondition(`details IS NULL AND status = 'active'`);
+        let rs = yield proxyDAO.findByCondition(`details IS NULL AND status = 'active'`);
         let proxies = rs;
         let link = Libs.generateRandomLink();
         let dem = 0;
