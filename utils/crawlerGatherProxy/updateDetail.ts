@@ -15,7 +15,7 @@ async function getDetailsLocationProxy(proxy){
             waitUntil: "domcontentloaded",
             timeout: 100000
         });
-        // let response =  await page.goto(url,);
+        // let response =  await page.goto(url);
         const rs = await page.evaluate(() => {
             let rs:any={};
             let trList:any = document.querySelectorAll(".table_dark_green > tbody > tr");
@@ -43,7 +43,7 @@ async function getDetailsLocationProxy(proxy){
 (async ()=>{
     try{
         console.log("Bat dau update details cua cac proxy server ....");
-        let rs = await proxyDAO.findCondition(`details IS NULL AND status = 'active'`);
+        let rs = await proxyDAO.findByCondition(`details IS NULL AND status = 'active'`);
         let proxies = rs; // convert to arr
         // @ts-ignore
         let link: any = Libs.generateRandomLink();

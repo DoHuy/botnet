@@ -6,8 +6,8 @@ create database webix;
 
 create table if not exists proxies(
     id serial not null primary key,
-    ip text not null,
-    port text not null,
+    ip text,
+    port text,
     proxyType text ,
     responseTime text,
     details jsonb,
