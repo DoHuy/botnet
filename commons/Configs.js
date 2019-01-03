@@ -16,6 +16,7 @@ exports.SERVER = {
     "HOST_NAME": "localhost"
 };
 exports.DEPLOY = `http://app.vnist.vn`;
+exports.COORDINATOR_TIME = 20000;
 exports.CHECK_PROXY_TIME = 3 * 60 * 60 * 1000;
 exports.DEFAULT_TIMEOUT = 30 * 1000;
 exports.FREQUENTLY_DEFAULT = 3 * 60 * 1000;

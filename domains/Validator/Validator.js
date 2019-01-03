@@ -80,6 +80,8 @@ Validator.prototype.validateChangeConfig = (rawData) => __awaiter(this, void 0, 
 Validator.prototype.validateRemoveWebsite = (webId) => __awaiter(this, void 0, void 0, function* () {
     try {
         let webParent = yield monitoredWebsiteDAO.findById(webId);
+        if (webParent == null)
+            return { flag: false, message: "webId invalid" };
         if (webParent.id == webParent.parent && webParent.deleted == null) {
             return { flag: true, message: "OK" };
         }

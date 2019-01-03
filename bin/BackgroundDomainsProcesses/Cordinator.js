@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const SubProcManager = require("./SubProcManager");
 const fs = require("fs");
+const CONFIG = require("../../commons/Configs");
 const MonitoredWebsiteDAO = require("../../dao/MonitoredWebsiteDAO");
 const CMD = ['normal', 'advance', 'dns', 'deface'];
 const monitoredWebsiteDAO = new MonitoredWebsiteDAO();
@@ -39,5 +40,5 @@ setInterval(() => {
             });
         }
     });
-}, 100000);
+}, CONFIG.COORDINATOR_TIME);
 //# sourceMappingURL=Cordinator.js.map

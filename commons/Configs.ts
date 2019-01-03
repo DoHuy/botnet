@@ -19,6 +19,8 @@ export const SERVER = {
 
 export const DEPLOY = `http://app.vnist.vn`; // cai nay de sua khi deploy
 
+export const COORDINATOR_TIME = 20000; // thoi gian kiem tra viec tao tien trinh con moi
+
 export const CHECK_PROXY_TIME = 3*60 * 60 * 1000 // default 3 hours
 
 export const DEFAULT_TIMEOUT = 30 * 1000; // nguoi dung khong truyen thi default = 100000

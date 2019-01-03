@@ -84,6 +84,7 @@ Validator.prototype.validateRemoveWebsite = async (webId)=>{
 
     try{
         let webParent: any = await monitoredWebsiteDAO.findById(webId);
+        if(webParent == null) return {flag: false, message: "webId invalid"};
         if(webParent.id == webParent.parent && webParent.deleted == null) {
             return {flag: true, message: "OK"};
         }

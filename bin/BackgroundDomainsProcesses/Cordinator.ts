@@ -1,5 +1,6 @@
 import *as SubProcManager from './SubProcManager';
 import *as fs from 'fs';
+import*as CONFIG from '../../commons/Configs';
 // @ts-ignore
 import *as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 
@@ -42,4 +43,4 @@ setInterval(() => {
         }
     });
 
-}, 100000);
+}, CONFIG.COORDINATOR_TIME);
