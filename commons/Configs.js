@@ -15,7 +15,7 @@ exports.SERVER = {
     "SERVER_PORT": 8080,
     "HOST_NAME": "localhost"
 };
-exports.DEPLOY = `http://localhost:8080`;
+exports.DEPLOY = `http://app.vnist.vn`;
 exports.CHECK_PROXY_TIME = 3 * 60 * 60 * 1000;
 exports.DEFAULT_TIMEOUT = 30 * 1000;
 exports.FREQUENTLY_DEFAULT = 3 * 60 * 1000;

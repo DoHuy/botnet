@@ -17,7 +17,7 @@ export const SERVER = {
 }
 
 
-export const DEPLOY = `http://localhost:8080`; // cai nay de sua khi deploy
+export const DEPLOY = `http://app.vnist.vn`; // cai nay de sua khi deploy
 
 export const CHECK_PROXY_TIME = 3*60 * 60 * 1000 // default 3 hours
 
