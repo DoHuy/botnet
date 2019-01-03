@@ -52,6 +52,8 @@ Auth.prototype.decode = (token) => {
 Auth.prototype.authenticate = function (account) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            account.password = Libs.base64EncodeUrl(account.password);
+            console.log(account.password);
             let credential = yield credentialDAO.findForLogin(account.credentialname, account.password);
             if (credential != null && credential.status == 'active')
                 return { flag: true, credential: credential };
@@ -133,11 +135,12 @@ Auth.prototype.renewToken = function (oldToken) {
 Auth.prototype.createCredential = function (newCredential) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            newCredential.password = Libs.base64EncodeUrl(newCredential.password);
             let credential = yield credentialDAO.create(newCredential);
-            let link = `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/verifyAccount/${credential.id}/${credential.credentialname}`;
+            let link = `${CONFIG.DEPLOY}/api/v1/verifyAccount/${credential.id}/${credential.credentialname}`;
             let form = `
-            <h1>Link verify account:</h1> <br>
-            <a id="verify" href="${link}"><strong>${Libs.base64EncodeUrl(link)}</strong></a>            
+            <h3>Link verify account:</h3>
+            <a id="verify" href="${link}"><strong>${Libs.base64EncodeUrl(link)}</strong></a>         
        `;
             let info = yield thirdFact.getThirdPartyService(Constants_1.SERVICE["MAIL"]).sendMail('Outlook', { user: CONFIG.MAIL_SERVER.user, pass: CONFIG.MAIL_SERVER.pass }, { from: CONFIG.MAIL_SERVER.user, to: credential.email, subject: "XÁC THỰC LẠI TÀI KHOẢN ĐĂNG KÍ CỦA DỊCH VỤ WEBCHECKER", html: form });
             return true;

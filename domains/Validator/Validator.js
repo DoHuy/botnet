@@ -46,6 +46,12 @@ Validator.prototype.validateSignUp = function (rawData) {
         if (rawData.email == undefined) {
             return { flag: false, message: "email is not empty" };
         }
+        else {
+            let credential = yield credentialDAO.findByCondition(`email='${rawData.email}'`);
+            if (credential != null) {
+                return { flag: false, message: "This email is used" };
+            }
+        }
         if (rawData.phone == undefined) {
             return { flag: false, message: "phone is not empty" };
         }
@@ -199,7 +205,10 @@ Validator.prototype.validateSearchByDate = (webId, credentialId, query) => __awa
     if (checkPermission.flag == false) {
         return { flag: false, message: "permission denied", statusCode: 403 };
     }
-    if ((query.start == null && query.end == null)) {
+    if (query.start != null && query.end != null) {
+        return { flag: true, message: "OK" };
+    }
+    if (!(query.start == null && query.end == null)) {
         return { flag: false, message: "query wrong", statusCode: 400 };
     }
     return { flag: true, message: "OK" };
@@ -284,6 +293,9 @@ Validator.prototype.validateSearchComparison = (webId, credentialId, query) => _
     if (web == null || web.deleted != null) {
         return { flag: false, message: `not found website has id is ${webId}`, statusCode: 404 };
     }
+    if (web.parent != web.id) {
+        return { flag: false, message: `This site must be parent site`, statusCode: 403 };
+    }
     let checkPermission = yield auth.authorize(credentialId, webId);
     if (checkPermission.flag == false) {
         return { flag: false, message: "permission denied", statusCode: 403 };
@@ -324,5 +336,26 @@ Validator.prototype.validateGetDomainsOfWebsite = (webId, credentialId) => __awa
     }
     return { flag: true, message: "ok" };
 });
+Validator.prototype.validateResetPassword = (rawData) => {
+    let regex = /^[a-z][a-z0-9_\.]{5,32}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/gm;
+    if (rawData.credentialname == undefined) {
+        return { flag: false, message: "credentialname not empty" };
+    }
+    if (regex.test(rawData.email) == true) {
+        return { flag: true, message: "ok" };
+    }
+    else {
+        return { flag: false, message: "email invalid" };
+    }
+};
+Validator.prototype.validateChangePassword = (rawData) => {
+    if (rawData.newPassword == undefined || rawData.againPassword == undefined) {
+        return { flag: false, message: "not empty" };
+    }
+    if (rawData.newPassword != rawData.againPassword) {
+        return { flag: false, message: "not match" };
+    }
+    return { flag: true, message: "ok" };
+};
 module.exports = Validator;
 //# sourceMappingURL=Validator.js.map

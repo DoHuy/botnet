@@ -76,7 +76,7 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
                     code: map.get(`${metric.status}`).code,
                     message: metric.message,
                     state: NOTICE_RULE.state[1],
-                    img: `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
+                    img: `${CONFIG.DEPLOY}/${image}`,
                     level: "error"
                 };
 
@@ -91,7 +91,7 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
                     DNSLookup: metric.DNSLookup,
                     InitConnection: metric.InitConnection,
                     DataTransfer: metric.DataTransfer,
-                    ResponseTime: metric.ResponseTime - Number.parseFloat(proxy.responseTime),
+                    ResponseTime: Math.abs(metric.ResponseTime - Number.parseFloat(proxy.responseTime)),
                     WaitTime: metric.WaitTime,
                     location: proxy.details
                 };
@@ -104,7 +104,7 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
                     code: map.get(`${metric.status}`).code,
                     message: map.get(`${metric.status}`).message,
                     state: NOTICE_RULE.state[0],
-                    img: `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
+                    img: `${CONFIG.DEPLOY}/${image}`,
                     level: level
                 };
 

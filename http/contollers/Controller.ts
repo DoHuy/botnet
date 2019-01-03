@@ -8,4 +8,5 @@ Controller.SearchingCon = require('./SearchingCon');
 Controller.HackedDNSDetectingCon = require('./HackedDNSDetectingCon');
 Controller.ExportingCon = require('./ExportingCon');
 Controller.OtherCon = require('./OtherCon');
+Controller.CredentialManagerCon = require('./CredentialManagerCon');
 module.exports = Controller;

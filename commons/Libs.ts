@@ -37,6 +37,19 @@ function generateRandomIndex(min, max){
     return min+Math.floor(Math.random() * (max-min));
 }
 
+/**
+ * generate random String
+ * @param length
+ */
+function generateRandomString(length) {
+    let string: any = "";
+    for(let i=0 ; i<length ; i++){
+        let index = generateRandomIndex(32, 126);
+        string += Constants.ASCII[index];
+    }
+    return string;
+}
+
 /** khong duoc truyen nguoc
  * ham tao ra 1 req de lay resource timing
  * @param url ls link cua website muon check
@@ -230,6 +243,7 @@ module.exports = {
     base64EncodeUrl,
     base64DecodeUrl,
     getQueryUrl,
-    convertDataToCsv
+    convertDataToCsv,
+    generateRandomString
 };
 //

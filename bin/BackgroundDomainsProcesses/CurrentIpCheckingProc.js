@@ -36,14 +36,14 @@ CurrentIpCheckingProc.run = function () {
             metric = yield Lib.requestWithPuppeteer(CurrentIpCheckingProc.url, imagePath, null, CurrentIpCheckingProc.connectionTimeout);
             if (metric.status == '500') {
                 response = {
-                    DNSLookup: Number.MIN_SAFE_INTEGER,
-                    InitConnection: Number.MIN_SAFE_INTEGER,
-                    DataTransfer: Number.MIN_SAFE_INTEGER,
-                    ResponseTime: Number.MIN_SAFE_INTEGER,
-                    WaitTime: Number.MIN_SAFE_INTEGER,
-                    averageResponseTime: Number.MIN_SAFE_INTEGER,
-                    maxResponseTime: Number.MIN_SAFE_INTEGER,
-                    minResponseTime: Number.MIN_SAFE_INTEGER,
+                    DNSLookup: 0,
+                    InitConnection: 0,
+                    DataTransfer: 0,
+                    ResponseTime: 0,
+                    WaitTime: 0,
+                    averageResponseTime: 0,
+                    maxResponseTime: 0,
+                    minResponseTime: 0,
                     location: location
                 };
                 notification = {
@@ -52,7 +52,7 @@ CurrentIpCheckingProc.run = function () {
                     code: map.get(`${metric.status}`).code,
                     message: metric.message,
                     state: Configs_1.NOTICE_RULE.state[1],
-                    img: `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`,
+                    img: `${CONFIG.DEPLOY}/${image}`,
                     level: "error"
                 };
             }
@@ -87,21 +87,28 @@ CurrentIpCheckingProc.run = function () {
                 let details = web.responseTime != null ? web.responseTime : firstResponse;
                 details[created] = firstResponse[created];
                 let totalResp = 0;
+                let count = 0;
                 for (let i in details) {
                     if (details[i].ResponseTime != Number.MIN_SAFE_INTEGER) {
                         if (details[i].multipleCountries == undefined) {
-                            averageResponseTime += details[i].ResponseTime;
-                            maxResponseTime = maxResponseTime >= details[i].ResponseTime ? maxResponseTime : details[i].ResponseTime;
-                            minResponseTime = minResponseTime <= details[i].ResponseTime ? minResponseTime : details[i].ResponseTime;
+                            if (details[i].ResponseTime != 0) {
+                                averageResponseTime += details[i].ResponseTime;
+                                maxResponseTime = maxResponseTime >= details[i].ResponseTime ? maxResponseTime : details[i].ResponseTime;
+                                minResponseTime = minResponseTime <= details[i].ResponseTime ? minResponseTime : details[i].ResponseTime;
+                                count++;
+                            }
                         }
                         else {
-                            averageResponseTime += details[i].response.ResponseTime;
-                            maxResponseTime = maxResponseTime >= details[i].response.ResponseTime ? maxResponseTime : details[i].response.ResponseTime;
-                            minResponseTime = minResponseTime <= details[i].response.ResponseTime ? minResponseTime : details[i].response.ResponseTime;
+                            if (details[i].ResponseTime != 0) {
+                                averageResponseTime += details[i].response.ResponseTime;
+                                maxResponseTime = maxResponseTime >= details[i].response.ResponseTime ? maxResponseTime : details[i].response.ResponseTime;
+                                minResponseTime = minResponseTime <= details[i].response.ResponseTime ? minResponseTime : details[i].response.ResponseTime;
+                                count++;
+                            }
                         }
                     }
                 }
-                averageResponseTime = averageResponseTime / (Object.keys(details).length);
+                averageResponseTime = averageResponseTime / count;
                 response = {
                     DNSLookup: metric.DNSLookup,
                     InitConnection: metric.InitConnection,
@@ -118,7 +125,7 @@ CurrentIpCheckingProc.run = function () {
                 tmp.code = map.get(`${metric.status}`).code;
                 tmp.message = map.get(`${metric.status}`).message;
                 tmp.state = Configs_1.NOTICE_RULE.state[0];
-                tmp.img = `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/${image}`;
+                tmp.img = `${CONFIG.DEPLOY}/${image}`;
                 if (tmp.statusCode == '200' && metric.ResponseTime <= CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success) {
                     tmp.level = "success";
                 }

@@ -16,6 +16,9 @@ export const SERVER = {
     "HOST_NAME": "localhost"
 }
 
+
+export const DEPLOY = `http://localhost:8080`; // cai nay de sua khi deploy
+
 export const CHECK_PROXY_TIME = 3*60 * 60 * 1000 // default 3 hours
 
 export const DEFAULT_TIMEOUT = 30 * 1000; // nguoi dung khong truyen thi default = 100000

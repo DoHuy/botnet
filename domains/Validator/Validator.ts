@@ -43,7 +43,15 @@ Validator.prototype.validateSignUp = async function (rawData){
         return {flag: false, message: "password is not empty"};
     }
     if(rawData.email == undefined){
+
         return {flag: false, message: "email is not empty"};
+    }
+    else{
+        //check email only unique
+        let credential = await credentialDAO.findByCondition(`email='${rawData.email}'`);
+        if(credential != null){
+            return {flag: false, message: "This email is used"};
+        }
     }
     if(rawData.phone == undefined){
         return {flag: false, message: "phone is not empty"};
@@ -226,7 +234,11 @@ Validator.prototype.validateSearchByDate = async (webId, credentialId, query)=>{
     }
 
     // validate
-    if((query.start == null && query.end == null)){
+    // console.log(query);
+    if(query.start != null && query.end != null){
+        return {flag: true, message:"OK"};
+    }
+    if(!(query.start == null && query.end == null)){
         return {flag: false, message: "query wrong", statusCode: 400}
     }
 
@@ -338,6 +350,9 @@ Validator.prototype.validateSearchComparison = async (webId, credentialId, query
         return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
     }
     // check permission
+    if(web.parent != web.id){
+        return {flag: false, message: `This site must be parent site`, statusCode: 403};
+    }
     let checkPermission = await auth.authorize(credentialId, webId);
     if(checkPermission.flag == false){
         return {flag: false, message: "permission denied", statusCode: 403};
@@ -392,6 +407,30 @@ Validator.prototype.validateGetDomainsOfWebsite = async (webId, credentialId)=>{
 
     return {flag: true, message: "ok"};
 };
+
+Validator.prototype.validateResetPassword = (rawData)=>{
+    let regex = /^[a-z][a-z0-9_\.]{5,32}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/gm;
+
+    if(rawData.credentialname == undefined){
+        return {flag: false, message: "credentialname not empty"};
+    }
+    if(regex.test(rawData.email) == true){
+        return {flag: true, message: "ok"};
+    }
+    else{
+        return {flag: false, message: "email invalid"};
+    }
+}
+
+Validator.prototype.validateChangePassword = (rawData)=>{
+    if(rawData.newPassword == undefined || rawData.againPassword == undefined){
+        return {flag: false, message: "not empty"};
+    }
+    if(rawData.newPassword != rawData.againPassword){
+        return {flag: false, message: "not match"};
+    }
+    return {flag: true, message: "ok"};
+}
 
 module.exports = Validator;
 

@@ -22,12 +22,28 @@ FilterByDate.prototype.doFiltering = (jsonData) => __awaiter(this, void 0, void 
     let rs = { siteName: "", url: "", images: [] };
     try {
         let site = yield monitoredWebsiteDAO.findById(jsonData.webId);
-        let respState = yield responseStateDAO.findByCondition(`webid=${jsonData.webId} AND created between '${jsonData.start}' and '${jsonData.end}'`);
-        respState.forEach(e => {
-            let obj = {
-                created: e.created,
-                img: e.notification.notification.img
-            };
+        let condition;
+        if (jsonData.start != null && jsonData.end != null) {
+            condition = `webid=${jsonData.webId} AND created between '${jsonData.start}' and '${jsonData.end}'`;
+        }
+        else {
+            condition = `webid=${jsonData.webId}`;
+        }
+        let respState = yield responseStateDAO.findByCondition(condition);
+        respState.forEach((e, index) => {
+            let obj;
+            if (e.notification.notification != undefined) {
+                obj = {
+                    created: e.created,
+                    img: e.notification.notification.img
+                };
+            }
+            else {
+                obj = {
+                    created: e.created,
+                    img: e.notification.img
+                };
+            }
             rs.images.push(obj);
         });
         rs.siteName = site.siteName;

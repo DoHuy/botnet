@@ -25,6 +25,14 @@ function generateRandomLink() {
 function generateRandomIndex(min, max) {
     return min + Math.floor(Math.random() * (max - min));
 }
+function generateRandomString(length) {
+    let string = "";
+    for (let i = 0; i < length; i++) {
+        let index = generateRandomIndex(32, 126);
+        string += Constants.ASCII[index];
+    }
+    return string;
+}
 function requestCurl(url, proxyServer = null, timeOutProxy = null) {
     return __awaiter(this, void 0, void 0, function* () {
         let rawResult = {};
@@ -159,6 +167,7 @@ module.exports = {
     base64EncodeUrl,
     base64DecodeUrl,
     getQueryUrl,
-    convertDataToCsv
+    convertDataToCsv,
+    generateRandomString
 };
 //# sourceMappingURL=Libs.js.map

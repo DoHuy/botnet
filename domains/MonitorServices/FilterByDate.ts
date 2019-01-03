@@ -23,13 +23,27 @@ FilterByDate.prototype.doFiltering = async (jsonData)=>{
 
     try{
         let site: any = await monitoredWebsiteDAO.findById(jsonData.webId);
-        let respState: any = await responseStateDAO.findByCondition(`webid=${jsonData.webId} AND created between '${jsonData.start}' and '${jsonData.end}'`);
-        respState.forEach(e=>{
-
-            // console.log(e.notification.notification.img);
-            let obj = {
-                created: e.created,
-                img: e.notification.notification.img
+        let condition;
+        if(jsonData.start != null && jsonData.end != null){
+            condition = `webid=${jsonData.webId} AND created between '${jsonData.start}' and '${jsonData.end}'`;
+        }
+        else {
+            condition = `webid=${jsonData.webId}`;
+        }
+        let respState: any = await responseStateDAO.findByCondition(condition);
+        respState.forEach((e, index)=>{
+            let obj;
+            if(e.notification.notification != undefined){
+                obj = {
+                    created: e.created,
+                    img: e.notification.notification.img
+                }
+            }
+            else{
+                obj = {
+                    created: e.created,
+                    img: e.notification.img
+                }
             }
             rs.images.push(obj);
         });

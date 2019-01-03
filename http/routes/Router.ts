@@ -13,13 +13,15 @@ const ExportingRouter = require('./ExportingRouter');
 // @ts-ignore
 const HackedDNSDetectingRouter = require('./HackedDNSDetectingRouter');
 const OtherRouter = require('./OtherRouter');
+const CredentialManagerRouter = require('./CredentialManagerRouter');
 
-router.use('/', UpDownCheckingRouter);
-router.use('/', AuthRouter);
-router.use('/', SettingRouter);
-router.use('/', SearchingRouter);
-router.use('/', HackedDNSDetectingRouter);
-router.use('/', ExportingRouter);
-router.use('/', OtherRouter);
+router.use('/api/v1/', UpDownCheckingRouter);
+router.use('/api/v1/', AuthRouter);
+router.use('/api/v1/', SettingRouter);
+router.use('/api/v1/', SearchingRouter);
+router.use('/api/v1/', HackedDNSDetectingRouter);
+router.use('/api/v1/', ExportingRouter);
+router.use('/api/v1/', OtherRouter);
+router.use('/api/v1/', CredentialManagerRouter);
 
 module.exports = router;

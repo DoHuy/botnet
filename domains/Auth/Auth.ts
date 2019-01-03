@@ -79,6 +79,10 @@ Auth.prototype.decode = (token)=>{
  */
 Auth.prototype.authenticate = async function (account) {
     try{
+        //decode base64 password
+        account.password = Libs.base64EncodeUrl(account.password);
+        console.log(account.password);
+        //
         let credential =  await credentialDAO.findForLogin(account.credentialname, account.password);
         if(credential != null && credential.status == 'active') return {flag: true, credential: credential};
         else if (credential != null && credential.status == 'inactive'){
@@ -186,11 +190,14 @@ Auth.prototype.renewToken = async function (oldToken) {
  */
 Auth.prototype.createCredential = async function (newCredential) {
     try{
+       // base64 password
+       newCredential.password = Libs.base64EncodeUrl(newCredential.password);
+       //
        let credential = await credentialDAO.create(newCredential);
-       let link = `http://${CONFIG.SERVER.HOST_NAME}:${CONFIG.SERVER.SERVER_PORT}/verifyAccount/${credential.id}/${credential.credentialname}`;
+       let link = `${CONFIG.DEPLOY}/api/v1/verifyAccount/${credential.id}/${credential.credentialname}`;
        let form = `
-            <h1>Link verify account:</h1> <br>
-            <a id="verify" href="${link}"><strong>${Libs.base64EncodeUrl(link)}</strong></a>            
+            <h3>Link verify account:</h3>
+            <a id="verify" href="${link}"><strong>${Libs.base64EncodeUrl(link)}</strong></a>         
        `;
         // console.log(form);
         let info =  await thirdFact.getThirdPartyService(SERVICE["MAIL"]).sendMail(
