@@ -45,7 +45,7 @@ exports.STATUS_CODE = [
     ["306", { "code": "UNUSED", "message": "The 306 status code was used in a previous version of the specification, is no longer used, and the code is reserved" }],
     ["307", { "code": "Temporary Redirect".toLocaleUpperCase(), "message": "The requested resource resides temporarily under a different URI. Since the redirection MAY be altered on occasion, the client SHOULD continue to use the Request-URI for future requests" }],
     ["400", { "code": "BAD REQUEST", "message": "The request could not be understood by the server due to malformed syntax" }],
-    ["401", { "code": "UNAUTHORIZED", "message": "The request requires user authentication" }],
+    ["401", { "code": "UNAUTHORIZED", "message": "The request requires user Auth" }],
     ["402", { "code": "PAYMENT REQUIRED", "message": "This code is reserved for future use" }],
     ["403", { "code": "Forbidden".toLocaleUpperCase(), "message": "The server understood the request, but is refusing to fulfill it" }],
     ["404", { "code": "NOT FOUND", "messaage": "The server has not found anything matching the Request-URI" }],
