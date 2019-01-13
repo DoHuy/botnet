@@ -73,6 +73,7 @@ SettingCon.removeWebsite = async function (req, res){
     try{
         check = await configor.removeWebsite(req.params.id);
         check2 = await configor.destroyHackedDNSDetecting(req.params.id);
+        await configor.destroyCoinminerDetecting(req.params.id);
         // ghi log
         let jsonLogData = {
             log: CONSTANT.LOG_FEATURES.removeMonitoredWebsite,

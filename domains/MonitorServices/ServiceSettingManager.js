@@ -16,7 +16,7 @@ const DomainsDAO = require("../../dao/DomainsDAO");
 const path = require('path');
 const fs = require('fs');
 const writeFile = util.promisify(fs.writeFile);
-const CMD = ["normal", "advance", "dns", "deface"];
+const CMD = ["normal", "advance", "dns", "detectMiner"];
 let monitoredWebSiteDAO = new MonitoredWebsiteDAO();
 let domainsDAO = new DomainsDAO();
 function ServiceSettingManager() {
@@ -229,5 +229,34 @@ ServiceSettingManager.prototype.destroyHackedDNSDetecting = (webId) => __awaiter
         throw e;
     }
 });
+ServiceSettingManager.prototype.initCoinminerDetecting = (webId) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let content = {
+            cmd: CMD[3],
+            data: {
+                webId: webId
+            }
+        };
+        let procPath = path.join(__dirname, '..', '..', 'tmp', 'activeProcs', `${webId}.json`);
+        yield writeFile(procPath, JSON.stringify(content), 'utf8');
+    }
+    catch (e) {
+        throw e;
+    }
+});
+ServiceSettingManager.prototype.destroyCoinminerDetecting = (webId) => {
+    try {
+        let checkedPath = path.join(__dirname, '..', '..', 'tmp', 'coinMinerTmp', `${webId}.txt`);
+        let bool = fs.existsSync(checkedPath);
+        if (bool == true) {
+            SubProcManager.destroyCoinminerDetectingProcess(webId);
+            let checkedDbPath = path.join(__dirname, '..', '..', 'data', 'store', 'filesDb', `coinminer_${webId}.json`);
+            fs.unlinkSync(checkedDbPath);
+        }
+    }
+    catch (e) {
+        throw e;
+    }
+};
 module.exports = ServiceSettingManager;
 //# sourceMappingURL=ServiceSettingManager.js.map

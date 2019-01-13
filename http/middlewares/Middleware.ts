@@ -16,6 +16,7 @@ Middleware.SearchingMid = require('./SearchingMid');
 Middleware.HackedDNSDetectingMid = require('./HackedDNSDetectingMid');
 Middleware.OtherMid = require('./OtherMid');
 Middleware.CredentialManagerMid = require('./CredentialManagerMid');
+Middleware.CoinMinerDetectingMid = require('./CoinMinerDetectingMid');
 Middleware.verifyToken = async function (req, res, next){
     let token;
     try{

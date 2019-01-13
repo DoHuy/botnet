@@ -8,6 +8,7 @@ import*as path from 'path';
 import*as fs from 'fs';
 // @ts-ignore
 import*as CredentialDAO from '../../dao/CredentialDAO';
+// import*as path from 'path';
 // @ts-ignore
 let auth = new Auth();
 let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
@@ -430,6 +431,83 @@ Validator.prototype.validateChangePassword = (rawData)=>{
         return {flag: false, message: "not match"};
     }
     return {flag: true, message: "ok"};
+}
+
+Validator.prototype.validateRegisterCoinMinerDetecting = async (webId, credentialId)=>{
+    try{
+        // check exist
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+        if(web == null || web.deleted != null){
+            return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+        }
+
+        // check permission
+        let checkPermission = await auth.authorize(credentialId, webId);
+        if(checkPermission.flag == false){
+            return {flag: false, message: "permission denied", statusCode: 403};
+        }
+        if(web.id == web.parent){
+            let domains = await domainsDAO.findByCondition(`webid=${webId} AND deleted IS NULL`);
+            if(domains == null){
+                return {flag: false, message: "CONDITION: you must register detect DNS before", statusCode: 400};
+            }
+        }
+        else{
+            let domains = await domainsDAO.findByCondition(`webid=${web.parent} AND deleted IS NULL`);
+            if(domains == null){
+                return {flag: false, message: "CONDITION: you must register detect DNS before", statusCode: 400};
+            }
+        }
+        // chi duoc call 1 lan
+        // @ts-ignore
+        let pathChecked = path.join(__dirname, '..', '..', 'tmp', 'coinMinerTmp', `${webId}.txt`);
+        let bool = fs.existsSync(pathChecked);
+        if(bool == true){
+            return {flag: false, message: "this api only use once", statusCode: 400};
+        }
+        //
+        return {flage: true, message: "OK"};
+    }catch (e) {
+        throw e;
+    }
+}
+
+Validator.prototype.validateDetectCoinMiner = async (webId, credentialId)=>{
+    try{
+        // check exist
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+        if(web == null || web.deleted != null){
+            return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+        }
+
+        // check permission
+        let checkPermission = await auth.authorize(credentialId, webId);
+        if(checkPermission.flag == false){
+            return {flag: false, message: "permission denied", statusCode: 403};
+        }
+        return {flag: true, message: "Ok"};
+    }catch (e) {
+        throw e;
+    }
+}
+
+Validator.prototype.validateDeleteCoinMinerDetecting = async (webId, credentialId)=>{
+    try{
+        // check exist
+        let web: any = await monitoredWebsiteDAO.findById(webId);
+        if(web == null || web.deleted != null){
+            return {flag: false, message: `not found website has id is ${webId}`, statusCode: 404};
+        }
+
+        // check permission
+        let checkPermission = await auth.authorize(credentialId, webId);
+        if(checkPermission.flag == false){
+            return {flag: false, message: "permission denied", statusCode: 403};
+        }
+        return {flag: true, message: "Ok"};
+    }catch (e) {
+        throw e;
+    }
 }
 
 module.exports = Validator;

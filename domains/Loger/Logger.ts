@@ -51,6 +51,14 @@ Logger.prototype.createLog = async (feature, jsonData, credentialId)=>{
                 // @ts-ignore
                 let deletingLogServiceD = new DeletingLogService(jsonData, credentialId);
                 logToMail = await deletingLogServiceD.logDeletingDNS();
+            case CONSTANT.LOG_FEATURES.registerDetectCoinMiner:
+                // @ts-ignore
+                let creatingLogServiceE = new CreatingLogService(jsonData, credentialId);
+                logToMail = await creatingLogServiceE.logCreatingDetectCoinMiner();
+            case CONSTANT.LOG_FEATURES.removeDetectCoinMiner:
+                // @ts-ignore
+                let deletingLogServiceE = new DeletingLogService(jsonData, credentialId);
+                logToMail = await deletingLogServiceE.logDeletingDetectingCoinMiner();
         }
 
         // send to mail credential

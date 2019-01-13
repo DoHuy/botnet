@@ -23,11 +23,13 @@ export const CHECK_PROXY_TIME = 3*60 * 60 * 1000 // default 3 hours
 
 export const DEFAULT_TIMEOUT = 30 * 1000; // nguoi dung khong truyen thi default = 100000
 
-export const FREQUENTLY_DEFAULT = 3 * 60 * 1000 // 1 phut // khoang thoi gian sau khi check xong trang web nay toi luc bat dau chek trang ke tiep
+export const DEFAULT_DETECT_COINMINER_TIME = 2*1000*60; // 2 phut
+
+export const FREQUENTLY_DEFAULT = 1 * 60 * 1000 // 1 phut // khoang thoi gian sau khi check xong trang web nay toi luc bat dau chek trang ke tiep
 
 export const MAX_FREQUENTLY = 24*60*60*1000;
 
-export const MIN_FREQUENTLY = 3*60*1000;
+export const MIN_FREQUENTLY = 1*60*1000;
 
 export const MAX_CONNECTION_TIMEOUT = 3*60*1000;
 

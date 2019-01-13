@@ -37,7 +37,18 @@ class DeletingLogService{
             throw e;
         }
     }
-
+    async logDeletingDetectingCoinMiner(){
+        try{
+            let rs: any = await logDAO.create({
+                log: this.jsonData.log,
+                created: this.jsonData.created,
+                credentialId: this.credentialId
+            });
+            return rs;
+        }catch (e) {
+            throw e;
+        }
+    }
 }
 
 

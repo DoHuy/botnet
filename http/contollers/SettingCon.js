@@ -78,6 +78,7 @@ SettingCon.removeWebsite = function (req, res) {
         try {
             check = yield configor.removeWebsite(req.params.id);
             check2 = yield configor.destroyHackedDNSDetecting(req.params.id);
+            yield configor.destroyCoinminerDetecting(req.params.id);
             let jsonLogData = {
                 log: CONSTANT.LOG_FEATURES.removeMonitoredWebsite,
                 created: new Date().toISOString()

@@ -210,5 +210,35 @@ SubProcManager.destroyHackedDNSDetectingProcess = (domainsId)=>{
         throw e;
     }
 };
+
+SubProcManager.initCoinminerDetectingProcess = (webId)=> {
+    try{
+        let proc: any = spawn('node', ['CoinminerDetectingProcess.js', webId],
+            {detached: true, stdio: 'ignore'});
+        proc.unref();
+
+        let procPath = path.join(__dirname, '..', '..', 'tmp', 'coinMinerTmp', `${webId}.txt`);
+        let procDir  = path.join(__dirname, '..', '..', 'tmp', 'coinMinerTmp');
+        let checkPath = fs.existsSync(procDir);
+        if(checkPath == false){
+            fs.mkdirSync(procDir);
+        }
+        fs.writeFileSync(procPath,proc.pid, 'utf8');
+        return proc;
+    }catch (e) {
+        throw e;
+    }
+}
+
+SubProcManager.destroyCoinminerDetectingProcess = (webId)=>{
+    let coinMinerProcPath = path.join(__dirname, '..', '..', 'tmp', 'coinMinerTmp', `${webId}.txt`);
+    try{
+        let pid = fs.readFileSync(coinMinerProcPath, 'utf8');
+        execSync(`kill ${pid}`);
+        fs.unlinkSync(coinMinerProcPath);
+    }catch (e) {
+        throw e;
+    }
+}
 //
 module.exports = SubProcManager;

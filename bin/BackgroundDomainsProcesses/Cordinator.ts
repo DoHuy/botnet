@@ -3,7 +3,7 @@ import *as fs from 'fs';
 // @ts-ignore
 import *as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
 
-const CMD = ['normal', 'advance', 'dns',  'deface'];
+const CMD = ['normal', 'advance', 'dns',  'detectMiner'];
 const monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 let counter=0;
 setInterval(() => {
@@ -32,6 +32,9 @@ setInterval(() => {
                                 // @ts-ignore
                                 SubProcManager.initHackedDNSDetectingProcess(chanvl.data.frequently, chanvl.data.domainsList, chanvl.data.ip, chanvl.data.domainsId);
                                 break;
+                            case CMD[3]:
+                                // @ts-ignore
+                                SubProcManager.initCoinminerDetectingProcess(chanvl.data.webId);
                         }
                         fs.unlink(path, (err)=>{
                             if(err) throw err;
@@ -42,4 +45,4 @@ setInterval(() => {
         }
     });
 
-}, 100000);
+}, 50000);

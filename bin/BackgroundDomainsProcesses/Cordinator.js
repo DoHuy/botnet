@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const SubProcManager = require("./SubProcManager");
 const fs = require("fs");
 const MonitoredWebsiteDAO = require("../../dao/MonitoredWebsiteDAO");
-const CMD = ['normal', 'advance', 'dns', 'deface'];
+const CMD = ['normal', 'advance', 'dns', 'detectMiner'];
 const monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 let counter = 0;
 setInterval(() => {
@@ -29,6 +29,8 @@ setInterval(() => {
                             case CMD[2]:
                                 SubProcManager.initHackedDNSDetectingProcess(chanvl.data.frequently, chanvl.data.domainsList, chanvl.data.ip, chanvl.data.domainsId);
                                 break;
+                            case CMD[3]:
+                                SubProcManager.initCoinminerDetectingProcess(chanvl.data.webId);
                         }
                         fs.unlink(path, (err) => {
                             if (err)
@@ -39,5 +41,5 @@ setInterval(() => {
             });
         }
     });
-}, 100000);
+}, 50000);
 //# sourceMappingURL=Cordinator.js.map

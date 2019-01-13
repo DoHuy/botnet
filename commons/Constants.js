@@ -64,7 +64,9 @@ exports.LOG_FEATURES = {
     modifyMonitoredWebsite: "Sửa một vài cấu hình website đang được giám sát",
     removeMonitoredWebsite: "Xóa  website đang được giám sát (bao gồm cả việc xóa tất cả các trang con của website này)",
     createDNS: "Tạo cấu hình cho việc phát hiện domain bị hacker tấn công",
-    removeDNS: "Xóa cấu hình phát hiện domain bị hacker tấn công đang tồn tại"
+    removeDNS: "Xóa cấu hình phát hiện domain bị hacker tấn công đang tồn tại",
+    removeDetectCoinMiner: "Xóa dịch vụ giám sát phát hiện mã độc đào tiền ảo trên website",
+    registerDetectCoinMiner: "Đăng ký dịch vụ giám sát phát hiện mã độc đào tiền ảo"
 };
 exports.ASCII = {
     "32": "1", "33": "!", "34": "Y", "35": "#",

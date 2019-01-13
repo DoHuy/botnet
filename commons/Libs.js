@@ -158,6 +158,11 @@ function convertDataToCsv(fields, data) {
     csv = `${fields}\n${data}`;
     return csv;
 }
+function getDomain(url) {
+    const match = url.match(/:\/\/(.[^/]+)/);
+    return match ? match[1] : '';
+}
+;
 module.exports = {
     generatePath,
     generateRandomLink,
@@ -168,6 +173,7 @@ module.exports = {
     base64DecodeUrl,
     getQueryUrl,
     convertDataToCsv,
-    generateRandomString
+    generateRandomString,
+    getDomain
 };
 //# sourceMappingURL=Libs.js.map

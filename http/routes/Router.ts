@@ -14,6 +14,7 @@ const ExportingRouter = require('./ExportingRouter');
 const HackedDNSDetectingRouter = require('./HackedDNSDetectingRouter');
 const OtherRouter = require('./OtherRouter');
 const CredentialManagerRouter = require('./CredentialManagerRouter');
+const CoinMinerDetectingRouter = require('./CoinMinerDetectingRouter');
 
 router.use('/api/v1/', UpDownCheckingRouter);
 router.use('/api/v1/', AuthRouter);
@@ -23,5 +24,6 @@ router.use('/api/v1/', HackedDNSDetectingRouter);
 router.use('/api/v1/', ExportingRouter);
 router.use('/api/v1/', OtherRouter);
 router.use('/api/v1/', CredentialManagerRouter);
+router.use('/api/v1/', CoinMinerDetectingRouter);
 
 module.exports = router;
