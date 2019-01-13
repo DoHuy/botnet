@@ -9,4 +9,5 @@ Controller.HackedDNSDetectingCon = require('./HackedDNSDetectingCon');
 Controller.ExportingCon = require('./ExportingCon');
 Controller.OtherCon = require('./OtherCon');
 Controller.CredentialManagerCon = require('./CredentialManagerCon');
+Controller.CoinMinerDetectingCon = require('./CoinMinerDetectingCon');
 module.exports = Controller;

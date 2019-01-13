@@ -359,5 +359,81 @@ Validator.prototype.validateChangePassword = (rawData) => {
     }
     return { flag: true, message: "ok" };
 };
+Validator.prototype.validateRegisterCoinMinerDetecting = (webId, credentialId) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let web = yield monitoredWebsiteDAO.findById(webId);
+        if (web == null || web.deleted != null) {
+            return { flag: false, message: `not found website has id is ${webId}`, statusCode: 404 };
+        }
+        let checkPermission = yield auth.authorize(credentialId, webId);
+        if (checkPermission.flag == false) {
+            return { flag: false, message: "permission denied", statusCode: 403 };
+        }
+        if (web.id == web.parent) {
+            let domains = yield domainsDAO.findByCondition(`webid=${webId} AND deleted IS NULL`);
+            if (domains == null) {
+                return { flag: false, message: "CONDITION: you must register detect DNS before", statusCode: 400 };
+            }
+        }
+        else {
+            let domains = yield domainsDAO.findByCondition(`webid=${web.parent} AND deleted IS NULL`);
+            if (domains == null) {
+                return { flag: false, message: "CONDITION: you must register detect DNS before", statusCode: 400 };
+            }
+        }
+        let pathChecked = path.join(__dirname, '..', '..', 'tmp', 'coinMinerTmp', `${webId}.txt`);
+        let bool = fs.existsSync(pathChecked);
+        if (bool == true) {
+            return { flag: false, message: "this api only use once", statusCode: 400 };
+        }
+        return { flage: true, message: "OK" };
+    }
+    catch (e) {
+        throw e;
+    }
+});
+Validator.prototype.validateDetectCoinMiner = (webId, credentialId) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let web = yield monitoredWebsiteDAO.findById(webId);
+        if (web == null || web.deleted != null) {
+            return { flag: false, message: `not found website has id is ${webId}`, statusCode: 404 };
+        }
+        let checkPermission = yield auth.authorize(credentialId, webId);
+        if (checkPermission.flag == false) {
+            return { flag: false, message: "permission denied", statusCode: 403 };
+        }
+        let pathCheck = path.join(__dirname, '..', '..', 'data', 'store', 'filesDb');
+        let contentOfDir = fs.readdirSync(pathCheck);
+        let flag = false;
+        contentOfDir.forEach(e => {
+            if (e == `coinminer_${webId}.json`) {
+                flag = true;
+            }
+        });
+        if (flag == false) {
+            return { flag: false, message: "not found", statusCode: 404 };
+        }
+        return { flag: true, message: "Ok" };
+    }
+    catch (e) {
+        throw e;
+    }
+});
+Validator.prototype.validateDeleteCoinMinerDetecting = (webId, credentialId) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let web = yield monitoredWebsiteDAO.findById(webId);
+        if (web == null || web.deleted != null) {
+            return { flag: false, message: `not found website has id is ${webId}`, statusCode: 404 };
+        }
+        let checkPermission = yield auth.authorize(credentialId, webId);
+        if (checkPermission.flag == false) {
+            return { flag: false, message: "permission denied", statusCode: 403 };
+        }
+        return { flag: true, message: "Ok" };
+    }
+    catch (e) {
+        throw e;
+    }
+});
 module.exports = Validator;
 //# sourceMappingURL=Validator.js.map

@@ -46,6 +46,12 @@ Logger.prototype.createLog = (feature, jsonData, credentialId) => __awaiter(this
             case CONSTANT.LOG_FEATURES.removeDNS:
                 let deletingLogServiceD = new DeletingLogService(jsonData, credentialId);
                 logToMail = yield deletingLogServiceD.logDeletingDNS();
+            case CONSTANT.LOG_FEATURES.registerDetectCoinMiner:
+                let creatingLogServiceE = new CreatingLogService(jsonData, credentialId);
+                logToMail = yield creatingLogServiceE.logCreatingDetectCoinMiner();
+            case CONSTANT.LOG_FEATURES.removeDetectCoinMiner:
+                let deletingLogServiceE = new DeletingLogService(jsonData, credentialId);
+                logToMail = yield deletingLogServiceE.logDeletingDetectingCoinMiner();
         }
         let form = `<h2>Chức năng:  ${feature}</h2>
                     <h4><i>Đã được tài khoản của bạn thực hiện lúc:  ${new Date(logToMail.created)}</i></h4> <br>`;

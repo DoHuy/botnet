@@ -45,6 +45,21 @@ class DeletingLogService {
             }
         });
     }
+    logDeletingDetectingCoinMiner() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let rs = yield logDAO.create({
+                    log: this.jsonData.log,
+                    created: this.jsonData.created,
+                    credentialId: this.credentialId
+                });
+                return rs;
+            }
+            catch (e) {
+                throw e;
+            }
+        });
+    }
 }
 module.exports = DeletingLogService;
 //# sourceMappingURL=DeletingLogService.js.map

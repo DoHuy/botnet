@@ -11,6 +11,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Configor = require("../../domains/MonitorServices/ServiceSettingManager");
 const CONSTANT = require("../../commons/Constants");
 const Logger = require("../../domains/Loger/Logger");
+const MonitoredWebsiteDAO = require("../../dao/MonitoredWebsiteDAO");
+let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
 const configor = new Configor();
 const logger = new Logger();
 let SettingCon = {};
@@ -76,15 +78,18 @@ SettingCon.removeWebsite = function (req, res) {
         let check;
         let check2;
         try {
+            let web = yield monitoredWebsiteDAO.findByCondition(`parent=${req.params.id}`);
             check = yield configor.removeWebsite(req.params.id);
-            check2 = yield configor.destroyHackedDNSDetecting(req.params.id);
+            web.forEach((e) => __awaiter(this, void 0, void 0, function* () {
+                yield configor.destroyHackedDNSDetecting(e.id);
+                yield configor.destroyCoinminerDetecting(e.id);
+            }));
             let jsonLogData = {
                 log: CONSTANT.LOG_FEATURES.removeMonitoredWebsite,
                 created: new Date().toISOString()
             };
             yield logger.createLog(CONSTANT.LOG_FEATURES.removeMonitoredWebsite, jsonLogData, req.credentialId);
-            if (check && check2)
-                return res.status(200).send({ flag: true, message: "remove successfully" });
+            return res.status(200).send({ flag: true, message: "remove successfully" });
         }
         catch (e) {
             return res.status(500).send({ flag: false, message: e.message });

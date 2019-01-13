@@ -2,6 +2,9 @@ import*as Configor from '../../domains/MonitorServices/ServiceSettingManager';
 import*as CONSTANT from '../../commons/Constants';
 import*as Logger from '../../domains/Loger/Logger';
 // @ts-ignore
+import*as MonitoredWebsiteDAO from '../../dao/MonitoredWebsiteDAO';
+let monitoredWebsiteDAO = new MonitoredWebsiteDAO();
+// @ts-ignore
 const configor = new Configor();
 // @ts-ignore
 const logger = new Logger();
@@ -71,8 +74,14 @@ SettingCon.removeWebsite = async function (req, res){
     let check;
     let check2;
     try{
+        let web: any = await monitoredWebsiteDAO.findByCondition(`parent=${req.params.id}`);
         check = await configor.removeWebsite(req.params.id);
-        check2 = await configor.destroyHackedDNSDetecting(req.params.id);
+        // remove coinMiner
+        web.forEach(async e=>{
+            await configor.destroyHackedDNSDetecting(e.id);
+            await configor.destroyCoinminerDetecting(e.id);
+        });
+        //
         // ghi log
         let jsonLogData = {
             log: CONSTANT.LOG_FEATURES.removeMonitoredWebsite,
@@ -80,7 +89,7 @@ SettingCon.removeWebsite = async function (req, res){
         };
         await logger.createLog(CONSTANT.LOG_FEATURES.removeMonitoredWebsite, jsonLogData, req.credentialId);
         //
-        if(check && check2)return res.status(200).send({flag: true, message:"remove successfully"});
+       return res.status(200).send({flag: true, message:"remove successfully"});
     }catch (e) {
         return res.status(500).send({flag: false, message: e.message});
     }

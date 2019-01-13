@@ -50,7 +50,7 @@ export const STATUS_CODE = [
     ["306", {"code": "UNUSED", "message": "The 306 status code was used in a previous version of the specification, is no longer used, and the code is reserved"}],
     ["307", {"code": "Temporary Redirect".toLocaleUpperCase(), "message": "The requested resource resides temporarily under a different URI. Since the redirection MAY be altered on occasion, the client SHOULD continue to use the Request-URI for future requests"}],
     ["400", {"code": "BAD REQUEST", "message": "The request could not be understood by the server due to malformed syntax"}],
-    ["401", {"code": "UNAUTHORIZED", "message": "The request requires user authentication"}],
+    ["401", {"code": "UNAUTHORIZED", "message": "The request requires user Auth"}],
     ["402", {"code": "PAYMENT REQUIRED", "message":"This code is reserved for future use"}],
     ["403", {"code":"Forbidden".toLocaleUpperCase(), "message": "The server understood the request, but is refusing to fulfill it"}],
     ["404", {"code":"NOT FOUND", "messaage": "The server has not found anything matching the Request-URI" }],
@@ -72,7 +72,9 @@ export const LOG_FEATURES = {
     modifyMonitoredWebsite: "Sửa một vài cấu hình website đang được giám sát",
     removeMonitoredWebsite: "Xóa  website đang được giám sát (bao gồm cả việc xóa tất cả các trang con của website này)",
     createDNS: "Tạo cấu hình cho việc phát hiện domain bị hacker tấn công",
-    removeDNS: "Xóa cấu hình phát hiện domain bị hacker tấn công đang tồn tại"
+    removeDNS: "Xóa cấu hình phát hiện domain bị hacker tấn công đang tồn tại",
+    removeDetectCoinMiner: "Xóa dịch vụ giám sát phát hiện mã độc đào tiền ảo trên website",
+    registerDetectCoinMiner: "Đăng ký dịch vụ giám sát phát hiện mã độc đào tiền ảo"
 };
 
 export const ASCII = {

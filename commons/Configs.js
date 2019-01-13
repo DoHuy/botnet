@@ -15,13 +15,14 @@ exports.SERVER = {
     "SERVER_PORT": 8080,
     "HOST_NAME": "localhost"
 };
-exports.DEPLOY = `http://app.vnist.vn`;
-exports.COORDINATOR_TIME = 20000;
+exports.DEPLOY = `localhost:8080`;
+exports.COORDINATOR_TIME = 10000;
 exports.CHECK_PROXY_TIME = 3 * 60 * 60 * 1000;
 exports.DEFAULT_TIMEOUT = 30 * 1000;
-exports.FREQUENTLY_DEFAULT = 3 * 60 * 1000;
+exports.DEFAULT_DETECT_COINMINER_TIME = 1 * 1000 * 60;
+exports.FREQUENTLY_DEFAULT = 1 * 60 * 1000;
 exports.MAX_FREQUENTLY = 24 * 60 * 60 * 1000;
-exports.MIN_FREQUENTLY = 3 * 60 * 1000;
+exports.MIN_FREQUENTLY = 1 * 60 * 1000;
 exports.MAX_CONNECTION_TIMEOUT = 3 * 60 * 1000;
 exports.MIN_CONNECTION_TIMEOUT = 30 * 1000;
 exports.SECRET_KEY = 'huy_dep_zai';
