@@ -125,7 +125,7 @@ AdvanceUpDownCheckingProcess.run = async function () {
 
 // AdvanceUpDownCheckingProcess.run();
 
-// // // test done
+//test done
 setInterval(()=>{
     AdvanceUpDownCheckingProcess.run();
 }, AdvanceUpDownCheckingProcess.frequently);

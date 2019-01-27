@@ -27,32 +27,48 @@ CurrentIpCheckingProc.run = function () {
         let created = `${new Date().toISOString()}`;
         let infoIp = yield exec(`curl https://ipinfo.io`);
         let location = JSON.parse(infoIp.stdout);
-        let image = `${created}.png`;
-        let imagePath = Lib.generatePath(__dirname, CONSTANT.PATH.FILE_DATA_PATH, image);
         let tmp = {};
         let map = new Map(CONSTANT.STATUS_CODE);
         let metric;
         try {
-            metric = yield Lib.requestWithPuppeteer(CurrentIpCheckingProc.url, imagePath, null, CurrentIpCheckingProc.connectionTimeout);
+            metric = yield Lib.requestWithCurl(CurrentIpCheckingProc.url, null, CurrentIpCheckingProc.connectionTimeout);
             if (metric.status == '500') {
                 response = {
                     DNSLookup: 0,
                     InitConnection: 0,
                     DataTransfer: 0,
-                    ResponseTime: 0,
                     WaitTime: 0,
+                    SSLHandshake: 0,
+                    TotalTime: 0,
                     averageResponseTime: 0,
                     maxResponseTime: 0,
                     minResponseTime: 0,
                     location: location
                 };
                 notification = {
-                    server: null,
                     statusCode: metric.status,
-                    code: map.get(`${metric.status}`).code,
-                    message: metric.message,
+                    message: map.get(`${metric.status}`).code,
                     state: Configs_1.NOTICE_RULE.state[1],
-                    img: `${CONFIG.DEPLOY}/${image}`,
+                    level: "error"
+                };
+            }
+            else if (metric.status != '200') {
+                response = {
+                    DNSLookup: metric.DNSLookup,
+                    InitConnection: metric.InitConnection,
+                    DataTransfer: metric.DataTransfer,
+                    WaitTime: metric.WaitTime,
+                    SSLHandshake: metric.SSLHandshake,
+                    TotalTime: metric.TotalTime,
+                    averageResponseTime: 0,
+                    maxResponseTime: 0,
+                    minResponseTime: 0,
+                    location: location
+                };
+                notification = {
+                    statusCode: metric.status,
+                    message: map.get(`${metric.status}`).code,
+                    state: Configs_1.NOTICE_RULE.state[1],
                     level: "error"
                 };
             }
@@ -77,9 +93,9 @@ CurrentIpCheckingProc.run = function () {
                     DNSLookup: metric.DNSLookup,
                     InitConnection: metric.InitConnection,
                     DataTransfer: metric.DataTransfer,
-                    ResponseTime: metric.ResponseTime,
                     WaitTime: metric.WaitTime,
-                    averageResponseTime: 0,
+                    SSLHandshake: metric.SSLHandshake,
+                    TotalTime: metric.TotalTime,
                     maxResponseTime: 0,
                     minResponseTime: 0,
                     location: location
@@ -89,20 +105,20 @@ CurrentIpCheckingProc.run = function () {
                 let totalResp = 0;
                 let count = 0;
                 for (let i in details) {
-                    if (details[i].ResponseTime != Number.MIN_SAFE_INTEGER) {
+                    if (details[i].TotalTime != Number.MIN_SAFE_INTEGER) {
                         if (details[i].multipleCountries == undefined) {
-                            if (details[i].ResponseTime != 0) {
-                                averageResponseTime += details[i].ResponseTime;
-                                maxResponseTime = maxResponseTime >= details[i].ResponseTime ? maxResponseTime : details[i].ResponseTime;
-                                minResponseTime = minResponseTime <= details[i].ResponseTime ? minResponseTime : details[i].ResponseTime;
+                            if (details[i].TotalTime != 0) {
+                                averageResponseTime += details[i].TotalTime;
+                                maxResponseTime = maxResponseTime >= details[i].TotalTime ? maxResponseTime : details[i].TotalTime;
+                                minResponseTime = minResponseTime <= details[i].TotalTime ? minResponseTime : details[i].TotalTime;
                                 count++;
                             }
                         }
                         else {
-                            if (details[i].ResponseTime != 0) {
-                                averageResponseTime += details[i].response.ResponseTime;
-                                maxResponseTime = maxResponseTime >= details[i].response.ResponseTime ? maxResponseTime : details[i].response.ResponseTime;
-                                minResponseTime = minResponseTime <= details[i].response.ResponseTime ? minResponseTime : details[i].response.ResponseTime;
+                            if (details[i].TotalTime != 0) {
+                                averageResponseTime += details[i].response.TotalTime;
+                                maxResponseTime = maxResponseTime >= details[i].response.TotalTime ? maxResponseTime : details[i].response.TotalTime;
+                                minResponseTime = minResponseTime <= details[i].response.TotalTime ? minResponseTime : details[i].response.TotalTime;
                                 count++;
                             }
                         }
@@ -113,23 +129,21 @@ CurrentIpCheckingProc.run = function () {
                     DNSLookup: metric.DNSLookup,
                     InitConnection: metric.InitConnection,
                     DataTransfer: metric.DataTransfer,
-                    ResponseTime: metric.ResponseTime,
                     WaitTime: metric.WaitTime,
+                    SSLHandshake: metric.SSLHandshake,
+                    TotalTime: metric.TotalTime,
                     averageResponseTime: averageResponseTime,
                     maxResponseTime: maxResponseTime,
                     minResponseTime: minResponseTime,
                     location: location
                 };
-                tmp.server = metric.server;
                 tmp.statusCode = metric.status;
-                tmp.code = map.get(`${metric.status}`).code;
-                tmp.message = map.get(`${metric.status}`).message;
+                tmp.message = map.get(`${metric.status}`).code;
                 tmp.state = Configs_1.NOTICE_RULE.state[0];
-                tmp.img = `${CONFIG.DEPLOY}/${image}`;
-                if (tmp.statusCode == '200' && metric.ResponseTime <= CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success) {
+                if (tmp.statusCode == '200' && metric.TotalTime <= CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success) {
                     tmp.level = "success";
                 }
-                else if (tmp.statusCode == '200' && metric.ResponseTime > CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success) {
+                else if (tmp.statusCode == '200' && metric.TotalTime > CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success) {
                     tmp.level = "warning";
                 }
                 else {

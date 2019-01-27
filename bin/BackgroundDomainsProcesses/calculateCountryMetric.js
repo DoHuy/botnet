@@ -17,9 +17,7 @@ const calculateMetric = (country, connectionTimeout, url) => __awaiter(this, voi
     let notification;
     let created = `${new Date().toISOString()}`;
     let metric;
-    let image = `${created}.png`;
     let map = new Map(CONSTANT.STATUS_CODE);
-    let imagePath = Lib.generatePath(__dirname, CONSTANT.PATH.FILE_DATA_PATH, image);
     let tmp = {};
     let proxyList = [];
     const MAX = 3;
@@ -34,7 +32,7 @@ const calculateMetric = (country, connectionTimeout, url) => __awaiter(this, voi
     try {
         for (let i = 0; i < proxyList.length; i++) {
             let proxy = proxyList[i];
-            metric = yield Lib.requestWithPuppeteer(url, imagePath, {
+            metric = yield Lib.requestWithCurl(url, {
                 ip: proxy.ip,
                 port: proxy.port
             }, connectionTimeout);
@@ -46,17 +44,33 @@ const calculateMetric = (country, connectionTimeout, url) => __awaiter(this, voi
                     DNSLookup: 0,
                     InitConnection: 0,
                     DataTransfer: 0,
-                    ResponseTime: 0,
+                    TotalTime: 0,
                     WaitTime: 0,
+                    SSLHandshake: 0,
                     location: proxy.details
                 };
                 let notification = {
-                    server: metric.server,
                     statusCode: metric.status,
-                    code: map.get(`${metric.status}`).code,
-                    message: metric.message,
+                    message: map.get(`${metric.status}`).code,
                     state: Configs_1.NOTICE_RULE.state[1],
-                    img: `${CONFIG.DEPLOY}/${image}`,
+                    level: "error"
+                };
+                return { response, notification };
+            }
+            else if (metric.status != '200' && count == MAX - 1) {
+                let response = {
+                    DNSLookup: metric.DNSLookup,
+                    InitConnection: metric.InitConnection,
+                    DataTransfer: metric.DataTransfer,
+                    WaitTime: metric.WaitTime,
+                    SSLHandshake: metric.SSLHandshake,
+                    TotalTime: metric.TotalTime,
+                    location: proxy.details
+                };
+                let notification = {
+                    statusCode: metric.status,
+                    message: map.get(`${metric.status}`).code,
+                    state: Configs_1.NOTICE_RULE.state[1],
                     level: "error"
                 };
                 return { response, notification };
@@ -68,18 +82,16 @@ const calculateMetric = (country, connectionTimeout, url) => __awaiter(this, voi
                     DNSLookup: metric.DNSLookup,
                     InitConnection: metric.InitConnection,
                     DataTransfer: metric.DataTransfer,
-                    ResponseTime: Math.abs(metric.ResponseTime - Number.parseFloat(proxy.responseTime)),
                     WaitTime: metric.WaitTime,
+                    SSLHandshake: metric.SSLHandshake,
+                    TotalTime: metric.TotalTime,
                     location: proxy.details
                 };
-                let level = newResponse.ResponseTime > CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success ? CONFIG.NOTICE_RULE.levels[1] : CONFIG.NOTICE_RULE.levels[0];
+                let level = newResponse.TotalTime > CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success ? CONFIG.NOTICE_RULE.levels[1] : CONFIG.NOTICE_RULE.levels[0];
                 newNotification = {
-                    server: metric.server,
                     statusCode: metric.status,
-                    code: map.get(`${metric.status}`).code,
                     message: map.get(`${metric.status}`).message,
                     state: Configs_1.NOTICE_RULE.state[0],
-                    img: `${CONFIG.DEPLOY}/${image}`,
                     level: level
                 };
                 response = newResponse;

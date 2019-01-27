@@ -21,7 +21,7 @@ MultipleCountryCheckingProc.run = async (countriesList: any)=>{
     let country1=[], country2=[], country3=[], country4=[];
     let countries = [];
     countriesList = JSON.parse(countriesList);
-    countriesList = JSON.parse(countriesList);
+    // countriesList = JSON.parse(countriesList);
 
     for(let i=0 ; i<countriesList.length ; i++){
         let e = countriesList[i];

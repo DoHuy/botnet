@@ -24,11 +24,11 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
     let notification: any; //{notification: {server, status, level, message}
     let created: any = `${new Date().toISOString()}`;
     let metric: any;
-    let image = `${created}.png`;
+    // let image = `${created}.png`;
     // @ts-ignore
     let map: any = new Map(CONSTANT.STATUS_CODE);
     // @ts-ignore
-    let imagePath = Lib.generatePath(__dirname, CONSTANT.PATH.FILE_DATA_PATH, image);
+    // let imagePath = Lib.generatePath(__dirname, CONSTANT.PATH.FILE_DATA_PATH, image);
 
     // co 3 level: success, warning, error
     let tmp:any={}; //{server, statusCode, code, state, level, message, img} // tmp la bien tam giu thong tin cua notification
@@ -53,7 +53,7 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
         for(let i=0 ; i<proxyList.length ; i++){
             let proxy = proxyList[i];
             // @ts-ignore
-            metric= await Lib.requestWithPuppeteer(url, imagePath, {ip: proxy.ip, port: proxy.port}, connectionTimeout);
+            metric= await Lib.requestWithCurl(url, {ip: proxy.ip, port: proxy.port}, connectionTimeout);
 
             if((metric.status == '500' || metric.status == 500) && count != MAX-1){
                 count++;
@@ -65,18 +65,37 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
                     DNSLookup: 0,
                     InitConnection: 0,
                     DataTransfer: 0,
-                    ResponseTime: 0,
                     WaitTime: 0,
+                    SSLHandshake: 0,
+                    TotalTime: 0,
                     location: proxy.details
 
                 };
                 notification = {
-                    server: metric.server,
                     statusCode: metric.status,
-                    code: map.get(`${metric.status}`).code,
-                    message: metric.message,
+                    message: map.get(`${metric.status}`).code,
                     state: NOTICE_RULE.state[1],
-                    img: `${CONFIG.DEPLOY}/${image}`,
+                    level: "error"
+                };
+
+                return {response, notification};
+            }
+            else if((metric.status != '200') && count == MAX-1){
+                // throw e/ neu co loi xay ra
+                response = {
+                    DNSLookup: metric.DNSLookup,
+                    InitConnection: metric.InitConnection,
+                    DataTransfer: metric.DataTransfer,
+                    WaitTime: metric.WaitTime,
+                    SSLHandshake: metric.SSLHandshake,
+                    TotalTime: metric.TotalTime,
+                    location: proxy.details
+
+                };
+                notification = {
+                    statusCode: metric.status,
+                    message: map.get(`${metric.status}`).code,
+                    state: NOTICE_RULE.state[1],
                     level: "error"
                 };
 
@@ -91,20 +110,18 @@ const calculateMetric = async (city, connectionTimeout, url)=>{
                     DNSLookup: metric.DNSLookup,
                     InitConnection: metric.InitConnection,
                     DataTransfer: metric.DataTransfer,
-                    ResponseTime: Math.abs(metric.ResponseTime - Number.parseFloat(proxy.responseTime)),
                     WaitTime: metric.WaitTime,
+                    SSLHandshake: metric.SSLHandshake,
+                    TotalTime: metric.TotalTime,
                     location: proxy.details
                 };
 
-                let level: any = newResponse.ResponseTime>CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success?CONFIG.NOTICE_RULE.levels[1]:CONFIG.NOTICE_RULE.levels[0];
+                let level: any = newResponse.TotalTime>CONFIG.NOTICE_RULE.connectionTimeout["threshold"].success?CONFIG.NOTICE_RULE.levels[1]:CONFIG.NOTICE_RULE.levels[0];
 
                 newNotification = {
-                    server: metric.server,
                     statusCode: metric.status,
-                    code: map.get(`${metric.status}`).code,
-                    message: map.get(`${metric.status}`).message,
-                    state: NOTICE_RULE.state[0],
-                    img: `${CONFIG.DEPLOY}/${image}`,
+                    message: map.get(`${metric.status}`).code,
+                    state: NOTICE_RULE.state[1],
                     level: level
                 };
 
@@ -188,5 +205,5 @@ MultipleIspCheckingProc.run = async ()=>{
 MultipleIspCheckingProc.run().then(rs=>{
     process.send(rs);
     process.exit(0);
-    // console.log(JSON.stringify(rs));
+    console.log(JSON.stringify(rs));
 });

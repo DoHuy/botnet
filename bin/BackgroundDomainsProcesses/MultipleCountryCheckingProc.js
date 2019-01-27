@@ -20,7 +20,6 @@ MultipleCountryCheckingProc.run = (countriesList) => __awaiter(this, void 0, voi
     let country1 = [], country2 = [], country3 = [], country4 = [];
     let countries = [];
     countriesList = JSON.parse(countriesList);
-    countriesList = JSON.parse(countriesList);
     for (let i = 0; i < countriesList.length; i++) {
         let e = countriesList[i];
         countries.push(e.key);
