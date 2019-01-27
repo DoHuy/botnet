@@ -39,22 +39,25 @@ function requestCurl(url, proxyServer = null, timeOutProxy = null) {
         let result = {};
         let timeout = timeOutProxy == null ? config.DEFAULT_TIMEOUT : timeOutProxy;
         let cmd = proxyServer !== null
-            ? `curl --max-time ${timeout} --proxy http://${proxyServer.ip}:${proxyServer.port} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`
-            : `curl --max-time ${timeout} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total}" -o /dev/null -s "${url}"`;
+            ? `curl --max-time ${timeout} --proxy http://${proxyServer.ip}:${proxyServer.port} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total} %{size_download}" -o /dev/null -s "${url}"`
+            : `curl --max-time ${timeout} -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_pretransfer} %{time_redirect} %{time_starttransfer} %{time_total} %{size_download}" -o /dev/null -s "${url}"`;
         try {
             let tmp = yield exec(cmd);
             let tmp2 = tmp.stdout.split(" ");
             let fields = ['http_code', 'time_namelookup', 'time_connect',
                 'time_appconnect', 'time_pretransfer', 'time_redirect',
-                'time_starttransfer', 'time_total'];
+                'time_starttransfer', 'time_total', 'size_download'];
             for (let i = 0; i < fields.length; i++) {
                 rawResult[fields[i]] = Number.parseFloat(tmp2[i].trim().replace(",", "."));
             }
             result.DNSLookup = rawResult.time_namelookup;
-            result.ConnectionTime = rawResult.time_connect - rawResult.time_namelookup + rawResult.time_appconnect - rawResult.time_connect;
-            result.WaitTime = rawResult.time_starttransfer - rawResult.time_appconnect;
+            result.ConnectionTime = rawResult.time_connect - rawResult.time_namelookup;
+            result.WaitTime = rawResult.time_starttransfer - rawResult.time_pretransfer;
+            result.SSLHandshake = rawResult.time_appconnect - rawResult.time_connect;
             result.DataTransfer = rawResult.time_total - rawResult.time_starttransfer;
             result.TotalTime = rawResult.time_total;
+            result.statusCode = rawResult.http_code;
+            result.pageSize = rawResult.size_download;
         }
         catch (e) {
             throw e;
@@ -105,9 +108,6 @@ function requestWithPuppeteer(url, imagePath, proxyServer = null, timeOutProxy =
             return result;
         }
         catch (e) {
-            yield page.screenshot({
-                path: imagePath
-            });
             yield browser.close();
             return {
                 server: "NOT AVAILABLE",
@@ -176,4 +176,7 @@ module.exports = {
     generateRandomString,
     getDomain
 };
+requestCurl("https://news.zing.vn", { ip: "42.115.26.154", port: "8080" }, "10000").then(rs => {
+    console.log(rs);
+});
 //# sourceMappingURL=Libs.js.map

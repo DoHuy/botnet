@@ -17,7 +17,7 @@ export const SERVER = {
 }
 
 
-export const DEPLOY = `http://app.vnist.vn`; // cai nay de sua khi deploy
+export const DEPLOY = `http://localhost:8080`; // cai nay de sua khi deploy
 
 export const COORDINATOR_TIME = 10000; // thoi gian kiem tra viec tao tien trinh con moi
 
