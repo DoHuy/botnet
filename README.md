@@ -1,21 +1,21 @@
 # Botnet
-###Monitoring status website
+### Monitoring status website
 
-#####Technical stack:
+##### Technical stack:
 1. Nodejs
 2. TypeScript
 3. PostgreSql
 4. Redis
 5. Nginx
 
-#####Features:
+##### Features:
 1. Check status website from host
 2. Check status website from multiple hosts
 3. Check status website from hosts of the others ADSL providers
 3. Detect expired domain or hacked domain
 4. Detect trojans "coinhive" (which is poison script support illegal coin miner)
 5. Trace action of account, send to user email
-#####How to build ?
+##### How to build ?
 
 1. Install Nginx and PostgreSQL
 2. Install Nodejs
